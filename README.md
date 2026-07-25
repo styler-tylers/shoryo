@@ -1,1 +1,1 @@
-# shoryo-v1.0
+# shoryo
