@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>渉猟 v1.1 — 国会図書館全文検索</title>
+
+<!-- changelog
+v1.1 (2026-07-25) HTTPエラーとCORS失敗を判別／刊年を編集可能に／コマ未指定時は出典コピーを抑止
+v1.0 (2026-07-25) 初版
+  - 次世代デジタルライブラリー Book API による横断全文検索
+  - Page API による資料内検索(ヒットコマ一覧 + スニペット)
+  - IIIF Image API による紙面画像表示(見せ場: 文字と紙面の併置)
+  - source-citation 準拠の出典書式書き出し(等級 A/B/C 選択式)
+  - CORS不通時に自動で手動モードへ退避(URL提示 + JSON貼付解析)
+-->
+
+<style>
+:root{
+  /* 玄冬 */
+  --ji:#171F2B; --men:#202A3C; --moji:#EAEFF5; --hojo:#8A93A5;
+  --hi:#C8963E; --shu:#B3402E; --seiji:#6AA89D; --fuji:#8B7FA6;
+  --sen:#303C53;
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  --gothic:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+  --mono:"SF Mono","Menlo",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ji);color:var(--moji);
+  font-family:var(--gothic);font-size:16px;line-height:1.8;
+  -webkit-text-size-adjust:100%;min-height:100dvh;
+}
+
+header{padding:24px 24px 16px;padding-top:calc(24px + env(safe-area-inset-top));border-bottom:1px solid var(--sen)}
+header h1{font-family:var(--mincho);font-weight:600;letter-spacing:.24em;font-size:28px;margin:0;line-height:1.4}
+header h1 .ver{font-family:var(--mono);font-size:12px;letter-spacing:0;color:var(--hojo);margin-left:12px;vertical-align:middle}
+header .sub{margin:4px 0 0;font-size:12px;color:var(--hojo);letter-spacing:.04em}
+
+.ctrl{padding:16px 24px 24px;border-bottom:1px solid var(--sen)}
+.searchrow{display:flex;gap:8px}
+input[type=text],input[type=search],select,textarea{
+  background:var(--men);color:var(--moji);border:1px solid var(--sen);border-radius:2px;
+  font-family:var(--gothic);font-size:16px;line-height:1.6;padding:10px 12px;min-height:44px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--hi)}
+#q{flex:1 1 auto;min-width:0}
+button{font-family:var(--gothic);font-size:14px;line-height:1;min-height:44px;padding:0 18px;
+  background:transparent;color:var(--hi);border:1px solid var(--hi);border-radius:2px;
+  cursor:pointer;touch-action:manipulation;letter-spacing:.04em}
+button:active{background:rgba(200,150,62,.16)}
+button.ghost{color:var(--hojo);border-color:var(--sen)}
+button.ghost:active{background:rgba(255,255,255,.05)}
+
+.presets{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;min-height:34px;padding:0 12px;color:var(--hojo);
+  border:1px solid var(--sen);background:transparent;border-radius:2px;
+  cursor:pointer;touch-action:manipulation;font-family:var(--gothic)}
+.chip:active{border-color:var(--hi);color:var(--hi)}
+
+.filters{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.filters label{font-size:12px;color:var(--hojo);letter-spacing:.04em}
+.filters select{font-size:14px;min-height:38px;padding:6px 10px}
+.pid-jump{display:flex;gap:8px;align-items:center}
+.pid-jump input{width:130px;font-family:var(--mono);font-size:16px}
+
+#status{padding:16px 24px;font-size:13px;color:var(--hojo);letter-spacing:.04em;font-family:var(--mono)}
+#status.err{color:var(--shu)}
+
+#manual{margin:0 24px 24px;padding:20px;border:1px solid var(--sen);border-left:2px solid var(--hi);
+  background:var(--men);border-radius:2px}
+#manual h2{font-family:var(--mincho);font-size:16px;margin:0 0 8px;letter-spacing:.08em}
+#manual p{font-size:13px;color:var(--hojo);margin:0 0 16px}
+#manual .url{font-family:var(--mono);font-size:12px;word-break:break-all;background:var(--ji);
+  border:1px solid var(--sen);padding:12px;border-radius:2px;color:var(--seiji);line-height:1.7}
+#manual .row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+#manual textarea{width:100%;height:120px;margin-top:16px;font-family:var(--mono);font-size:13px}
+
+#results{list-style:none;margin:0;padding:0 24px 40px}
+.item{padding:24px 0;border-bottom:1px solid var(--sen);cursor:pointer;touch-action:manipulation}
+.item.sel{border-left:2px solid var(--hi);padding-left:16px;margin-left:-18px;
+  background:linear-gradient(90deg,rgba(200,150,62,.09),transparent 60%)}
+.item .title{font-family:var(--mincho);font-size:20px;font-weight:600;letter-spacing:.04em;line-height:1.5;margin:0}
+.item .meta{font-size:12px;color:var(--hojo);margin-top:4px;font-family:var(--mono)}
+.item .meta .classic{color:var(--fuji)}
+.item .snips{margin-top:12px}
+.snip{font-size:14px;line-height:1.9;padding-left:14px;border-left:1px solid var(--sen);margin-bottom:6px}
+.snip em{font-style:normal;color:var(--hi);font-weight:600}
+#more{display:block;margin:0 auto 64px}
+
+#panel{position:fixed;left:0;right:0;bottom:0;z-index:20;max-height:82dvh;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;background:var(--men);border-top:1px solid var(--hi);
+  transform:translateY(101%);transition:transform .22s ease-in-out;
+  padding:24px 24px calc(40px + env(safe-area-inset-bottom));box-shadow:0 -8px 32px rgba(0,0,0,.45)}
+#panel.open{transform:translateY(0)}
+#panel .close{position:absolute;top:16px;right:16px}
+#panel h2{font-family:var(--mincho);font-size:20px;margin:0 96px 4px 0;letter-spacing:.04em;line-height:1.5}
+#panel .pmeta{font-family:var(--mono);font-size:12px;color:var(--hojo);margin-bottom:24px}
+#panel .pmeta a{color:var(--seiji)}
+#panel section{margin-top:40px}
+#panel section>h3{font-family:var(--mincho);font-size:14px;letter-spacing:.12em;color:var(--hi);
+  margin:0 0 16px;padding-bottom:6px;border-bottom:1px solid var(--sen);font-weight:600}
+
+.komarow{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--sen)}
+.komarow .thumb{flex:0 0 132px;background:var(--ji);border:1px solid var(--sen);min-height:96px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-size:11px;color:var(--hojo);font-family:var(--mono);line-height:1.6;
+  cursor:pointer;touch-action:manipulation;overflow:hidden;padding:8px}
+.komarow .thumb img{width:100%;height:auto;display:block}
+.komarow .txt{flex:1 1 auto;min-width:0}
+.komarow .kno{font-family:var(--mono);font-size:12px;color:var(--seiji);letter-spacing:.04em}
+
+.cite{font-family:var(--mono);font-size:13px;line-height:1.9;background:var(--ji);
+  border:1px solid var(--sen);border-left:2px solid var(--hi);padding:16px;border-radius:2px;
+  white-space:pre-wrap;word-break:break-all}
+.citectl{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.citectl label{font-size:12px;color:var(--hojo)}
+.citectl input[type=text]{width:90px;font-family:var(--mono)}
+.inbook{display:flex;gap:8px;margin-bottom:16px}
+.inbook input{flex:1 1 auto;min-width:0}
+
+footer{padding:40px 24px calc(40px + env(safe-area-inset-bottom));border-top:1px solid var(--sen);
+  font-size:12px;color:var(--hojo);line-height:1.9}
+footer a{color:var(--seiji)}
+
+@media (min-width:900px){
+  header,.ctrl,#status,#manual,#results,footer{padding-right:calc(42% + 24px)}
+  #panel{top:0;left:auto;width:42%;max-height:100dvh;border-top:none;border-left:1px solid var(--hi);
+    transform:translateX(101%)}
+  #panel.open{transform:translateX(0)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>渉猟<span class="ver">v1.1</span></h1>
+  <p class="sub">国立国会図書館 次世代デジタルライブラリー — 全文検索端末</p>
+</header>
+
+<div class="ctrl">
+  <div class="searchrow">
+    <input type="search" id="q" placeholder="検索語（例: 那賀都神社）" autocomplete="off" enterkeyhint="search">
+    <button id="go">検索する</button>
+  </div>
+  <div class="presets" id="presets"></div>
+  <div class="filters">
+    <label>対象
+      <select id="f-field">
+        <option value="">書誌＋本文</option>
+        <option value="contentonly">本文のみ</option>
+        <option value="metaonly">書誌のみ</option>
+      </select>
+    </label>
+    <label>資料種別
+      <select id="f-classic">
+        <option value="">指定なし</option>
+        <option value="true">古典籍のみ</option>
+        <option value="false">古典籍を除く</option>
+      </select>
+    </label>
+    <label>NDC
+      <select id="f-ndc">
+        <option value="">指定なし</option>
+        <option value="2">2 歴史・地誌</option>
+        <option value="21">21 日本史</option>
+        <option value="29">29 地理・地誌</option>
+        <option value="16">16 宗教</option>
+        <option value="17">17 神道</option>
+        <option value="28">28 伝記・系譜</option>
+        <option value="38">38 民俗</option>
+      </select>
+    </label>
+    <label>件数
+      <select id="f-size">
+        <option value="20">20件</option>
+        <option value="50">50件</option>
+        <option value="100">100件</option>
+      </select>
+    </label>
+    <span class="pid-jump">
+      <label for="pid">PID直行</label>
+      <input type="text" id="pid" inputmode="numeric" placeholder="1234567">
+      <button class="ghost" id="pidgo">開く</button>
+    </span>
+  </div>
+</div>
+
+<div id="status">検索語を入れてください。収録は保護期間満了の図書28万点・古典籍8万点。</div>
+
+<div id="manual" hidden>
+  <h2>手動モード</h2>
+  <p>ブラウザから直接APIを取得できませんでした（CORS未許可、または通信失敗）。下のURLを開くか、Claudeに貼ってください。返ってきたJSONをここに貼れば、そのまま整形して表示します。</p>
+  <div class="url" id="m-url"></div>
+  <div class="row">
+    <button class="ghost" id="m-copy">URLをコピーする</button>
+    <button class="ghost" id="m-open">別タブで開く</button>
+  </div>
+  <textarea id="m-json" placeholder="ここにJSONを貼り付ける"></textarea>
+  <div class="row">
+    <button id="m-parse">貼り付けたJSONを読む</button>
+    <button class="ghost" id="m-retry">直接取得を再試行する</button>
+  </div>
+</div>
+
+<ul id="results"></ul>
+<button id="more" class="ghost" hidden>さらに読み込む</button>
+
+<aside id="panel">
+  <button class="ghost close" id="p-close">閉じる</button>
+  <div id="p-body"></div>
+</aside>
+
+<footer>
+  データ提供: 国立国会図書館「次世代デジタルライブラリー」API および デジタルコレクション IIIF API。<br>
+  OCRテキストは機械処理由来のため誤りを含む。引用にあたっては必ず紙面画像で原文を確認すること。<br>
+  利用条件は <a href="https://lab.ndl.go.jp/service/tsugidigi/" target="_blank" rel="noopener">NDLラボの案内</a> に従う。
+</footer>
+
+<script>
+"use strict";
+
+/* ═══════════ DATA — 改修時はここだけ触ればよい ═══════════ */
+const DATA = {
+  api:"https://lab.ndl.go.jp/dl/api",
+  iiif:"https://dl.ndl.go.jp/api/iiif",
+  pidUrl:"https://dl.ndl.go.jp/pid/",
+  presets:[
+    "那賀都神社","日原","古屋家家譜","甲斐国志",
+    "山梨県市郡村誌","三富村","萬力村","甲斐国造",
+    "丸石道祖神","浅間神社","笛吹川","伴氏","日本武尊 甲斐"
+  ],
+  defaultGrade:"B"
+};
+
+/* ═══════════ state ═══════════ */
+const state = {
+  query:"", from:0, size:20, field:"", classic:"", ndc:"",
+  hits:0, items:[], selected:null, komas:[], koma:null,
+  pubyear:"", grade:DATA.defaultGrade,
+  manual:false, pendingUrl:"", pendingKind:""
+};
+
+const $ = id => document.getElementById(id);
+const today = () => {
+  const d = new Date(), p = n => String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
+};
+const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+/* スニペット: <em>だけ残し、他のタグは全て除去してからエスケープ */
+function renderSnippet(s){
+  if(!s) return "";
+  let t = String(s).replace(/<em>/gi,"\u0001").replace(/<\/em>/gi,"\u0002");
+  t = t.replace(/<[^>]*>/g,"");
+  const ta = document.createElement("textarea");
+  ta.innerHTML = t; t = ta.value;
+  t = t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return t.replace(/\u0001/g,"<em>").replace(/\u0002/g,"</em>");
+}
+
+/* ═══════════ URL組み立て ═══════════ */
+function searchUrl(){
+  const p = new URLSearchParams();
+  p.set("keyword",state.query);
+  p.set("size",state.size);
+  p.set("from",state.from);
+  if(state.field)   p.set("searchfield",state.field);
+  if(state.classic) p.set("fc-isClassic",state.classic);
+  if(state.ndc)     p.set("f-ndc",state.ndc+"*");
+  return DATA.api+"/book/search?"+p.toString();
+}
+function pageSearchUrl(pid,kw){
+  const p = new URLSearchParams();
+  p.set("f-book",pid); p.set("q-contents",kw); p.set("size","50");
+  return DATA.api+"/page/search?"+p.toString();
+}
+const bookUrl = pid => DATA.api+"/book/"+pid;
+const komaImg = (pid,koma,size) =>
+  DATA.iiif+"/"+pid+"/R"+String(koma).padStart(7,"0")+"/full/"+(size||"1024,")+"/0/default.jpg";
+
+/* ═══════════ 取得 — 失敗したら手動モードへ退避 ═══════════ */
+async function grab(url,kind){
+  state.pendingUrl = url; state.pendingKind = kind;
+  if(state.manual){ showManual(url); return null; }
+  try{
+    const res = await fetch(url,{headers:{"Accept":"application/json"}});
+    if(!res.ok){
+      /* 応答が返っている＝通信もCORSも正常。原因はサーバ側 */
+      setStatus("HTTP "+res.status+"（通信・CORSは正常）。PIDまたはエンドポイントを確認してください。",true);
+      return null;
+    }
+    hideManual();
+    return await res.json();
+  }catch(e){
+    /* 応答自体が届かない＝CORSかネットワーク */
+    state.manual = true; showManual(url);
+    setStatus("応答に到達できません（CORSまたはネットワーク）: "+e.message,true);
+    return null;
+  }
+}
+function showManual(url){ $("m-url").textContent = url; $("manual").hidden = false; }
+function hideManual(){ $("manual").hidden = true; }
+function setStatus(msg,isErr){ const el=$("status"); el.textContent=msg; el.className=isErr?"err":""; }
+
+/* ═══════════ 横断検索 ═══════════ */
+async function runSearch(append){
+  if(!state.query){ setStatus("検索語を入れてください。"); return; }
+  if(!append){ state.from = 0; state.items = []; }
+  setStatus("検索中… "+state.query);
+  const data = await grab(searchUrl(),"search");
+  if(data) applySearch(data,append);
+}
+function applySearch(data,append){
+  const list = Array.isArray(data.list) ? data.list : [];
+  state.hits = data.hit ?? list.length;
+  state.items = append ? state.items.concat(list) : list;
+  renderResults();
+  if(state.hits === 0){
+    setStatus("「"+state.query+"」該当なし。旧字・異体字の表記ゆれを試すか、絞り込みを外してください。");
+  }else{
+    setStatus(state.hits.toLocaleString()+"件中 "+state.items.length+"件を表示");
+  }
+  $("more").hidden = !(state.items.length < state.hits);
+}
+function renderResults(){
+  const ul = $("results"); ul.innerHTML = "";
+  state.items.forEach((it,i)=>{
+    const li = document.createElement("li");
+    li.className = "item" + (state.selected && state.selected.id===it.id ? " sel" : "");
+    const vol = it.volume ? " "+esc(it.volume) : "";
+    const meta = [
+      it.responsibility && esc(it.responsibility),
+      it.publisher && esc(it.publisher),
+      it.published && esc(it.published),
+      it.ndc && ("NDC "+esc(it.ndc)),
+      it.page && (esc(it.page)+"コマ"),
+      "pid/"+esc(it.id)
+    ].filter(Boolean).join("　/　");
+    const snips = (it.highlights||[]).slice(0,3)
+      .map(h=>'<div class="snip">'+renderSnippet(h)+'</div>').join("");
+    li.innerHTML =
+      '<p class="title">'+esc(it.title)+vol+'</p>'+
+      '<div class="meta">'+meta+(it.isClassic?' <span class="classic">［古典籍］</span>':'')+'</div>'+
+      (snips?'<div class="snips">'+snips+'</div>':'');
+    li.addEventListener("click",()=>select(i));
+    ul.appendChild(li);
+  });
+}
+
+/* ═══════════ 詳細パネル ═══════════ */
+function select(i){
+  state.selected = state.items[i];
+  state.komas = []; state.koma = null;
+  state.pubyear = state.selected.published || "";
+  renderResults(); renderPanel();
+  $("panel").classList.add("open");
+  if(state.query) runInBook(state.query);
+}
+
+function renderPanel(){
+  const it = state.selected;
+  if(!it){ $("p-body").innerHTML=""; return; }
+  const vol = it.volume ? " "+esc(it.volume) : "";
+
+  const rows = state.komas.length
+    ? state.komas.map(k=>
+        '<div class="komarow">'+
+          '<div class="thumb" data-koma="'+esc(k.koma)+'">コマ'+esc(k.koma)+'<br>タップで紙面</div>'+
+          '<div class="txt">'+
+            '<div class="kno">コマ '+esc(k.koma)+'</div>'+
+            '<div class="snip">'+renderSnippet(k.snip)+'</div>'+
+            '<div style="margin-top:8px"><button class="chip" data-cite="'+esc(k.koma)+'">このコマを出典にする</button></div>'+
+          '</div>'+
+        '</div>').join("")
+    : '<p style="font-size:13px;color:var(--hojo);margin:0">資料内のヒットコマがまだありません。上の欄に語を入れて探してください。</p>';
+
+  $("p-body").innerHTML =
+    '<h2>'+esc(it.title)+vol+'</h2>'+
+    '<div class="pmeta">'+
+      esc(it.responsibility||"")+'<br>'+
+      esc(it.publisher||"")+'　'+esc(it.published||"")+'　全'+esc(it.page||"?")+'コマ<br>'+
+      'pid/'+esc(it.id)+'　<a href="'+DATA.pidUrl+encodeURIComponent(it.id)+'" target="_blank" rel="noopener">NDLで開く</a>'+
+    '</div>'+
+    '<section><h3>資料内検索</h3>'+
+      '<div class="inbook"><input type="text" id="ib-q" value="'+esc(state.query)+'" placeholder="この資料の中を検索"><button class="ghost" id="ib-go">探す</button></div>'+
+      rows+
+    '</section>'+
+    '<section><h3>出典書式</h3>'+
+      '<div class="cite" id="citebox">'+esc(buildCite())+'</div>'+
+      '<div class="citectl">'+
+        '<label>コマ <input type="text" id="c-koma" value="'+esc(state.koma??"")+'" inputmode="numeric"></label>'+
+        '<label>刊年 <input type="text" id="c-year" value="'+esc(state.pubyear)+'"></label>'+
+        '<label>等級 <select id="c-grade">'+
+          '<option value="A"'+(state.grade==="A"?" selected":"")+'>A</option>'+
+          '<option value="B"'+(state.grade==="B"?" selected":"")+'>B</option>'+
+          '<option value="C"'+(state.grade==="C"?" selected":"")+'>C</option>'+
+        '</select></label>'+
+        '<button class="ghost" id="c-copy">出典をコピーする</button>'+
+      '</div>'+
+    '</section>';
+
+  $("ib-go").addEventListener("click",()=>runInBook($("ib-q").value));
+  $("ib-q").addEventListener("keydown",e=>{ if(e.key==="Enter") runInBook($("ib-q").value); });
+  $("c-koma").addEventListener("input",e=>{ state.koma = e.target.value.trim()||null; refreshCite(); });
+  $("c-year").addEventListener("input",e=>{ state.pubyear = e.target.value.trim(); refreshCite(); });
+  $("c-grade").addEventListener("change",e=>{ state.grade = e.target.value; refreshCite(); });
+  $("c-copy").addEventListener("click",()=>{
+    if(!state.koma){
+      setStatus("コマ番号が未指定です。出典には必ずコマ番号を記録してください。",true);
+      return;
+    }
+    copy(buildCite(),$("c-copy"),"出典をコピーする");
+  });
+
+  $("p-body").querySelectorAll(".thumb").forEach(el=>{
+    el.addEventListener("click",()=>showKoma(el,el.dataset.koma));
+  });
+  $("p-body").querySelectorAll("[data-cite]").forEach(el=>{
+    el.addEventListener("click",ev=>{
+      ev.stopPropagation();
+      state.koma = el.dataset.cite;
+      $("c-koma").value = state.koma;
+      refreshCite();
+    });
+  });
+}
+
+function showKoma(el,koma){
+  if(el.dataset.loaded === "1"){
+    window.open(komaImg(state.selected.id,koma,"full"),"_blank","noopener");
+    return;
+  }
+  el.dataset.loaded = "1";
+  const img = new Image();
+  img.alt = "コマ"+koma;
+  img.onload = ()=>{ el.innerHTML=""; el.appendChild(img); };
+  img.onerror = ()=>{ el.textContent = "画像を取得できません"; el.dataset.loaded="0"; };
+  img.src = komaImg(state.selected.id,koma,"600,");
+  el.textContent = "読み込み中…";
+}
+
+/* 出典書式（source-citation 準拠） */
+function buildCite(){
+  const it = state.selected;
+  if(!it) return "";
+  return (it.responsibility ? it.responsibility : "")+
+    "『"+it.title+"』"+(it.volume||"")+
+    (it.publisher ? "、"+it.publisher : "")+
+    (state.pubyear ? "、"+state.pubyear+"年" : "")+
+    "、NDLデジタルコレクション pid/"+it.id+
+    (state.koma ? " コマ"+state.koma : "")+
+    "（"+today()+"閲覧）。【"+state.grade+"】";
+}
+function refreshCite(){ const b=$("citebox"); if(b) b.textContent = buildCite(); }
+
+/* 資料内検索 */
+async function runInBook(kw){
+  if(!state.selected || !kw || !kw.trim()) return;
+  setStatus("資料内検索中… pid/"+state.selected.id);
+  const data = await grab(pageSearchUrl(state.selected.id,kw.trim()),"page");
+  if(data) applyInBook(data);
+}
+function applyInBook(data){
+  const list = Array.isArray(data.list) ? data.list : [];
+  state.komas = list.map(p=>{
+    /* コマ番号の在処は複数の可能性がある。堅く拾う */
+    let koma = p.pageNo ?? p.page ?? p.komaNo ?? null;
+    if(koma == null && p.id != null){
+      const m = String(p.id).split("_");
+      if(m.length > 1) koma = m[m.length-1];
+    }
+    return { koma: koma ?? "?", snip: (p.highlights && p.highlights[0]) || p.contents || "" };
+  });
+  setStatus("資料内 "+state.komas.length+"コマにヒット");
+  renderPanel();
+}
+
+/* コピー */
+async function copy(text,btn,label){
+  try{ await navigator.clipboard.writeText(text); }
+  catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); ta.remove();
+  }
+  if(btn){ btn.textContent="コピーした"; setTimeout(()=>{btn.textContent=label;},1400); }
+}
+
+/* ═══════════ 配線 ═══════════ */
+DATA.presets.forEach(w=>{
+  const b=document.createElement("button");
+  b.className="chip"; b.textContent=w;
+  b.addEventListener("click",()=>{ $("q").value=w; doSearch(); });
+  $("presets").appendChild(b);
+});
+
+function doSearch(){
+  state.query   = $("q").value.trim();
+  state.size    = parseInt($("f-size").value,10);
+  state.field   = $("f-field").value;
+  state.classic = $("f-classic").value;
+  state.ndc     = $("f-ndc").value;
+  state.selected = null;
+  $("panel").classList.remove("open");
+  runSearch(false);
+}
+
+$("go").addEventListener("click",doSearch);
+$("q").addEventListener("keydown",e=>{ if(e.key==="Enter") doSearch(); });
+$("more").addEventListener("click",()=>{ state.from = state.items.length; runSearch(true); });
+$("p-close").addEventListener("click",()=>$("panel").classList.remove("open"));
+
+$("pidgo").addEventListener("click",async ()=>{
+  const pid = $("pid").value.trim();
+  if(!pid) return;
+  setStatus("書誌取得中… pid/"+pid);
+  const data = await grab(bookUrl(pid),"book");
+  if(data){
+    state.items=[data]; state.hits=1; renderResults();
+    setStatus("pid/"+pid+" を取得"); select(0);
+  }
+});
+
+$("m-copy").addEventListener("click",()=>copy(state.pendingUrl,$("m-copy"),"URLをコピーする"));
+$("m-open").addEventListener("click",()=>window.open(state.pendingUrl,"_blank","noopener"));
+$("m-retry").addEventListener("click",()=>{
+  state.manual=false;
+  setStatus("直接取得を再試行します…");
+  if(state.pendingKind==="page") runInBook($("ib-q")?$("ib-q").value:state.query);
+  else if(state.pendingKind==="book") $("pidgo").click();
+  else runSearch(false);
+});
+$("m-parse").addEventListener("click",()=>{
+  let data;
+  try{ data = JSON.parse($("m-json").value); }
+  catch(e){ setStatus("JSONとして読めません。全体を貼れているか確認してください。",true); return; }
+  if(state.pendingKind==="page") applyInBook(data);
+  else if(state.pendingKind==="book"){ state.items=[data]; state.hits=1; renderResults(); select(0); }
+  else applySearch(data,false);
+  $("m-json").value = "";
+});
+</script>
+</body>
+</html>
