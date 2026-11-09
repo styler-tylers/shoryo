@@ -160,6 +160,23 @@ def clean(raw: str, opts: Options | None = None) -> str:
     return s
 
 
+# EVA で複数文字が 1 つの字形を表すもの（長いものから順に照合する）
+MULTI_CHAR_GLYPHS = ("cth", "ckh", "cph", "cfh", "ch", "sh")
+_GLYPH_RE = re.compile(
+    r"@\d+;'*|" + "|".join(f"{g}'*" for g in MULTI_CHAR_GLYPHS) + r"|.'*"
+)
+
+
+def glyphs(word: str) -> list[str]:
+    """EVA の単語を字形単位に分割する。
+
+    ch, sh と台付きガロウズ（cth, ckh, cph, cfh）は 1 字形、稀少文字 @nnn; も 1 字形とし、
+    アポストロフィ（'）は直前の字形に含める。
+    例: "qokchedy" -> ["q", "o", "k", "ch", "e", "d", "y"]
+    """
+    return _GLYPH_RE.findall(word)
+
+
 def words(raw: str, opts: Options | None = None) -> list[str]:
     """1 行の生テキストを単語リストに分解する。"""
     opts = opts or Options()

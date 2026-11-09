@@ -1,4 +1,4 @@
-"""ivtff / word_freq のテスト（python3 -m unittest discover voynich）。"""
+"""ivtff / word_freq / affix のテスト（python3 -m unittest discover voynich）。"""
 
 import sys
 import unittest
@@ -6,6 +6,8 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import affix  # noqa: E402
+import corpus  # noqa: E402
 import ivtff  # noqa: E402
 import word_freq  # noqa: E402
 
@@ -59,9 +61,43 @@ class StatsTest(unittest.TestCase):
         self.assertAlmostEqual(word_freq.zipf_exponent(counter), 1.0, places=1)
 
     def test_log_likelihood_sign(self):
-        self.assertGreater(word_freq.log_likelihood(50, 10, 1000, 1000), 0)
-        self.assertLess(word_freq.log_likelihood(10, 50, 1000, 1000), 0)
-        self.assertAlmostEqual(word_freq.log_likelihood(10, 10, 1000, 1000), 0.0)
+        self.assertGreater(corpus.log_likelihood(50, 10, 1000, 1000), 0)
+        self.assertLess(corpus.log_likelihood(10, 50, 1000, 1000), 0)
+        self.assertAlmostEqual(corpus.log_likelihood(10, 10, 1000, 1000), 0.0)
+
+
+class GlyphTest(unittest.TestCase):
+    def test_glyphs(self):
+        self.assertEqual(ivtff.glyphs("qokchedy"), ["q", "o", "k", "ch", "e", "d", "y"])
+        self.assertEqual(ivtff.glyphs("cthshckhy"), ["cth", "sh", "ckh", "y"])
+        self.assertEqual(ivtff.glyphs("ch'o@185;l"), ["ch'", "o", "@185;", "l"])
+        self.assertEqual(ivtff.glyphs("cy"), ["c", "y"])
+
+
+class AffixTest(unittest.TestCase):
+    WORDS = Counter({"qokedy": 3, "chedy": 2, "daiin": 4, "ol": 1, "s": 5})
+
+    def test_prefix(self):
+        tokens, types, whole = affix.affixes(self.WORDS, 2, suffix=False)
+        self.assertEqual(tokens, Counter({"qo": 3, "che": 2, "da": 4, "ol": 1}))
+        self.assertEqual(types["qo"], 1)
+        self.assertEqual(whole, Counter({"ol": 1}))
+
+    def test_suffix(self):
+        tokens, _, _ = affix.affixes(self.WORDS, 3, suffix=True)
+        self.assertEqual(tokens, Counter({"edy": 5, "iin": 4}))
+
+    def test_positions(self):
+        pos = affix.glyph_positions(self.WORDS)
+        self.assertEqual(pos["q"], Counter({"語頭": 3}))
+        self.assertEqual(pos["s"], Counter({"単独": 5}))
+        self.assertEqual(pos["d"], Counter({"語中": 5, "語頭": 4}))
+
+    def test_cross(self):
+        table = affix.cross_table(self.WORDS, 1, 2)
+        self.assertEqual(table[("q", "dy")], 3)
+        self.assertEqual(table[("ch", "dy")], 2)
+        self.assertNotIn(("o", "ol"), table)  # 3 字形未満は対象外
 
 
 if __name__ == "__main__":
