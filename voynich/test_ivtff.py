@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import affix  # noqa: E402
 import corpus  # noqa: E402
 import ivtff  # noqa: E402
+import line_position  # noqa: E402
 import word_freq  # noqa: E402
 
 SAMPLE = """\
@@ -98,6 +99,39 @@ class AffixTest(unittest.TestCase):
         self.assertEqual(table[("q", "dy")], 3)
         self.assertEqual(table[("ch", "dy")], 2)
         self.assertNotIn(("o", "ol"), table)  # 3 字形未満は対象外
+
+
+class LinePositionTest(unittest.TestCase):
+    def setUp(self):
+        raw = [
+            "<%>pchor.daiin.chol.dam",  # 段落の最初の行
+            "ychey.qokedy.otam",
+            "sol.ar<$>",  # 2 語の行は比較に使わない
+        ]
+        lines = [ivtff.Line(ivtff.Page("f1r"), str(i), "+", "P0", r) for i, r in enumerate(raw)]
+        self.tls = line_position.text_lines(lines, ivtff.Options())
+
+    def test_text_lines(self):
+        self.assertEqual([tl.paragraph_start for tl in self.tls], [True, False, False])
+        self.assertEqual([tl.paragraph_end for tl in self.tls], [False, False, True])
+
+    def test_collect(self):
+        pos = line_position.collect(self.tls)
+        self.assertEqual(pos.para_first, Counter({"pchor": 1}))
+        self.assertEqual(pos.line_first_other, Counter({"ychey": 1}))
+        self.assertEqual(pos.line_last_other, Counter({"dam": 1, "otam": 1}))
+        self.assertEqual(pos.middle, Counter({"daiin": 1, "chol": 1, "qokedy": 1}))
+
+    def test_glyph_helpers(self):
+        words = Counter({"pchor": 2, "otam": 1})
+        self.assertEqual(line_position.first_glyphs(words, 2), Counter({"pch": 2, "ot": 1}))
+        self.assertEqual(line_position.last_glyphs(words), Counter({"r": 2, "m": 1}))
+
+    def test_length_by_position(self):
+        head, tail = line_position.length_by_position(self.tls, 1)
+        # pchor(4) + ychey(4) + sol(3) 字形, 3 行
+        self.assertEqual(head[0], [11, 3])
+        self.assertEqual(tail[0], [3 + 4 + 2, 3])  # dam(3) + otam(4) + ar(2)
 
 
 if __name__ == "__main__":
