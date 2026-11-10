@@ -11,6 +11,7 @@
   - 多数決の判定での Q1〜Q3（mismatch_test.py と同じ検定）と M5 の集計
 
     python3 voynich/rater_aggregate.py <dir>
+    python3 voynich/rater_aggregate.py <dir> --sample notes/replication_sample.json --out notes/rater_consensus_rep.csv
 """
 
 from __future__ import annotations
@@ -49,7 +50,14 @@ def read(path: Path) -> dict[str, dict]:
 
 
 def main(argv=None) -> None:
-    d = Path((argv or sys.argv[1:])[0])
+    import argparse
+    ap = argparse.ArgumentParser(description="盲検の判定者の集計")
+    ap.add_argument("dir", type=Path)
+    ap.add_argument("--sample", type=Path, default=NOTES / "anatomy_sample.json",
+                    help="頁 → 言語の対応（{\"A\": [...], \"B\": [...]}）")
+    ap.add_argument("--out", type=Path, default=NOTES / "rater_consensus.csv")
+    args = ap.parse_args(argv)
+    d = args.dir
     key = json.loads((d / "key.json").read_text())
     roots = [read(d / "out" / f"root{i}.csv") for i in (1, 2, 3)]
     mis = [read(d / "out" / f"mis{i}.csv") for i in (1, 2, 3)]
@@ -79,7 +87,7 @@ def main(argv=None) -> None:
         rows.append({"頁": key[c], "根の型": root, "根の票": " ".join(r[c]["root"].strip() for r in roots),
                      **m, "不一致の点数": sum(m[it] for it in ITEMS[:4]), "割れた項目数": split})
     rows.sort(key=lambda r: r["頁"])
-    out = NOTES / "rater_consensus.csv"
+    out = args.out
     with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
@@ -90,7 +98,8 @@ def main(argv=None) -> None:
     print(f"M5（異質な部分）あり: {sum(r['M5'] for r in rows)} 頁\n")
 
     # 事前に決めた Q1〜Q3 を、多数決の判定でやり直す
-    _, _, lang = mismatch_test.load()
+    sample = json.loads(args.sample.read_text(encoding="utf-8"))
+    lang = {p: "A" for p in sample.get("A", [])} | {p: "B" for p in sample.get("B", [])}
     use = [r for r in rows if r["根の型"] not in ("R0", "不定")]
     score = [r["不一致の点数"] for r in use]
     flag = [s >= 2 for s in score]
@@ -110,14 +119,19 @@ def main(argv=None) -> None:
 
     a = [f for f, l in zip(flag, langs) if l == "A"]
     b = [f for f, l in zip(flag, langs) if l == "B"]
-    p1 = mismatch_test.perm_p(diff_rate(langs), diff_rate, langs, trials, rng)
-    print(f"Q1 言語差: A {sum(a)}/{len(a)}、B {sum(b)}/{len(b)}、p = {p1:.4f}（両側）")
+    if a and b:
+        p1 = mismatch_test.perm_p(diff_rate(langs), diff_rate, langs, trials, rng)
+        print(f"Q1 言語差: A {sum(a)}/{len(a)}、B {sum(b)}/{len(b)}、p = {p1:.4f}（両側）")
+    else:
+        print(f"Q1 言語差: 片方の言語しか無いため省略（A {sum(a)}/{len(a)}、B {sum(b)}/{len(b)}）")
 
     n = len(use)
     for name, keyf in (("同じ二つ折り", lambda p: (meta[p].get("Q"), meta[p].get("B"))),
                        ("同じクワイア", lambda p: meta[p].get("Q"))):
         g = [keyf(r["頁"]) for r in use]
         pairs = [(i, j) for i in range(n) for j in range(i + 1, n) if g[i] == g[j]]
+        if not pairs:
+            continue
 
         def gap(sc, pairs=pairs):
             return sum(abs(sc[i] - sc[j]) for i, j in pairs) / len(pairs)

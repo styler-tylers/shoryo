@@ -52,11 +52,13 @@ def main(argv=None) -> None:
     ap.add_argument("--file", type=Path, default=corpus.DEFAULT_FILE)
     ap.add_argument("--trials", type=int, default=10000)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--consensus", type=Path, default=NOTES / "rater_consensus.csv")
+    ap.add_argument("--sample", type=Path, default=NOTES / "anatomy_sample.json")
     args = ap.parse_args(argv)
     rng = random.Random(args.seed)
 
-    cons = {r["頁"]: r for r in csv.DictReader(open(NOTES / "rater_consensus.csv", encoding="utf-8"))}
-    sample = json.loads((NOTES / "anatomy_sample.json").read_text(encoding="utf-8"))
+    cons = {r["頁"]: r for r in csv.DictReader(open(args.consensus, encoding="utf-8"))}
+    sample = json.loads(args.sample.read_text(encoding="utf-8"))
     lang = {p: "A" for p in sample["A"]} | {p: "B" for p in sample["B"]}
     words = page_words(corpus.ensure_data(args.file))
 
@@ -66,7 +68,12 @@ def main(argv=None) -> None:
     print(f"転写ファイル: {args.file.name}")
     for L in ("A", "B"):
         pages = [p for p in cons if lang.get(p) == L and words.get(p)]
+        if not pages:
+            continue
         grp = [suspicious(cons[p]) for p in pages]
+        if min(sum(grp), len(grp) - sum(grp)) < 5:
+            print(f"\n=== 言語 {L}: 怪しい絵 {sum(grp)} 頁、普通の絵 {len(grp) - sum(grp)} 頁 ===")
+            print("  片方の群が 5 頁未満のため、力不足で判定不能（事前の取り決め）。参考として値だけ示す。")
         ws = [words[p] for p in pages]
         mlen = [sum(len(ivtff.glyphs(w)) for w in x) / len(x) for x in ws]
         ttr = [len(set(x[:FIRST_N])) / len(x[:FIRST_N]) for x in ws]
