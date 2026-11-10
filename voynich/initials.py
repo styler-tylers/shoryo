@@ -66,15 +66,20 @@ def main(argv: list[str] | None = None) -> None:
     args.out.mkdir(parents=True, exist_ok=True)
     crops = []
     for i, name in enumerate(names, 1):
-        if name not in pages:
+        label = spread.resolve_page(pages, name)
+        if label is None:
             print(f"  （IIIF に無い頁: {name}）", file=sys.stderr)
             continue
+        if label != name:
+            # 折り込みや 2 頁まとめた画像。同じ画像を指す頁は最初の 1 つだけ切り出す
+            if any(c[3] == label for c in crops):
+                continue
         dest = args.out / f"crop_{name}.jpg"
         if not dest.exists():
             img = spread.get_image(pages, name, f"pct:{args.region}", f"{args.width},")
             img.save(dest, quality=88)
         word = first_paragraph_word(by_page.get(name, []))
-        crops.append((name, word, dest))
+        crops.append((name, word, dest, label))
         print(f"  {i}/{len(names)} {name}", file=sys.stderr)
 
     # 一覧画像
@@ -87,9 +92,10 @@ def main(argv: list[str] | None = None) -> None:
         rows = (len(chunk) + args.cols - 1) // args.cols
         sheet = Image.new("RGB", (cell_w * args.cols, cell_h * rows), "white")
         draw = ImageDraw.Draw(sheet)
-        for k, ((name, word, _), im) in enumerate(zip(chunk, ims)):
+        for k, ((name, word, _, label), im) in enumerate(zip(chunk, ims)):
             x, y = (k % args.cols) * cell_w, (k // args.cols) * cell_h
-            draw.text((x + 4, y + 4), f"{name}  {word}", fill="black")
+            note = "" if label == name else f"  [画像: {label}]"
+            draw.text((x + 4, y + 4), f"{name}  {word}{note}", fill="black")
             sheet.paste(im, (x, y + label_h))
         out = args.out / f"sheet_{s // args.per_sheet + 1:02d}_{chunk[0][0]}-{chunk[-1][0]}.jpg"
         sheet.save(out, quality=85)

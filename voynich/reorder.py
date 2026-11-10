@@ -489,6 +489,15 @@ def print_singulion(title: str, lines: list[ivtff.Line], opts, args) -> None:
     for k, (sc, order) in enumerate(scored[:args.top_orders], 1):
         print(f"    {k:>2}. {sc:.3f}  {fmt(order)}")
     print()
+    for start in (args.start or "").split(","):
+        start = start.strip()
+        if start not in keys:
+            continue
+        idx = keys.index(start)
+        best = next((sc, order) for sc, order in scored if order[0] == idx)
+        print(f"  {start} から始まる並びの最良: {fmt(best[1])}")
+        print(f"    見開きの類似度 {best[0]:.3f}、{total:,} 通り中 {rank_of(best[1]):,} 位")
+        print()
     for spec in (args.order or []):
         wanted = [x.strip() for x in spec.split(",") if x.strip()]
         if sorted(wanted) != sorted(keys):
@@ -527,6 +536,9 @@ def parse_args(argv: list[str] | None = None):
     p.add_argument("--exact-max", type=int, default=8,
                    help="--singulion で総当たりする二つ折りの最大枚数（既定: 8）")
     p.add_argument("--top-orders", type=int, default=5, help="--singulion で表示する上位の数（既定: 5）")
+    p.add_argument("--start",
+                   help="--singulion で、この二つ折りから始まる並びの最良も表示（例: 76|83,105|114）。"
+                        "大きな頭文字で始まる頁など、始まりの手がかりがある場合に使う")
     p.add_argument("--order", action="append",
                    help="--singulion で評価する並び（例: 77|82,78|81,75|84,76|83,79|80）。複数指定可")
     p.add_argument("--consensus", action="store_true",

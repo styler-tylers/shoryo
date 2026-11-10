@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import re
 import sys
 import time
 import urllib.error
@@ -113,10 +114,28 @@ def make_comparison(pages, left: str, right: str, gutter_frac: float, out_dir: P
     return path
 
 
+def resolve_page(pages, name: str) -> str | None:
+    """IIIF のラベル名を返す。折り込みや 2 頁まとめて撮影された画像（例: 'f100v and 101r'）にも対応する。
+
+    折り込みの頁番号（f67r1 など）は末尾の数字を外して探す。見つからなければ None。
+    """
+    if name in pages:
+        return name
+    base = re.sub(r"^(f\d+[rv])\d+$", r"\1", name)
+    if base in pages:
+        return base
+    for label in pages:
+        tokens = ["f" + t.lstrip("f") for t in re.findall(r"f?\d+[rv]", label)]
+        if base in tokens:
+            return label
+    return None
+
+
 def get_image(pages, name: str, region: str = "full", size: str = "900,") -> Image.Image:
-    if name not in pages:
+    label = resolve_page(pages, name)
+    if label is None:
         sys.exit(f"頁 {name} が IIIF マニフェストに見つかりません。")
-    service = pages[name][0]
+    service = pages[label][0]
     return Image.open(io.BytesIO(fetch(f"{service}/{region}/{size}/0/default.jpg"))).convert("RGB")
 
 

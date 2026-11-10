@@ -294,5 +294,18 @@ class SingulionTest(unittest.TestCase):
         self.assertAlmostEqual(reorder.sequence_score([0, 1], trans), 1.0)
 
 
+class ResolvePageTest(unittest.TestCase):
+    PAGES = {"f78v": None, "f67r": None, "f100v and 101r": None, "f85r (part) 86v (part) (part of 85-86 foldout)": None}
+
+    def test_resolve(self):
+        import spread
+        self.assertEqual(spread.resolve_page(self.PAGES, "f78v"), "f78v")
+        self.assertEqual(spread.resolve_page(self.PAGES, "f67r1"), "f67r")
+        self.assertEqual(spread.resolve_page(self.PAGES, "f101r"), "f100v and 101r")
+        self.assertEqual(spread.resolve_page(self.PAGES, "f86v3"),
+                         "f85r (part) 86v (part) (part of 85-86 foldout)")
+        self.assertIsNone(spread.resolve_page(self.PAGES, "f12r"))
+
+
 if __name__ == "__main__":
     unittest.main()

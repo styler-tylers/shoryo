@@ -13,6 +13,7 @@ René Zandbergen の **ZL 転写ファイル**（IVTFF 形式・EVA 表記, 版 
 | `reorder.py` | 語彙の類似度から元の並びを推定（二つ折り単位） |
 | `compare_transcriptions.py` | 主な指標を複数の転写で比べる |
 | `spread.py` | Yale の IIIF 画像から見開き画像と綴じ目の拡大を作る（Pillow が必要） |
+| `initials.py` | Yale の IIIF 画像から各頁の左上を切り出し、大きな頭文字を探すための一覧画像を作る（Pillow が必要） |
 
 - 転写ファイル: https://www.voynich.nu/data/ZL3b-n.txt （初回実行時に `voynich/data/` へ自動ダウンロード。リポジトリには含めません）
 - 他の転写: すべてのスクリプトで `--file IT2a-n.txt`（高橋健の転写）や `--file RF1b-e.txt`（参照転写）のようにファイル名だけを渡すと、同じく自動ダウンロードして使えます。
@@ -303,6 +304,7 @@ python3 voynich/reorder.py --singulion --quire M,T --locus P,L,C,R   # singulion
 | `--consensus` / `--consensus-min` | — / 2 | 3 設定での一致を見る / 何設定以上で支持された組を出すか |
 | `--singulion` | — | 二つ折り 1 枚ずつを開いて読む作りを仮定し、クワイアごとに総当たりで並べる（下記） |
 | `--order` | — | `--singulion` で評価する並び（例: `77\|82,78\|81,75\|84,76\|83,79\|80`）。複数指定可 |
+| `--start` | — | `--singulion` で、指定した二つ折りから始まる並びの最良も出す（例: 大きな頭文字の頁 `76\|83,105\|114`） |
 
 ### singulion モデルでの総当たり（`--singulion`）
 
@@ -373,6 +375,21 @@ python3 voynich/spread.py --conjoint --compare   # 現在の見開きと並べ�
 5 組の目視の結果（3 組支持・1 組区別不可・1 組確認できず）は `notes/2026-11-10 ヴォイニッチ手稿 singulion 仮説の検証.md` の検証 3 にあります。
 
 Yale の画像サーバーは混むと 504 を返すことがあるため、数回やり直します（1 組あたり数秒〜数分）。
+
+---
+
+# 大きな頭文字を探す一覧画像（`initials.py`）
+
+段落テキストのある頁の左上（既定: 幅 45%・高さ 30%）を Yale の IIIF 画像から切り出し、頁名と最初の語（EVA）を添えて
+20 頁ずつの一覧画像（`voynich/out/initials/sheet_*.jpg`）にします。転写には字の大きさが記録されていないため、目で探すための道具です。
+
+```sh
+python3 voynich/initials.py                                  # 全頁（初回は数十分かかる。切り出しは再利用）
+python3 voynich/initials.py --pages f76r,f105r,f78v --region 0,0,60,40 --width 600 --cols 3
+```
+
+折り込みや 2 頁まとめて撮影された画像（例: `f100v and 101r`）は、その画像の左上を使います（同じ画像を指す頁は 1 回だけ）。
+目視の結果（f76r・f105r に加え、f78v・f42r・f42v などが候補）は研究ノート第 4 回の検証 6 にあります。
 
 ---
 
