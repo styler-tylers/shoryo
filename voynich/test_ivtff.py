@@ -10,6 +10,7 @@ import affix  # noqa: E402
 import corpus  # noqa: E402
 import ivtff  # noqa: E402
 import line_position  # noqa: E402
+import vocab_shift  # noqa: E402
 import word_freq  # noqa: E402
 
 SAMPLE = """\
@@ -132,6 +133,43 @@ class LinePositionTest(unittest.TestCase):
         # pchor(4) + ychey(4) + sol(3) 字形, 3 行
         self.assertEqual(head[0], [11, 3])
         self.assertEqual(tail[0], [3 + 4 + 2, 3])  # dam(3) + otam(4) + ar(2)
+
+
+class VocabShiftTest(unittest.TestCase):
+    def test_cosine(self):
+        self.assertAlmostEqual(vocab_shift.cosine(Counter(a=1, b=1), Counter(a=2, b=2)), 1.0)
+        self.assertEqual(vocab_shift.cosine(Counter(a=1), Counter(b=1)), 0.0)
+        self.assertEqual(vocab_shift.cosine(Counter(), Counter(b=1)), 0.0)
+
+    def test_glyph_bigrams(self):
+        self.assertEqual(vocab_shift.glyph_bigrams(Counter({"qol": 2})),
+                         Counter({"#q": 2, "qo": 2, "ol": 2, "l#": 2}))
+        self.assertEqual(vocab_shift.glyph_bigrams(Counter({"chy": 1})),
+                         Counter({"#ch": 1, "chy": 1, "y#": 1}))
+
+    def test_folio_number(self):
+        self.assertEqual(vocab_shift.folio_number("f86v3"), "86")
+        self.assertEqual(vocab_shift.folio_number("f1r"), "1")
+
+    def test_adjacency_test(self):
+        # 隣り合うページだけが似ている並び: 実際の平均は並べ替えより大きくなるはず
+        n = 10
+        sim = [[1.0 if i == j else 0.9 if abs(i - j) == 1 else 0.1 for j in range(n)]
+               for i in range(n)]
+        obs, shuffled, p = vocab_shift.adjacency_test(sim, trials=200, seed=0)
+        self.assertAlmostEqual(obs, 0.9)
+        self.assertLess(shuffled, obs)
+        self.assertLess(p, 0.05)
+
+    def test_burstiness(self):
+        page = ivtff.Page
+        pages = [vocab_shift.PageText(page("f1r"), 0, Counter(x=10, y=1)),
+                 vocab_shift.PageText(page("f1v"), 1, Counter(z=10, y=1)),
+                 vocab_shift.PageText(page("f2r"), 2, Counter(z=10, y=1))]
+        rows = vocab_shift.burstiness(pages, min_count=3)
+        ratios = {word: ratio for ratio, word, *_ in rows}
+        self.assertLess(ratios["x"], ratios["y"])  # x は 1 ページに集中
+        self.assertGreater(ratios["y"], 1.0)  # y は全ページに散らばる（期待値より多いページに出る）
 
 
 if __name__ == "__main__":
