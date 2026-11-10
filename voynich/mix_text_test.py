@@ -119,7 +119,7 @@ def main(argv=None) -> None:
             else:
                 desc = f"G² = {obs:.1f}"
             print(f"  {name:<24} {desc:<32} p = {p:.4f}")
-    print("\n6 検定のボンフェローニ補正の基準: p < 0.0083")
+    print("\nボンフェローニ補正の基準: 2 言語なら 6 検定で p < 0.0083、1 言語なら 3 検定で p < 0.0167")
 
 
 if __name__ == "__main__":
