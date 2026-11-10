@@ -12,6 +12,7 @@ René Zandbergen の **ZL 転写ファイル**（IVTFF 形式・EVA 表記, 版 
 | `vocab_shift.py` | ページごとの語彙の移り変わり |
 | `reorder.py` | 語彙の類似度から元の並びを推定（二つ折り単位） |
 | `compare_transcriptions.py` | 主な指標を複数の転写で比べる |
+| `spread.py` | Yale の IIIF 画像から見開き画像と綴じ目の拡大を作る（Pillow が必要） |
 
 - 転写ファイル: https://www.voynich.nu/data/ZL3b-n.txt （初回実行時に `voynich/data/` へ自動ダウンロード。リポジトリには含めません）
 - 他の転写: すべてのスクリプトで `--file IT2a-n.txt`（高橋健の転写）や `--file RF1b-e.txt`（参照転写）のようにファイル名だけを渡すと、同じく自動ダウンロードして使えます。
@@ -347,6 +348,22 @@ ZL・高橋版 × 重み 2 種 × 対象テキスト 2 種の 5 通りの設定�
 > [!WARNING]
 > 語彙が似ていることは、元の並びで隣だったことの**証拠ではなく候補**です。同じ筆写者・同じ話題の紙は、離れた位置にあっても語彙が似ます。
 > 絵のつながり（`--link`）、クワイアの番号付け、紙の汚れ・染みの転写など、語彙以外の証拠と照らし合わせて検証してください。
+
+---
+
+# 見開き画像の組み立て（`spread.py`）
+
+Yale 大学図書館の IIIF 画像から 2 つの頁を取得し、左右に並べた見開きの画像（`spread_*.jpg`）と、
+綴じ目の側だけを拡大して並べた画像（`gutter_*.jpg`）を `voynich/out/spreads/` に作ります（画像はリポジトリに含めません）。
+綴じ目をまたぐ絵のつながりを目で確かめるためのものです。Pillow が必要です。
+
+```sh
+python3 voynich/spread.py f78v f81r          # 二つ折りの中央見開き（singulion 仮説での元の見開き）
+python3 voynich/spread.py f80v f81r          # 現在の綴じ順での見開き（比較用）
+python3 voynich/spread.py --conjoint         # Layfield & Davis (2026) が挙げた 5 組をまとめて
+```
+
+Yale の画像サーバーは混むと 504 を返すことがあるため、数回やり直します（1 組あたり数秒〜数分）。
 
 ---
 

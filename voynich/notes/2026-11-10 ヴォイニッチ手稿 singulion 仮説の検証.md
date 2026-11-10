@@ -100,6 +100,24 @@ Colin Layfield, Lisa Fagin Davis「Singulion Structure and the Voynich Manuscrip
 > - ただし両者は同じ文章（転写）を使っているので、完全に独立な証拠ではない。「並びの推定が手法に依存しない」ことを示したにとどまる。
 > - 生物・浴場のクワイアは頁あたりの文章が多く話題も似ているため、見開きの類似度だけでは並びを決めにくい。
 
+## 検証 3: f78v と f81r の画像の確認
+
+研究者本人が共有した 2 枚の画像（「ヴォイニッチ手稿 143.jpg」「148.jpg」）は、Yale の IIIF 画像の f78v（canvas 142）と f81r（canvas 147）と一致した（共有元サイトの番号は Yale の canvas 番号より 1 大きい）。
+`python3 voynich/spread.py f78v f81r f80v f81r` で、二つ折りの中央見開き（f78v | f81r）と、現在の見開き（f80v | f81r）を並べて綴じ目の側を比べた。
+
+| 頁 | 綴じ目の側に見えるもの |
+|---|---|
+| f81r（左端 = 綴じ目） | 本流から分かれた 2 本の二重線の流れが、左へ向かって綴じ目に入っていく（頁の高さのおよそ 55% と 60% の位置） |
+| f78v（右端 = 綴じ目） | 浴槽の右端の注ぎ口と、その下の二重線が右へ向かって綴じ目に達する。2 か所の間隔は f81r の 2 本の流れの間隔とほぼ同じ |
+| f80v（現在 f81r と見開き。右端 = 綴じ目） | 綴じ目沿いに縦の塔（管）が通る。f81r の 2 本の流れに対応する横向きの線は見当たらない |
+
+- f81r の 2 本の流れは、現在の見開きの f80v より、中央見開きの f78v の 2 か所の出口とよく対応して見える。論文の主な例を画像でも確認できた。
+
+> [!warning] 目視の限界
+> - 綴じ目の奥は製本で隠れており、線が実際につながる部分は見えない。各頁は別々に撮影されているので、高さの対応は概略。
+> - 撮影画像の綴じ目付近には、隣の頁の端が写り込んでいる（f78v の画像の右端の細い帯は f79r の端）。
+> - 判定は縮小画像（原寸の 1/2）を研究者が目で見たもので、計測ではない。
+
 ## [[頁順の問題]] への影響
 
 - 研究者本人が指摘していた「頁をまたぐ絵」は、論文が挙げた 5 組すべてが**同じ二つ折りの中央見開き**だった。入れ子の束ではなく、二つ折り 1 枚の上で絵が描かれたことを示す。
@@ -109,7 +127,7 @@ Colin Layfield, Lisa Fagin Davis「Singulion Structure and the Voynich Manuscrip
 ## 次のアクション
 
 1. 論文の原文を精読し、数値・頁番号・方法（LSA の設定）を再確認する。必要なら史料ノートを作る
-2. 綴じ目をまたぐ絵の 5 組を IIIF 画像で確認する（コマ番号を記録）
+2. 綴じ目をまたぐ絵の 5 組を IIIF 画像で確認する（f78v—f81r は確認済み。残り 4 組は `python3 voynich/spread.py --conjoint` で画像を作成済み、目視は未了）
 3. 他のクワイア（植物 A〜G など）でも `--singulion` で並べ替える。8 枚以上のクワイアは総当たりできないので、ヒューリスティックな探索を足す
 4. 星・レシピの推定順（105→104→106→107→108→103）で頁を読み直し、行や段落が二つ折りをまたいでつながる箇所があるか調べる
 
@@ -127,4 +145,6 @@ Colin Layfield, Lisa Fagin Davis「Singulion Structure and the Voynich Manuscrip
 - ナゾロジー「誰にも読めない『ヴォイニッチ手稿』、15世紀に綴じた人も読めずに綴じ間違えていた」2026-10-26、https://nazology.kusuguru.co.jp/archives/203324 （2026-11-10 閲覧）。【C】
 - 図「ヴォイニッチ手稿はこうして誤って製本された可能性がある」ニュース記事掲載の図（研究者本人が 2026-11-10 に共有した画像 URL。news-img.cdn.nimg.jp）。【C】
 - René Zandbergen「ZL transliteration file, Version 3b」https://www.voynich.nu/data/ZL3b-n.txt 、高橋健の転写（IT 版）https://www.voynich.nu/data/IT2a-n.txt 。【B】
-- 分析スクリプト: このリポジトリの `voynich/vocab_shift.py` `reorder.py --singulion`
+- 画像: Yale University Library「Cipher manuscript」IIIF マニフェスト https://collections.library.yale.edu/manifests/2002046 の canvas 142（78v）・145（80v）・147（81r）（2026-11-10 取得）。【A（原本の画像）】
+- 研究者本人が共有した画像 2 枚（「ヴォイニッチ手稿 143.jpg」「148.jpg」, 2026-11-10）。【C（Yale 画像と一致）】
+- 分析スクリプト: このリポジトリの `voynich/vocab_shift.py` `reorder.py --singulion` `spread.py`
