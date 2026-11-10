@@ -32,11 +32,17 @@ CLASS_FILE = Path(__file__).resolve().parent / "notes" / "anatomy_classification
 UNCONFIRMED = "Claude（未確認）"
 
 
+def is_confirmed(row: dict) -> bool:
+    """研究者が確認した行か（未確認・判断保留は確認済みとしない）。"""
+    who = row.get("確認者", "").strip()
+    return who not in ("", UNCONFIRMED) and "保留" not in who
+
+
 def load_classes(confirmed_only: bool) -> dict[str, dict[str, str]]:
     with open(CLASS_FILE, encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     if confirmed_only:
-        rows = [r for r in rows if r.get("確認者", "").strip() not in ("", UNCONFIRMED)]
+        rows = [r for r in rows if is_confirmed(r)]
     return {r["頁"]: r for r in rows}
 
 
@@ -84,7 +90,7 @@ def main(argv=None) -> None:
 
     print(f"転写ファイル: {path.name}、分類: {CLASS_FILE.name}（{len(classes)} 頁"
           f"{'、確認済みのみ' if args.confirmed_only else ''}）\n")
-    unconfirmed = sum(1 for r in classes.values() if r.get("確認者", "").strip() in ("", UNCONFIRMED))
+    unconfirmed = sum(1 for r in classes.values() if not is_confirmed(r))
     if unconfirmed:
         print(f"注意: {unconfirmed} 頁の分類は未確認（分析補助の AI の下書き）です。\n")
 
