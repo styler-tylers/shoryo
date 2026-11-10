@@ -253,5 +253,46 @@ class ReorderTest(unittest.TestCase):
         self.assertEqual(len(failed), 1)
 
 
+class SingulionTest(unittest.TestCase):
+    def page_text(self, name, index, q="M", b="4"):
+        return vocab_shift.PageText(ivtff.Page(name, {"Q": q, "B": b}), index, Counter())
+
+    def test_plain_side(self):
+        self.assertEqual(vocab_shift.plain_side("f78v"), (78, "v"))
+        self.assertIsNone(vocab_shift.plain_side("f67r1"))
+
+    def test_conjoint_and_facing(self):
+        f78v, f81r = self.page_text("f78v", 7), self.page_text("f81r", 12)
+        f79r = self.page_text("f79r", 8, b="5")
+        self.assertTrue(vocab_shift.is_conjoint(f78v, f81r))
+        self.assertTrue(vocab_shift.is_conjoint(f81r, f78v))
+        self.assertFalse(vocab_shift.is_conjoint(self.page_text("f78r", 6), f81r))
+        self.assertTrue(vocab_shift.is_current_facing(f78v, f79r))
+        self.assertFalse(vocab_shift.is_current_facing(f78v, f81r))
+
+    def test_mean_difference_test(self):
+        p = vocab_shift.mean_difference_test([0.9] * 20, [0.1] * 20, trials=200, seed=0)
+        self.assertLess(p, 0.01)
+
+    def test_build_sheets_and_transitions(self):
+        raw = [
+            ("f1r", "A", "1", "daiin.ol"), ("f1v", "A", "1", "chedy"),
+            ("f8r", "A", "1", "chedy"), ("f8v", "A", "1", "qokeedy.qokeedy"),
+            ("f2r", "A", "2", "qokeedy"), ("f2v", "A", "2", "ol"),
+            ("f7r", "A", "2", "ol"), ("f7v", "A", "2", "daiin"),
+            ("f67r1", "I", "1", "otol"),
+        ]
+        lines = [ivtff.Line(ivtff.Page(n, {"Q": q, "B": b}), "1", "@", "P0", t) for n, q, b, t in raw]
+        sheets, skipped = reorder.build_sheets(lines, ivtff.Options())
+        self.assertEqual([sh.key for sh in sheets], ["1|8", "2|7"])
+        self.assertEqual(len(skipped), 1)  # 折り込みの f67r1 は対象外
+        trans = reorder.transition_matrix(sheets, "raw")
+        # 1|8 の最後の頁 f8v（qokeedy）→ 2|7 の最初の頁 f2r（qokeedy）は同じ語
+        self.assertAlmostEqual(trans[0][1], 1.0)
+        # 2|7 の最後の頁 f7v（daiin）→ 1|8 の最初の頁 f1r（daiin ol）
+        self.assertAlmostEqual(trans[1][0], 1 / 2 ** 0.5)
+        self.assertAlmostEqual(reorder.sequence_score([0, 1], trans), 1.0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -25,6 +25,7 @@ created: 2026-11-10
 - [[2026-11-10 ヴォイニッチ手稿 定量分析]] — 単語頻度・語頭語尾・行頭行末・語彙の移り変わり（第 1 回）
 - [[2026-11-10 ヴォイニッチ手稿 転写比較と行頭形の検証]] — 3 つの転写での再現確認と、行頭形・行末形の検証（第 2 回）
 - [[2026-11-10 ヴォイニッチ手稿 元の並びの推定]] — 二つ折り単位で語彙の似たものを隣に並べた候補（第 3 回）
+- [[2026-11-10 ヴォイニッチ手稿 singulion 仮説の検証]] — Layfield & Davis (2026) の再現。星・レシピの並びが論文と一致（第 4 回）
 
 ## 方法論
 
@@ -45,6 +46,7 @@ created: 2026-11-10
 
 ## 外部資料
 
+- Layfield & Davis「Singulion Structure and the Voynich Manuscript」*Digital Medievalist* 19 (2026), doi:10.4000/16k0a — 二つ折り 1 枚ずつ読む作りだったという説【B】
 - voynich.nu（René Zandbergen）: 来歴・研究史・転写データ https://www.voynich.nu/
 - Voynich Ninja: 研究者のフォーラム https://www.voynich.ninja/
 - Yale University Press 版 複製本 *The Voynich Manuscript*（2016, Raymond Clemens 編）【未見】

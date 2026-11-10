@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 
+import itertools
 import math
 import random
 import sys
@@ -382,6 +383,123 @@ def analyse(title: str, units: list[Unit], args) -> None:
         print_result(compute(units, args, args.feature, args.weight), args)
 
 
+# ---------------------------------------------------------------------------
+# singulion モデル: 二つ折り 1 枚ずつを開いて読む作りでの総当たりの並べ替え
+# ---------------------------------------------------------------------------
+#
+# Layfield & Davis (2026) は、各二つ折りを「前の葉の表・裏・後ろの葉の表・裏」の 4 頁として
+# 順に読む作り（singulion）だったと推定した。この作りで二つ折り X の次に Y を綴じると、
+# X の最後の頁（後ろの葉の裏）と Y の最初の頁（前の葉の表）が見開きになる。
+# ここでは、その見開きの類似度の平均が最大になる二つ折りの並びを総当たりで探す。
+
+
+@dataclass
+class Sheet:
+    """singulion として読む二つ折り 1 枚。"""
+
+    key: str  # 例: "78|81"
+    first: int  # 前の葉の番号
+    second: int  # 後ろの葉の番号
+    page_words: dict  # 頁名 -> Counter
+
+    def page(self, which: str) -> str:
+        return {"first_r": f"f{self.first}r", "first_v": f"f{self.first}v",
+                "second_r": f"f{self.second}r", "second_v": f"f{self.second}v"}[which]
+
+
+def build_sheets(lines: list[ivtff.Line], opts: ivtff.Options) -> tuple[list[Sheet], list[str]]:
+    """二つ折りごとに Sheet を作る。2 枚の葉からなる通常の二つ折りだけを扱う。"""
+    groups: dict[str, dict[str, Counter]] = {}
+    order: list[str] = []
+    for ln in lines:
+        q, b = ln.page.get("Q"), ln.page.get("B")
+        if q == "?" or b == "?":
+            continue
+        key = f"{q}{b}"
+        if key not in groups:
+            groups[key] = {}
+            order.append(key)
+        groups[key].setdefault(ln.page.name, Counter()).update(ivtff.words(ln.raw, opts))
+    sheets, skipped = [], []
+    for key in order:
+        pages = groups[key]
+        sides = [vocab_shift.plain_side(n) for n in pages]
+        folios = sorted({s_[0] for s_ in sides if s_})
+        if any(s_ is None for s_ in sides) or len(folios) != 2:
+            skipped.append(f"{key}（{' '.join(pages)}）")
+            continue
+        sheets.append(Sheet(f"{folios[0]}|{folios[1]}", folios[0], folios[1], pages))
+    return sheets, skipped
+
+
+def transition_matrix(sheets: list[Sheet], weight: str) -> list[list[float]]:
+    """T[i][j] = 二つ折り i の最後の頁と、二つ折り j の最初の頁の類似度（向きあり）。"""
+    names, counters = [], []
+    for sh in sheets:
+        for pname, words in sh.page_words.items():
+            names.append(pname)
+            counters.append(words)
+    feats = features([Unit(n, 0, [], c) for n, c in zip(names, counters)], "words", weight)
+    vec = dict(zip(names, feats))
+    empty = Counter()
+    n = len(sheets)
+    return [[vocab_shift.cosine(vec.get(sheets[i].page("second_v"), empty),
+                                vec.get(sheets[j].page("first_r"), empty)) if i != j else 0.0
+             for j in range(n)] for i in range(n)]
+
+
+def sequence_score(order, trans) -> float:
+    return sum(trans[a][b] for a, b in zip(order, order[1:])) / max(len(order) - 1, 1)
+
+
+def print_singulion(title: str, lines: list[ivtff.Line], opts, args) -> None:
+    sheets, skipped = build_sheets(lines, opts)
+    print(f"=== {title}: singulion モデルでの総当たり（{len(sheets)} 枚）===")
+    for sk in skipped:
+        print(f"  （折り込み等のため対象外: {sk}）")
+    n = len(sheets)
+    if n < 3:
+        print("二つ折りが 3 枚未満のため並べ替えません。\n")
+        return
+    if n > args.exact_max:
+        print(f"二つ折りが {n} 枚あり、総当たり（{math.factorial(n):,} 通り）が多すぎます。"
+              f"--quire などで絞ってください（上限 --exact-max {args.exact_max}）。\n")
+        return
+    trans = transition_matrix(sheets, args.weight)
+    keys = [sh.key for sh in sheets]
+    scored = sorted(((sequence_score(p, trans), p) for p in itertools.permutations(range(n))),
+                    reverse=True)
+    total = len(scored)
+
+    def rank_of(order) -> int:
+        s_ = sequence_score(order, trans)
+        return 1 + sum(1 for sc, _ in scored if sc > s_ + 1e-12)
+
+    def fmt(order) -> str:
+        return ", ".join(keys[i] for i in order)
+
+    print("見開きの類似度 = 二つ折りの最後の頁（後ろの葉の裏）と次の二つ折りの最初の頁（前の葉の表）の"
+          "類似度の平均")
+    print(f"全 {total:,} 通りの平均: {sum(sc for sc, _ in scored) / total:.3f}\n")
+    current = list(range(n))
+    print(f"  現在の並び（外側から内側）: {fmt(current)}")
+    print(f"    見開きの類似度 {sequence_score(current, trans):.3f}、"
+          f"{total:,} 通り中 {rank_of(current):,} 位\n")
+    print(f"  上位 {args.top_orders} 通り:")
+    for k, (sc, order) in enumerate(scored[:args.top_orders], 1):
+        print(f"    {k:>2}. {sc:.3f}  {fmt(order)}")
+    print()
+    for spec in (args.order or []):
+        wanted = [x.strip() for x in spec.split(",") if x.strip()]
+        if sorted(wanted) != sorted(keys):
+            continue  # 別のクワイア向けの指定
+        order = [keys.index(x) for x in wanted]
+        print(f"  指定した並び: {fmt(order)}")
+        print(f"    見開きの類似度 {sequence_score(order, trans):.3f}、"
+              f"{total:,} 通り中 {rank_of(order):,} 位")
+    print()
+
+
 def parse_args(argv: list[str] | None = None):
     p = corpus.make_parser("ヴォイニッチ手稿（ZL 転写, EVA）の元の並びの推定")
     p.add_argument("--unit", choices=["bifolio", "folio", "page"], default="bifolio",
@@ -403,6 +521,14 @@ def parse_args(argv: list[str] | None = None):
     p.add_argument("--random", type=int, default=1000,
                    help="比較用のランダムな並びの数（既定: 1000）")
     p.add_argument("--seed", type=int, default=1, help="乱数の種（既定: 1）")
+    p.add_argument("--singulion", action="store_true",
+                   help="二つ折り 1 枚ずつを開いて読む作りを仮定し、見開きの類似度で総当たりの並べ替えをする"
+                        "（--quire で絞って使う。例: --quire M）")
+    p.add_argument("--exact-max", type=int, default=8,
+                   help="--singulion で総当たりする二つ折りの最大枚数（既定: 8）")
+    p.add_argument("--top-orders", type=int, default=5, help="--singulion で表示する上位の数（既定: 5）")
+    p.add_argument("--order", action="append",
+                   help="--singulion で評価する並び（例: 77|82,78|81,75|84,76|83,79|80）。複数指定可")
     p.add_argument("--consensus", action="store_true",
                    help="3 つの設定（words/tfidf, words/raw, glyph2/raw）で並べ替え、一致した隣どうしを出す")
     p.add_argument("--consensus-min", type=int, default=2,
@@ -418,6 +544,13 @@ def main(argv: list[str] | None = None) -> None:
     path, lines = corpus.load_lines(args)
     opts = corpus.word_options(args)
     print(f"転写ファイル: {path.name}（特徴: {args.feature}, 重み: {args.weight}）\n")
+    if args.singulion:
+        groups_q: dict[str, list[ivtff.Line]] = {}
+        for ln in lines:
+            groups_q.setdefault(ln.page.get(args.within or "Q"), []).append(ln)
+        for key in groups_q:
+            print_singulion(corpus.group_label(args.within or "Q", key), groups_q[key], opts, args)
+        return
     if args.within:
         groups: dict[str, list[ivtff.Line]] = {}
         for ln in lines:

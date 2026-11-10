@@ -113,6 +113,34 @@ def folio_number(page_name: str) -> str:
     return m.group(1) if m else page_name
 
 
+_PLAIN_PAGE_RE = re.compile(r"^f(\d+)([rv])$")
+
+
+def plain_side(page_name: str) -> tuple[int, str] | None:
+    """折り込みでない頁の (葉番号, 'r' または 'v')。折り込みの頁（f67r1 など）は None。"""
+    m = _PLAIN_PAGE_RE.match(page_name)
+    return (int(m.group(1)), m.group(2)) if m else None
+
+
+def is_current_facing(a: PageText, b: PageText) -> bool:
+    """a と b が現在の綴じ順で見開き（ある葉の裏と、次の葉の表）になっているか。"""
+    sa, sb = plain_side(a.name), plain_side(b.name)
+    return (b.index == a.index + 1 and sa is not None and sb is not None
+            and sa[1] == "v" and sb[1] == "r" and sa[0] != sb[0])
+
+
+def is_conjoint(a: PageText, b: PageText) -> bool:
+    """a と b が同じ二つ折りの中央見開き（前の葉の裏と後ろの葉の表, 例: f78v と f81r）か。"""
+    sa, sb = plain_side(a.name), plain_side(b.name)
+    if sa is None or sb is None or sa[0] == sb[0]:
+        return False
+    pa, pb = a.page, b.page
+    if not (pa.get("Q") == pb.get("Q") != "?" and pa.get("B") == pb.get("B") != "?"):
+        return False
+    (first, s1), (second, s2) = sorted([sa, sb])
+    return s1 == "v" and s2 == "r"
+
+
 def relation_table(pages: list[PageText], sim: list[list[float]]) -> list[tuple[str, list[float]]]:
     """ページの組を関係ごとに分け、類似度のリストを返す。
 
@@ -136,6 +164,12 @@ def relation_table(pages: list[PageText], sim: list[list[float]]) -> list[tuple[
             same_folio = folio_number(a.name) == folio_number(b.name)
             if same_folio:
                 add("同じ葉の表と裏", v)
+            if is_current_facing(pages[i], pages[j]):
+                add("現在の見開き（葉の裏と次の葉の表）", v)
+            if is_conjoint(pages[i], pages[j]):
+                add("二つ折りの中央見開き（例: f78v と f81r）", v)
+            if same_folio:
+                pass
             elif a.get("Q") == b.get("Q") != "?" and a.get("B") == b.get("B") != "?":
                 add("同じ二つ折りの別の葉", v)
             if a.get("Q") == b.get("Q") != "?":
@@ -149,10 +183,24 @@ def relation_table(pages: list[PageText], sim: list[list[float]]) -> list[tuple[
                 add("同じ筆写者", v)
             if a.get("L") in "AB" and b.get("L") in "AB" and a.get("L") != b.get("L"):
                 add("言語が異なる (A と B)", v)
-    order = ["全ての組", "隣り合うページ", "同じ葉の表と裏", "同じ二つ折りの別の葉", "同じクワイア",
+    order = ["全ての組", "隣り合うページ", "同じ葉の表と裏", "現在の見開き（葉の裏と次の葉の表）",
+             "二つ折りの中央見開き（例: f78v と f81r）", "同じ二つ折りの別の葉", "同じクワイア",
              "同じセクション（挿絵種別）", "同じセクションで隣り合う", "同じセクションで隣り合わない",
              "同じ言語 (A/B)", "同じ筆写者", "言語が異なる (A と B)"]
     return [(k, rel[k]) for k in order if k in rel]
+
+
+def mean_difference_test(a: list[float], b: list[float], trials: int, seed: int) -> float:
+    """a の平均が b の平均より大きいかを、組のラベルを入れ替える並べ替え検定で調べる（片側 p 値）。"""
+    observed = mean(a) - mean(b)
+    pooled = a + b
+    rng = random.Random(seed)
+    hits = 0
+    for _ in range(trials):
+        rng.shuffle(pooled)
+        if mean(pooled[:len(a)]) - mean(pooled[len(a):]) >= observed:
+            hits += 1
+    return (hits + 1) / (trials + 1)
 
 
 def adjacency_test(sim: list[list[float]], trials: int, seed: int) -> tuple[float, float, float]:
@@ -223,6 +271,15 @@ def print_relations(pages, sim, trials, seed) -> None:
     for label, vals in relation_table(pages, sim):
         print(f"{ljust(label, 30)}  {len(vals):>7}  {mean(vals):>6.3f}")
     print()
+    rel = dict(relation_table(pages, sim))
+    conj = rel.get("二つ折りの中央見開き（例: f78v と f81r）")
+    facing = rel.get("現在の見開き（葉の裏と次の葉の表）")
+    if conj and facing and trials:
+        p = mean_difference_test(conj, facing, trials, seed)
+        print(f"二つ折りの中央見開き（{mean(conj):.3f}）は現在の見開き（{mean(facing):.3f}）より似ている: "
+              f"並べ替え検定 p = {p:.4f}")
+        print("中央見開きの方が似ていれば、二つ折り 1 枚ずつを開いて読む作り（singulion）だった"
+              "という仮説と整合する。\n")
     if len(pages) > 2 and trials:
         obs, shuffled, p = adjacency_test(sim, trials, seed)
         print(f"隣り合うページの平均類似度 {obs:.3f} に対し、ページ順をランダムに "
