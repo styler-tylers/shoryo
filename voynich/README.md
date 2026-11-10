@@ -361,7 +361,11 @@ Yale 大学図書館の IIIF 画像から 2 つの頁を取得し、左右に並
 python3 voynich/spread.py f78v f81r          # 二つ折りの中央見開き（singulion 仮説での元の見開き）
 python3 voynich/spread.py f80v f81r          # 現在の綴じ順での見開き（比較用）
 python3 voynich/spread.py --conjoint         # Layfield & Davis (2026) が挙げた 5 組をまとめて
+python3 voynich/spread.py --conjoint --compare   # 現在の見開きと並べた比較画像（compare_*.jpg）も作る
 ```
+
+`--compare` は各組について「左頁 | 現在の相手」「左頁 | 右頁」「現在の相手 | 右頁」の綴じ目の拡大を横に並べます。
+5 組の目視の結果（3 組支持・1 組区別不可・1 組確認できず）は `notes/2026-11-10 ヴォイニッチ手稿 singulion 仮説の検証.md` の検証 3 にあります。
 
 Yale の画像サーバーは混むと 504 を返すことがあるため、数回やり直します（1 組あたり数秒〜数分）。
 

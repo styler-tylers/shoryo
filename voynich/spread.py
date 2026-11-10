@@ -7,6 +7,7 @@ Yale 大学図書館の IIIF 画像から 2 つの頁を取得し、左右に並
     python3 voynich/spread.py f78v f81r                 # 二つ折りの中央見開き（singulion 仮説）
     python3 voynich/spread.py f78v f79r                 # 現在の綴じ順での見開き（比較用）
     python3 voynich/spread.py --conjoint                # 論文が挙げた 5 組をまとめて作る
+    python3 voynich/spread.py --conjoint --compare      # 現在の見開きと並べた比較画像も作る
 
 左に置く頁（ふつうは裏 v）の右端と、右に置く頁（ふつうは表 r）の左端が綴じ目の側。
 出力先は voynich/out/spreads/（リポジトリには含めない）。Pillow が必要。
@@ -76,6 +77,42 @@ def load_manifest() -> dict[str, tuple[str, int, int]]:
     return pages
 
 
+def page_order(pages) -> list[str]:
+    return list(pages)  # マニフェストの順 = 現在の綴じ順
+
+
+def current_neighbours(pages, left: str, right: str) -> tuple[str | None, str | None]:
+    """現在の綴じ順で left の次の頁（left の現在の見開きの相手）と、right の前の頁を返す。"""
+    order = page_order(pages)
+    i, j = order.index(left), order.index(right)
+    nxt = order[i + 1] if i + 1 < len(order) else None
+    prv = order[j - 1] if j > 0 else None
+    return nxt, prv
+
+
+def make_comparison(pages, left: str, right: str, gutter_frac: float, out_dir: Path) -> Path | None:
+    """[left | 現在の相手]、[left | right]、[現在の相手 | right] の綴じ目の拡大を横に並べる。"""
+    nxt, prv = current_neighbours(pages, left, right)
+    if nxt == right:
+        print(f"  {left} と {right} は現在の綴じ順でも見開きのため、比較画像は作りません", file=sys.stderr)
+        return None
+    panels = []
+    for a, b in ((left, nxt), (left, right), (prv, right)):
+        if a and b:
+            path = out_dir / f"gutter_{a}_{b}.jpg"
+            if not path.exists():
+                make_spread(pages, a, b, gutter_frac, out_dir)
+            im = Image.open(path)
+            h = 1100
+            panels.append(im.resize((int(im.width * h / im.height), h)))
+    out = panels[0]
+    for im in panels[1:]:
+        out = side_by_side(out, im, gap=30)
+    path = out_dir / f"compare_{left}_{right}.jpg"
+    out.save(path, quality=88)
+    return path
+
+
 def get_image(pages, name: str, region: str = "full", size: str = "900,") -> Image.Image:
     if name not in pages:
         sys.exit(f"頁 {name} が IIIF マニフェストに見つかりません。")
@@ -117,6 +154,9 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--gutter", type=float, default=0.25,
                    help="綴じ目の側として切り出す幅（頁幅に対する割合, 既定: 0.25）")
     p.add_argument("--out", type=Path, default=OUT_DIR, help="出力先（既定: voynich/out/spreads）")
+    p.add_argument("--compare", action="store_true",
+                   help="各組について [左頁 | 現在の相手] [左頁 | 右頁] [現在の相手 | 右頁] の"
+                        "綴じ目の拡大を並べた比較画像（compare_*.jpg）も作る")
     args = p.parse_args(argv)
 
     pairs = []
@@ -133,6 +173,10 @@ def main(argv: list[str] | None = None) -> None:
     for left, right in pairs:
         for path in make_spread(pages, left, right, args.gutter, args.out):
             print(path)
+        if args.compare:
+            path = make_comparison(pages, left, right, args.gutter, args.out)
+            if path:
+                print(path)
 
 
 if __name__ == "__main__":
