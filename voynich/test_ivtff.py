@@ -12,6 +12,7 @@ import corpus  # noqa: E402
 import ivtff  # noqa: E402
 import line_forms  # noqa: E402
 import labels  # noqa: E402
+import mismatch_test  # noqa: E402
 import line_position  # noqa: E402
 import reorder  # noqa: E402
 import self_citation  # noqa: E402
@@ -381,6 +382,27 @@ class AnatomyTest(unittest.TestCase):
         self.assertEqual(len(classes), 54)
         self.assertTrue(all(r["根"] in {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"} for r in classes.values()))
         self.assertTrue(all(r["葉"] in {"L0", "L1", "L2", "L3", "L4", "L5"} for r in classes.values()))
+
+
+class MismatchTest(unittest.TestCase):
+    def test_load_consistent(self):
+        mism, roots, lang = mismatch_test.load()
+        self.assertEqual(len(mism), 52)
+        self.assertTrue(all(0 <= v <= 4 for v in mism.values()))
+        self.assertTrue(set(mism) <= set(roots) and set(mism) <= set(lang))
+        self.assertTrue(all(roots[p] != "R0" for p in mism))
+
+    def test_perm_p(self):
+        import random
+        # 明らかな差は小さな p
+        labels = ["x"] * 10 + ["y"] * 10
+        vals = [1] * 10 + [0] * 10
+
+        def stat(ls):
+            return sum(v for v, l in zip(vals, ls) if l == "x") - sum(v for v, l in zip(vals, ls) if l == "y")
+
+        p = mismatch_test.perm_p(stat(labels), stat, labels, 500, random.Random(0))
+        self.assertLess(p, 0.01)
 
 
 if __name__ == "__main__":
