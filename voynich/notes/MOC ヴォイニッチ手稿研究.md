@@ -46,7 +46,7 @@ created: 2026-11-10
 - このリポジトリの `voynich/`: 分析スクリプト一式（使い方は `voynich/README.md`）
   - `word_freq.py` 単語頻度 / `affix.py` 語頭・語尾 / `line_position.py` 行頭・行末 / `vocab_shift.py` 語彙の移り変わり
   - `line_forms.py` 行頭形・行末形の検証 / `compare_transcriptions.py` 転写の比較 / `reorder.py` 元の並びの推定
-  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析
+  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]）
 
 ## 外部資料
 
