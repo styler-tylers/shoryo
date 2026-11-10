@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import affix  # noqa: E402
+import anatomy_test  # noqa: E402
 import corpus  # noqa: E402
 import ivtff  # noqa: E402
 import line_forms  # noqa: E402
@@ -361,6 +362,25 @@ class SelfCitationTest(unittest.TestCase):
         obs, null, p, n = self_citation.vertical_alignment(pages, rng, 200)
         self.assertLess(obs, null)
         self.assertLess(p, 0.05)
+
+
+class AnatomyTest(unittest.TestCase):
+    def test_permutation_detects_grouping(self):
+        import random
+        # 型 X の頁どうしだけが似ている類似度行列
+        labels = ["X"] * 6 + ["Y"] * 6
+        sim = [[1.0 if i == j else (0.8 if labels[i] == labels[j] == "X" else 0.2) for j in range(12)]
+               for i in range(12)]
+        s, d, ns, nd, p = anatomy_test.permutation_test(labels, sim, lambda i, j: False, 500, random.Random(0))
+        self.assertGreater(s, d)
+        self.assertLess(p, 0.05)
+        self.assertEqual(ns + nd, 66)
+
+    def test_classification_file(self):
+        classes = anatomy_test.load_classes(False)
+        self.assertEqual(len(classes), 54)
+        self.assertTrue(all(r["根"] in {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7"} for r in classes.values()))
+        self.assertTrue(all(r["葉"] in {"L0", "L1", "L2", "L3", "L4", "L5"} for r in classes.values()))
 
 
 if __name__ == "__main__":
