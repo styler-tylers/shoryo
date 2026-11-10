@@ -35,7 +35,7 @@ PAGE_VARIABLES = {
     "B": "二つ折り (Bifolio in quire)",
     "I": "挿絵種別 (Illustration)",
     "L": "Currier 言語 (Language A/B)",
-    "H": "筆写者 (Hand, Davis 分類)",
+    "H": "筆写者 (Hand)",
     "C": "Currier の筆写者 (Currier hand)",
     "X": "追加情報 (Extraneous writing)",
 }
