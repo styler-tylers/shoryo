@@ -29,6 +29,7 @@ created: 2026-11-10
 - [[2026-11-10 ヴォイニッチ手稿 singulion 仮説の検証]] — Layfield & Davis (2026) の再現。星・レシピの並びが論文と一致（第 4 回）
 - [[2026-11-10 ヴォイニッチ手稿 絵と文章の対応（色の予備実験）]] — 絵の色と語彙の対応は植物セクション内では見られず（第 5 回）
 - [[2026-11-10 ヴォイニッチ手稿 ラベルの分析]] — ラベルは本文と形が違うが、同じ頁の本文での言及は偶然並み（第 6 回）
+- [[2026-11-10 ヴォイニッチ手稿 自己引用説の検証]] — 上の行を見て書いた形跡はあるが小さい（第 7 回）
 
 ## 方法論
 
@@ -46,7 +47,7 @@ created: 2026-11-10
 - このリポジトリの `voynich/`: 分析スクリプト一式（使い方は `voynich/README.md`）
   - `word_freq.py` 単語頻度 / `affix.py` 語頭・語尾 / `line_position.py` 行頭・行末 / `vocab_shift.py` 語彙の移り変わり
   - `line_forms.py` 行頭形・行末形の検証 / `compare_transcriptions.py` 転写の比較 / `reorder.py` 元の並びの推定
-  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]）
+  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証
 
 ## 外部資料
 

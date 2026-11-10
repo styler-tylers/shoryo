@@ -13,6 +13,7 @@ import line_forms  # noqa: E402
 import labels  # noqa: E402
 import line_position  # noqa: E402
 import reorder  # noqa: E402
+import self_citation  # noqa: E402
 import vocab_shift  # noqa: E402
 import word_freq  # noqa: E402
 
@@ -334,6 +335,32 @@ class LabelsTest(unittest.TestCase):
         self.assertAlmostEqual(labels.circular_position_stat(same)[0], 0.0)
         opposite = {"a": ["x", "q", "r", "s"], "b": ["t", "u", "x", "v"]}
         self.assertAlmostEqual(labels.circular_position_stat(opposite)[0], 0.5)
+
+
+class SelfCitationTest(unittest.TestCase):
+    def test_distance(self):
+        self.assertEqual(self_citation.distance("chedy", "chedy"), 0)
+        self.assertEqual(self_citation.distance("chedy", "shedy"), 1)   # ch → sh
+        self.assertEqual(self_citation.distance("chedy", "qochedy"), 2)  # 字形 2 つ追加
+        self.assertEqual(self_citation.distance("daiin", "aiin"), 1)
+        self.assertEqual(self_citation.best("okal", ["daiin", "okar", "ol"]), 1)
+
+    def test_vertical_alignment_detects_copies(self):
+        import random
+        # 上の行の同じ位置の語を 1 字変えて写した頁（写しがあれば真上に偏る）
+        rng = random.Random(0)
+        vocab = ["daiin", "chol", "shey", "qokal", "otedy", "sar", "dor", "kchy", "lkam", "pchod"]
+        pages = {}
+        for n in range(6):
+            lines = [rng.sample(vocab, 6)]
+            for _ in range(10):
+                prev = lines[-1]
+                new = [w[:-1] + "x" if i % 2 == 0 else rng.choice(vocab) for i, w in enumerate(prev)]
+                lines.append(new)
+            pages[f"p{n}"] = lines
+        obs, null, p, n = self_citation.vertical_alignment(pages, rng, 200)
+        self.assertLess(obs, null)
+        self.assertLess(p, 0.05)
 
 
 if __name__ == "__main__":
