@@ -11,6 +11,7 @@ import corpus  # noqa: E402
 import ivtff  # noqa: E402
 import line_forms  # noqa: E402
 import line_position  # noqa: E402
+import reorder  # noqa: E402
 import vocab_shift  # noqa: E402
 import word_freq  # noqa: E402
 
@@ -202,6 +203,54 @@ class CorpusTest(unittest.TestCase):
     def test_resolve_known_file(self):
         self.assertEqual(corpus.resolve_file(Path("IT2a-n.txt")), corpus.DATA_DIR / "IT2a-n.txt")
         self.assertEqual(corpus.resolve_file(Path("other.txt")), Path("other.txt"))
+
+
+class ReorderTest(unittest.TestCase):
+    @staticmethod
+    def chain_sim(order):
+        """order の順に隣どうしだけが似ている類似度行列。"""
+        n = len(order)
+        pos = {u: i for i, u in enumerate(order)}
+        return [[1.0 if i == j else 0.9 if abs(pos[i] - pos[j]) == 1 else 0.1
+                 for j in range(n)] for i in range(n)]
+
+    def test_best_path_recovers_chain(self):
+        import random
+        true_order = [3, 0, 5, 1, 4, 2, 6]
+        sim = self.chain_sim(true_order)
+        found = reorder.best_path(sim, restarts=5, rng=random.Random(0))
+        self.assertIn(found, (true_order, true_order[::-1]))
+
+    def test_two_opt_improves(self):
+        sim = self.chain_sim([0, 1, 2, 3, 4])
+        bad = [0, 3, 2, 1, 4]
+        better = reorder.two_opt(bad[:], sim)
+        self.assertGreater(reorder.path_score(better, sim), reorder.path_score(bad, sim))
+
+    def test_orient(self):
+        self.assertEqual(reorder.orient([4, 3, 2, 1, 0]), [0, 1, 2, 3, 4])
+        self.assertEqual(reorder.orient([0, 2, 1, 3]), [0, 2, 1, 3])
+
+    def test_unit_key(self):
+        page = ivtff.Page("f84v", {"Q": "M", "B": "1"})
+        self.assertEqual(reorder.unit_key(page, "bifolio"), "M1")
+        self.assertEqual(reorder.unit_key(page, "folio"), "f84")
+        self.assertEqual(reorder.unit_key(page, "page"), "f84v")
+        self.assertEqual(reorder.unit_key(ivtff.Page("f86v3"), "bifolio"), "f86")
+
+    def test_bootstrap_keeps_size(self):
+        import random
+        words = Counter(daiin=5, ol=3, chedy=2)
+        boot = reorder.bootstrap_words(words, random.Random(0))
+        self.assertEqual(sum(boot.values()), 10)
+        self.assertLessEqual(set(boot), set(words))
+
+    def test_links(self):
+        units = [reorder.Unit("A1", 0, [ivtff.Page("f1r")]), reorder.Unit("A2", 1, [ivtff.Page("f2r")])]
+        sim = [[1.0, 0.1], [0.1, 1.0]]
+        failed = reorder.apply_links(sim, units, [("f1r", "f2r"), ("f1r", "f9r")])
+        self.assertAlmostEqual(sim[0][1], 0.1 + reorder.LINK_BONUS)
+        self.assertEqual(len(failed), 1)
 
 
 if __name__ == "__main__":
