@@ -19,6 +19,7 @@ created: 2026-11-10
 - [[ヴォイニッチ手稿（Beinecke MS 408）]] — 写本そのもの。Yale Beinecke 蔵、全頁デジタル公開【A】
 - [[ZL転写ファイル]] — 全文の EVA 転写（Zandbergen, 版 3b）【B】
 - IT 転写（高橋健, 1999 年版）・RF 参照転写 — 比較に使用。史料ノートは未作成【B】
+- [[Singulion Structure and the Voynich Manuscript]] — Layfield & Davis (2026)。二つ折り 1 枚ずつ読む作りだったという論文【B】
 
 ## 調査ログ
 
