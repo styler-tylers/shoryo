@@ -13,6 +13,7 @@ import ivtff  # noqa: E402
 import line_forms  # noqa: E402
 import labels  # noqa: E402
 import mismatch_test  # noqa: E402
+import rater_aggregate  # noqa: E402
 import line_position  # noqa: E402
 import reorder  # noqa: E402
 import self_citation  # noqa: E402
@@ -403,6 +404,14 @@ class MismatchTest(unittest.TestCase):
 
         p = mismatch_test.perm_p(stat(labels), stat, labels, 500, random.Random(0))
         self.assertLess(p, 0.01)
+
+
+class RaterAggregateTest(unittest.TestCase):
+    def test_fleiss_kappa(self):
+        # 手計算: P̄ = 7/9, Pe = 41/81 → κ = 22/40
+        k = rater_aggregate.fleiss_kappa([["a", "a", "a"], ["b", "b", "b"], ["a", "a", "b"]])
+        self.assertAlmostEqual(k, 0.55)
+        self.assertAlmostEqual(rater_aggregate.fleiss_kappa([["a", "a", "a"], ["b", "b", "b"]]), 1.0)
 
 
 if __name__ == "__main__":
