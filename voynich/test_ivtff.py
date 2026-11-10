@@ -10,6 +10,7 @@ import affix  # noqa: E402
 import corpus  # noqa: E402
 import ivtff  # noqa: E402
 import line_forms  # noqa: E402
+import labels  # noqa: E402
 import line_position  # noqa: E402
 import reorder  # noqa: E402
 import vocab_shift  # noqa: E402
@@ -305,6 +306,34 @@ class ResolvePageTest(unittest.TestCase):
         self.assertEqual(spread.resolve_page(self.PAGES, "f86v3"),
                          "f85r (part) 86v (part) (part of 85-86 foldout)")
         self.assertIsNone(spread.resolve_page(self.PAGES, "f12r"))
+
+
+class LabelsTest(unittest.TestCase):
+    def test_stem(self):
+        self.assertEqual(labels.stem("otaly"), "taly")
+        self.assertEqual(labels.stem("qokeedy"), "keedy")
+        self.assertEqual(labels.stem("ykal"), "kal")
+        self.assertEqual(labels.stem("ol"), "ol")  # 短すぎる語はそのまま
+        self.assertEqual(labels.stem("chedy"), "chedy")
+
+    def test_collect_and_mention(self):
+        page = ivtff.Page("f88r", {"I": "P"})
+        lines = [
+            ivtff.Line(page, "1", "@", "Lf", "otaly"),
+            ivtff.Line(page, "2", "@", "Lf", "o"),  # 1 字形のラベルは除く
+            ivtff.Line(page, "3", "@", "P0", "<%>daiin.taly.chol<$>"),
+        ]
+        lab, para, section = labels.collect(lines, ivtff.Options(), None, 2)
+        self.assertEqual(lab["f88r"], [("otaly", "Lf")])
+        assign = {"f88r": "f88r"}
+        self.assertEqual(labels.mention_rate(["f88r"], assign, lab, para, False), (0, 1))
+        self.assertEqual(labels.mention_rate(["f88r"], assign, lab, para, True), (1, 1))
+
+    def test_circular_position(self):
+        same = {"a": ["x", "y", "z", "w"], "b": ["x", "y", "z", "w"]}
+        self.assertAlmostEqual(labels.circular_position_stat(same)[0], 0.0)
+        opposite = {"a": ["x", "q", "r", "s"], "b": ["t", "u", "x", "v"]}
+        self.assertAlmostEqual(labels.circular_position_stat(opposite)[0], 0.5)
 
 
 if __name__ == "__main__":
