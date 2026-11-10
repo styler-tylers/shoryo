@@ -379,7 +379,7 @@ class AnatomyTest(unittest.TestCase):
     def test_classification_file(self):
         classes = anatomy_test.load_classes(False)
         self.assertEqual(len(classes), 54)
-        self.assertTrue(all(r["根"] in {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7"} for r in classes.values()))
+        self.assertTrue(all(r["根"] in {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"} for r in classes.values()))
         self.assertTrue(all(r["葉"] in {"L0", "L1", "L2", "L3", "L4", "L5"} for r in classes.values()))
 
 
