@@ -13,6 +13,7 @@ import ivtff  # noqa: E402
 import line_forms  # noqa: E402
 import labels  # noqa: E402
 import mismatch_test  # noqa: E402
+import mix_text_test  # noqa: E402
 import rater_aggregate  # noqa: E402
 import line_position  # noqa: E402
 import reorder  # noqa: E402
@@ -412,6 +413,12 @@ class RaterAggregateTest(unittest.TestCase):
         k = rater_aggregate.fleiss_kappa([["a", "a", "a"], ["b", "b", "b"], ["a", "a", "b"]])
         self.assertAlmostEqual(k, 0.55)
         self.assertAlmostEqual(rater_aggregate.fleiss_kappa([["a", "a", "a"], ["b", "b", "b"]]), 1.0)
+
+
+class MixTextTest(unittest.TestCase):
+    def test_g2(self):
+        self.assertAlmostEqual(mix_text_test.g2([[10, 10], [10, 10]]), 0.0)
+        self.assertGreater(mix_text_test.g2([[20, 0], [0, 20]]), 50)
 
 
 if __name__ == "__main__":

@@ -20,6 +20,8 @@ René Zandbergen の **ZL 転写ファイル**（IVTFF 形式・EVA 表記, 版 
 | `pharma_labels.py` | 薬学セクションの「ラベル → 物」対応表の下書き（`notes/薬学ラベル対応表.csv`）を作る |
 | `self_citation.py` | 自己引用説（近くの語を写して少し変えた）の検証。対照に自然言語のテキストも分析できる |
 | `mismatch_test.py` | 地上部と根の不一致（合成図仮説）の検定（判定は `notes/mismatch_classification.csv`） |
+| `rater_aggregate.py` | 盲検の判定者の集計（Fleiss の κ、多数決、検定のやり直し） |
+| `mix_text_test.py` | 混在仮説: 「怪しい絵」の頁と普通の頁で文章の性質が違うか |
 | `anatomy_test.py` | 植物＝解剖図仮説の検定（根の型・葉の型ごとの語彙の類似。分類は `notes/anatomy_classification.csv`） |
 
 - 転写ファイル: https://www.voynich.nu/data/ZL3b-n.txt （初回実行時に `voynich/data/` へ自動ダウンロード。リポジトリには含めません）
