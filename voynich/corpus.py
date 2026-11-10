@@ -12,8 +12,17 @@ from pathlib import Path
 
 import ivtff
 
-ZL_URL = "https://www.voynich.nu/data/ZL3b-n.txt"
-DEFAULT_FILE = Path(__file__).resolve().parent / "data" / "ZL3b-n.txt"
+DATA_URL = "https://www.voynich.nu/data/"
+DATA_DIR = Path(__file__).resolve().parent / "data"
+DEFAULT_FILE = DATA_DIR / "ZL3b-n.txt"
+ZL_URL = DATA_URL + DEFAULT_FILE.name
+
+# voynich.nu で公開されている EVA 系の転写ファイル（--file にファイル名だけ渡せば自動で取得する）
+KNOWN_FILES = {
+    "ZL3b-n.txt": "ZL: Zandbergen-Landini 転写（版 3b）",
+    "IT2a-n.txt": "IT: 高橋健（Takeshi Takahashi）の転写（1999 年版, LSI 収録）",
+    "RF1b-e.txt": "RF: 参照転写（ZL と GC を統合, 段落記号なし）",
+}
 
 GROUP_LABELS = {
     "L": {"A": "言語 A", "B": "言語 B"},
@@ -28,22 +37,31 @@ _FILTER_KEYS = {"language": "L", "hand": "H", "illustration": "I", "quire": "Q"}
 # ---------------------------------------------------------------------------
 
 
+def resolve_file(path: Path) -> Path:
+    """--file の値を実際のパスにする。既知のファイル名だけなら data/ 以下を指す。"""
+    if not path.exists() and path.parent == Path(".") and path.name in KNOWN_FILES:
+        return DATA_DIR / path.name
+    return path
+
+
 def ensure_data(path: Path) -> Path:
-    """転写ファイルが無ければ voynich.nu からダウンロードする。"""
+    """転写ファイルが無ければ voynich.nu からダウンロードする（data/ 以下の既知ファイルのみ）。"""
+    path = resolve_file(path)
     if path.exists():
         return path
-    if path != DEFAULT_FILE:
+    if path.parent.resolve() != DATA_DIR or path.name not in KNOWN_FILES:
         sys.exit(f"エラー: ファイルが見つかりません: {path}")
+    url = DATA_URL + path.name
     path.parent.mkdir(parents=True, exist_ok=True)
-    print(f"転写ファイルをダウンロードします: {ZL_URL}", file=sys.stderr)
-    req = urllib.request.Request(ZL_URL, headers={"User-Agent": "voynich-analysis/1.0"})
+    print(f"転写ファイルをダウンロードします: {url}", file=sys.stderr)
+    req = urllib.request.Request(url, headers={"User-Agent": "voynich-analysis/1.0"})
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = resp.read()
     except Exception as e:  # noqa: BLE001
         sys.exit(
             f"エラー: ダウンロードに失敗しました ({e})。\n"
-            f"手動で {ZL_URL} を取得し {path} に置くか、--file で指定してください。"
+            f"手動で {url} を取得し {path} に置くか、--file で指定してください。"
         )
     path.write_bytes(data)
     return path
@@ -67,7 +85,8 @@ def make_parser(description: str) -> argparse.ArgumentParser:
         ),
     )
     p.add_argument("--file", type=Path, default=DEFAULT_FILE,
-                   help="IVTFF 転写ファイル（省略時は ZL3b を自動ダウンロード）")
+                   help="IVTFF 転写ファイル（省略時は ZL3b-n.txt。"
+                        + "、".join(KNOWN_FILES) + " はファイル名だけで自動ダウンロード）")
 
     f = p.add_argument_group("絞り込み（カンマ区切りで複数指定可）")
     f.add_argument("--language", help="Currier 言語（A, B）")

@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import affix  # noqa: E402
 import corpus  # noqa: E402
 import ivtff  # noqa: E402
+import line_forms  # noqa: E402
 import line_position  # noqa: E402
 import vocab_shift  # noqa: E402
 import word_freq  # noqa: E402
@@ -170,6 +171,37 @@ class VocabShiftTest(unittest.TestCase):
         ratios = {word: ratio for ratio, word, *_ in rows}
         self.assertLess(ratios["x"], ratios["y"])  # x は 1 ページに集中
         self.assertGreater(ratios["y"], 1.0)  # y は全ページに散らばる（期待値より多いページに出る）
+
+
+class LineFormsTest(unittest.TestCase):
+    MIDDLE = Counter({"chedy": 5, "aiin": 4, "ol": 3, "ykeey": 2, "keey": 1, "daiin": 2})
+
+    def test_strip(self):
+        self.assertEqual(line_forms.strip_first("ychedy"), ("y", "chedy"))
+        self.assertEqual(line_forms.strip_last("dam"), ("da", "m"))
+        self.assertIsNone(line_forms.strip_first("y"))
+
+    def test_stem_rate(self):
+        first = Counter({"ychedy": 3, "ykeey": 1})
+        # ychedy -> chedy（行中 5 回）は一致、ykeey -> keey（行中 1 回）は不一致
+        self.assertEqual(line_forms.stem_rate(first, "y", self.MIDDLE, 2), (3, 4))
+
+    def test_replace_rate(self):
+        last = Counter({"dam": 2, "om": 1})
+        self.assertEqual(line_forms.replace_rate(last, "m", "iin", self.MIDDLE, 2), (2, 3))
+        self.assertEqual(line_forms.replace_rate(last, "m", "l", self.MIDDLE, 2), (1, 3))
+
+    def test_stem_initials_and_only_at_start(self):
+        first = Counter({"ychedy": 3, "ykeey": 1})
+        self.assertEqual(line_forms.stem_initials(first, "y"), Counter({"ch": 3, "k": 1}))
+        # ychedy は行中に無く、chedy は行中の語 → 行頭だけの語。ykeey は行中にもある
+        self.assertEqual(line_forms.only_at_start(first, "y", self.MIDDLE, 2), (3, 4))
+
+
+class CorpusTest(unittest.TestCase):
+    def test_resolve_known_file(self):
+        self.assertEqual(corpus.resolve_file(Path("IT2a-n.txt")), corpus.DATA_DIR / "IT2a-n.txt")
+        self.assertEqual(corpus.resolve_file(Path("other.txt")), Path("other.txt"))
 
 
 if __name__ == "__main__":
