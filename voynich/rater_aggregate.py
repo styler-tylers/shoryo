@@ -12,6 +12,9 @@
 
     python3 voynich/rater_aggregate.py <dir>
     python3 voynich/rater_aggregate.py <dir> --sample notes/replication_sample.json --out notes/rater_consensus_rep.csv
+    python3 voynich/rater_aggregate.py <dir> --control --sample notes/ljs419_sample.json --out notes/rater_consensus_ljs419.csv
+
+--control: ヴォイニッチ以外の写本（対照）。紙・束の検定（Q2）を省き、Q1 は sample の群 A・B の差になる。
 """
 
 from __future__ import annotations
@@ -56,6 +59,8 @@ def main(argv=None) -> None:
     ap.add_argument("--sample", type=Path, default=NOTES / "anatomy_sample.json",
                     help="頁 → 言語の対応（{\"A\": [...], \"B\": [...]}）")
     ap.add_argument("--out", type=Path, default=NOTES / "rater_consensus.csv")
+    ap.add_argument("--control", action="store_true",
+                    help="ヴォイニッチ以外の写本（Q2 の紙・束の検定を省く）")
     args = ap.parse_args(argv)
     d = args.dir
     key = json.loads((d / "key.json").read_text())
@@ -106,8 +111,9 @@ def main(argv=None) -> None:
     rng = random.Random(1)
     trials = 10000
     meta = {}
-    for ln in ivtff.parse_file(corpus.ensure_data(corpus.DEFAULT_FILE)):
-        meta.setdefault(ln.page.name, ln.page)
+    if not args.control:
+        for ln in ivtff.parse_file(corpus.ensure_data(corpus.DEFAULT_FILE)):
+            meta.setdefault(ln.page.name, ln.page)
     print(f"=== 多数決の判定での検定（根の型が R0・不定の頁を除く {len(use)} 頁）===")
 
     langs = [lang[r["頁"]] for r in use]
@@ -126,8 +132,9 @@ def main(argv=None) -> None:
         print(f"Q1 言語差: 片方の言語しか無いため省略（A {sum(a)}/{len(a)}、B {sum(b)}/{len(b)}）")
 
     n = len(use)
-    for name, keyf in (("同じ二つ折り", lambda p: (meta[p].get("Q"), meta[p].get("B"))),
-                       ("同じクワイア", lambda p: meta[p].get("Q"))):
+    groups = () if args.control else (("同じ二つ折り", lambda p: (meta[p].get("Q"), meta[p].get("B"))),
+                                      ("同じクワイア", lambda p: meta[p].get("Q")))
+    for name, keyf in groups:
         g = [keyf(r["頁"]) for r in use]
         pairs = [(i, j) for i in range(n) for j in range(i + 1, n) if g[i] == g[j]]
         if not pairs:
