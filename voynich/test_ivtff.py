@@ -7,11 +7,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import affix  # noqa: E402
+import anatomy_test  # noqa: E402
 import corpus  # noqa: E402
 import ivtff  # noqa: E402
 import line_forms  # noqa: E402
+import labels  # noqa: E402
+import mismatch_test  # noqa: E402
+import mix_text_test  # noqa: E402
+import rater_aggregate  # noqa: E402
 import line_position  # noqa: E402
 import reorder  # noqa: E402
+import self_citation  # noqa: E402
 import vocab_shift  # noqa: E402
 import word_freq  # noqa: E402
 
@@ -305,6 +311,114 @@ class ResolvePageTest(unittest.TestCase):
         self.assertEqual(spread.resolve_page(self.PAGES, "f86v3"),
                          "f85r (part) 86v (part) (part of 85-86 foldout)")
         self.assertIsNone(spread.resolve_page(self.PAGES, "f12r"))
+
+
+class LabelsTest(unittest.TestCase):
+    def test_stem(self):
+        self.assertEqual(labels.stem("otaly"), "taly")
+        self.assertEqual(labels.stem("qokeedy"), "keedy")
+        self.assertEqual(labels.stem("ykal"), "kal")
+        self.assertEqual(labels.stem("ol"), "ol")  # 短すぎる語はそのまま
+        self.assertEqual(labels.stem("chedy"), "chedy")
+
+    def test_collect_and_mention(self):
+        page = ivtff.Page("f88r", {"I": "P"})
+        lines = [
+            ivtff.Line(page, "1", "@", "Lf", "otaly"),
+            ivtff.Line(page, "2", "@", "Lf", "o"),  # 1 字形のラベルは除く
+            ivtff.Line(page, "3", "@", "P0", "<%>daiin.taly.chol<$>"),
+        ]
+        lab, para, section = labels.collect(lines, ivtff.Options(), None, 2)
+        self.assertEqual(lab["f88r"], [("otaly", "Lf")])
+        assign = {"f88r": "f88r"}
+        self.assertEqual(labels.mention_rate(["f88r"], assign, lab, para, False), (0, 1))
+        self.assertEqual(labels.mention_rate(["f88r"], assign, lab, para, True), (1, 1))
+
+    def test_circular_position(self):
+        same = {"a": ["x", "y", "z", "w"], "b": ["x", "y", "z", "w"]}
+        self.assertAlmostEqual(labels.circular_position_stat(same)[0], 0.0)
+        opposite = {"a": ["x", "q", "r", "s"], "b": ["t", "u", "x", "v"]}
+        self.assertAlmostEqual(labels.circular_position_stat(opposite)[0], 0.5)
+
+
+class SelfCitationTest(unittest.TestCase):
+    def test_distance(self):
+        self.assertEqual(self_citation.distance("chedy", "chedy"), 0)
+        self.assertEqual(self_citation.distance("chedy", "shedy"), 1)   # ch → sh
+        self.assertEqual(self_citation.distance("chedy", "qochedy"), 2)  # 字形 2 つ追加
+        self.assertEqual(self_citation.distance("daiin", "aiin"), 1)
+        self.assertEqual(self_citation.best("okal", ["daiin", "okar", "ol"]), 1)
+
+    def test_vertical_alignment_detects_copies(self):
+        import random
+        # 上の行の同じ位置の語を 1 字変えて写した頁（写しがあれば真上に偏る）
+        rng = random.Random(0)
+        vocab = ["daiin", "chol", "shey", "qokal", "otedy", "sar", "dor", "kchy", "lkam", "pchod"]
+        pages = {}
+        for n in range(6):
+            lines = [rng.sample(vocab, 6)]
+            for _ in range(10):
+                prev = lines[-1]
+                new = [w[:-1] + "x" if i % 2 == 0 else rng.choice(vocab) for i, w in enumerate(prev)]
+                lines.append(new)
+            pages[f"p{n}"] = lines
+        obs, null, p, n = self_citation.vertical_alignment(pages, rng, 200)
+        self.assertLess(obs, null)
+        self.assertLess(p, 0.05)
+
+
+class AnatomyTest(unittest.TestCase):
+    def test_permutation_detects_grouping(self):
+        import random
+        # 型 X の頁どうしだけが似ている類似度行列
+        labels = ["X"] * 6 + ["Y"] * 6
+        sim = [[1.0 if i == j else (0.8 if labels[i] == labels[j] == "X" else 0.2) for j in range(12)]
+               for i in range(12)]
+        s, d, ns, nd, p = anatomy_test.permutation_test(labels, sim, lambda i, j: False, 500, random.Random(0))
+        self.assertGreater(s, d)
+        self.assertLess(p, 0.05)
+        self.assertEqual(ns + nd, 66)
+
+    def test_classification_file(self):
+        classes = anatomy_test.load_classes(False)
+        self.assertEqual(len(classes), 54)
+        self.assertTrue(all(r["根"] in {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"} for r in classes.values()))
+        self.assertTrue(all(r["葉"] in {"L0", "L1", "L2", "L3", "L4", "L5"} for r in classes.values()))
+
+
+class MismatchTest(unittest.TestCase):
+    def test_load_consistent(self):
+        mism, roots, lang = mismatch_test.load()
+        self.assertEqual(len(mism), 52)
+        self.assertTrue(all(0 <= v <= 4 for v in mism.values()))
+        self.assertTrue(set(mism) <= set(roots) and set(mism) <= set(lang))
+        self.assertTrue(all(roots[p] != "R0" for p in mism))
+
+    def test_perm_p(self):
+        import random
+        # 明らかな差は小さな p
+        labels = ["x"] * 10 + ["y"] * 10
+        vals = [1] * 10 + [0] * 10
+
+        def stat(ls):
+            return sum(v for v, l in zip(vals, ls) if l == "x") - sum(v for v, l in zip(vals, ls) if l == "y")
+
+        p = mismatch_test.perm_p(stat(labels), stat, labels, 500, random.Random(0))
+        self.assertLess(p, 0.01)
+
+
+class RaterAggregateTest(unittest.TestCase):
+    def test_fleiss_kappa(self):
+        # 手計算: P̄ = 7/9, Pe = 41/81 → κ = 22/40
+        k = rater_aggregate.fleiss_kappa([["a", "a", "a"], ["b", "b", "b"], ["a", "a", "b"]])
+        self.assertAlmostEqual(k, 0.55)
+        self.assertAlmostEqual(rater_aggregate.fleiss_kappa([["a", "a", "a"], ["b", "b", "b"]]), 1.0)
+
+
+class MixTextTest(unittest.TestCase):
+    def test_g2(self):
+        self.assertAlmostEqual(mix_text_test.g2([[10, 10], [10, 10]]), 0.0)
+        self.assertGreater(mix_text_test.g2([[20, 0], [0, 20]]), 50)
 
 
 if __name__ == "__main__":
