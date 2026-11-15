@@ -3,7 +3,8 @@
 
 Z1 ラベルの繰り返し / Z2 同じ頁の円形の文章との共有（頁の入れ替え） / Z3 語頭の分布 / Z4 頁ごとの語の候補。
 
-    python3 voynich/zodiac_labels.py
+    python3 voynich/zodiac_labels.py            # 第 2 段階
+    python3 voynich/zodiac_labels.py --stage3   # 第 3 段階（頁の並び順）
 """
 
 from __future__ import annotations
@@ -114,5 +115,75 @@ def main() -> None:
         print(f"   {p:<6} " + (", ".join(f"{w}×{c}{'（ラベル）' if w in inlab else ''}" for w, c in cand) or "なし"))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and "--stage3" not in sys.argv:
     main()
+
+
+# ---------------------------------------------------------------------------
+# 第 3 段階: 黄道の頁の並び順とラベル
+# ---------------------------------------------------------------------------
+
+SIGN = {"f70v2": "うお座", "f70v1": "おひつじ座（暗）", "f71r": "おひつじ座（明）", "f71v": "おうし座（明）",
+        "f72r1": "おうし座（暗）", "f72r2": "ふたご座", "f72r3": "かに座", "f72v3": "しし座", "f72v2": "おとめ座",
+        "f72v1": "てんびん座", "f73r": "さそり座", "f73v": "いて座"}
+ORDER = list(SIGN)
+
+
+def stage3() -> None:
+    rng = random.Random(2026)
+    args = corpus.make_parser("").parse_args([])
+    args.locus = None
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    lab, allw = defaultdict(list), defaultdict(set)
+    for ln in lines:
+        if ln.page.name in SIGN:
+            ws = ivtff.words(ln.raw, opts)
+            if ln.locus_class == "L":
+                lab[ln.page.name] += [w for w in ws if len(ivtff.glyphs(w)) >= 3]
+            allw[ln.page.name].update(ws)
+    where = defaultdict(set)
+    for p in ORDER:
+        for w in set(lab[p]):
+            where[w].add(p)
+    rep = {w: ps for w, ps in where.items() if len(ps) >= 2}
+
+    def zo1(order):
+        idx = {p: i for i, p in enumerate(order)}
+        d = [abs(idx[a] - idx[b]) for ps in rep.values() for a in ps for b in ps if a < b]
+        return sum(d) / len(d)
+
+    def jac(a, b):
+        return len(allw[a] & allw[b]) / len(allw[a] | allw[b])
+
+    def zo2(order):
+        adj = [jac(a, b) for a, b in zip(order, order[1:])]
+        non = [jac(order[i], order[j]) for i in range(len(order)) for j in range(i + 2, len(order))]
+        return sum(adj) / len(adj) - sum(non) / len(non)
+
+    o1, o2 = zo1(ORDER), zo2(ORDER)
+    g1 = g2 = 0
+    n1, n2 = [], []
+    for _ in range(5000):
+        sh = ORDER[:]
+        rng.shuffle(sh)
+        a, b = zo1(sh), zo2(sh)
+        n1.append(a)
+        n2.append(b)
+        g1 += a <= o1
+        g2 += b >= o2
+    print(f"ZO1 繰り返すラベル {len(rep)} 語: 出る頁どうしの並び順の差の平均 {o1:.2f}、入れ替えた場合 {sum(n1) / 5000:.2f}、"
+          f"p = {(g1 + 1) / 5001:.4f}")
+    for w, ps in sorted(rep.items(), key=lambda x: -len(x[1])):
+        print(f"   {w:<10} " + ", ".join(f"{SIGN[p]}" for p in ORDER if p in ps))
+    print(f"ZO2 隣り合う月の Jaccard − 隣り合わない組 = {o2:+.4f}、入れ替えた場合 {sum(n2) / 5000:+.4f}、"
+          f"p = {(g2 + 1) / 5001:.4f}")
+    pairs = sorted(((jac(a, b), a, b) for i, a in enumerate(ORDER) for b in ORDER[i + 1:]), reverse=True)
+    rank = {(a, b): r + 1 for r, (_, a, b) in enumerate(pairs)}
+    for a, b in (("f70v1", "f71r"), ("f71v", "f72r1")):
+        print(f"ZO3 {SIGN[a]}–{SIGN[b]}: Jaccard {jac(a, b):.3f}、66 組中 {rank[(a, b)]} 番目")
+    print("   似ている組の上位 5: " + ", ".join(f"{SIGN[a]}–{SIGN[b]} {j:.3f}" for j, a, b in pairs[:5]))
+
+
+if __name__ == "__main__" and "--stage3" in sys.argv:
+    stage3()
