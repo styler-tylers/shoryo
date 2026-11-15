@@ -91,7 +91,7 @@ def source_wn(G, rng, n_types=8000):
     return f, f
 
 
-def build(inner_src, edge_src, G, rng, c=0.4, beta=0.5, q=0.25, vary=False, short_last=False, width=37, cap=30000, lpp=25):
+def build(inner_src, edge_src, G, rng, c=0.4, beta=0.5, q=0.25, vary=False, short_last=False, width=37, cap=30000, lpp=25, n_last=3):
     lines, inner, cur, cur_len, total = [], [], [], 0, 0
     W = width
 
@@ -122,7 +122,7 @@ def build(inner_src, edge_src, G, rng, c=0.4, beta=0.5, q=0.25, vary=False, shor
         line = line[k:] + line[:k]
         a = edge_src()
         if short_last:
-            cands = [edge_src() for _ in range(3)]
+            cands = [edge_src() for _ in range(n_last)]
             b = None if None in cands else min(cands, key=len)
         else:
             b = edge_src()
