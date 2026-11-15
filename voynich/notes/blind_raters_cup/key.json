@@ -1,0 +1,986 @@
+{
+ "G6818": {
+  "ms": "voynich",
+  "page": "f10v"
+ },
+ "G3928": {
+  "ms": "voynich",
+  "page": "f11r"
+ },
+ "G1455": {
+  "ms": "voynich",
+  "page": "f13r"
+ },
+ "G7099": {
+  "ms": "voynich",
+  "page": "f14v"
+ },
+ "G6935": {
+  "ms": "voynich",
+  "page": "f15r"
+ },
+ "G5291": {
+  "ms": "voynich",
+  "page": "f15v"
+ },
+ "G3662": {
+  "ms": "voynich",
+  "page": "f16r"
+ },
+ "G1182": {
+  "ms": "voynich",
+  "page": "f16v"
+ },
+ "G4075": {
+  "ms": "voynich",
+  "page": "f17r"
+ },
+ "G6057": {
+  "ms": "voynich",
+  "page": "f17v"
+ },
+ "G6826": {
+  "ms": "voynich",
+  "page": "f18r"
+ },
+ "G9628": {
+  "ms": "voynich",
+  "page": "f18v"
+ },
+ "G1009": {
+  "ms": "voynich",
+  "page": "f20r"
+ },
+ "G9519": {
+  "ms": "voynich",
+  "page": "f20v"
+ },
+ "G1934": {
+  "ms": "voynich",
+  "page": "f21v"
+ },
+ "G4309": {
+  "ms": "voynich",
+  "page": "f22r"
+ },
+ "G1227": {
+  "ms": "voynich",
+  "page": "f22v"
+ },
+ "G1031": {
+  "ms": "voynich",
+  "page": "f23v"
+ },
+ "G5930": {
+  "ms": "voynich",
+  "page": "f24v"
+ },
+ "G8797": {
+  "ms": "voynich",
+  "page": "f25r"
+ },
+ "G3118": {
+  "ms": "voynich",
+  "page": "f26r"
+ },
+ "G5827": {
+  "ms": "voynich",
+  "page": "f26v"
+ },
+ "G4751": {
+  "ms": "voynich",
+  "page": "f27r"
+ },
+ "G7812": {
+  "ms": "voynich",
+  "page": "f27v"
+ },
+ "G9211": {
+  "ms": "voynich",
+  "page": "f28r"
+ },
+ "G8663": {
+  "ms": "voynich",
+  "page": "f28v"
+ },
+ "G2482": {
+  "ms": "voynich",
+  "page": "f29r"
+ },
+ "G8716": {
+  "ms": "voynich",
+  "page": "f29v"
+ },
+ "G3682": {
+  "ms": "voynich",
+  "page": "f2r"
+ },
+ "G7741": {
+  "ms": "voynich",
+  "page": "f2v"
+ },
+ "G7207": {
+  "ms": "voynich",
+  "page": "f30r"
+ },
+ "G6557": {
+  "ms": "voynich",
+  "page": "f30v"
+ },
+ "G4773": {
+  "ms": "voynich",
+  "page": "f31r"
+ },
+ "G6725": {
+  "ms": "voynich",
+  "page": "f31v"
+ },
+ "G4079": {
+  "ms": "voynich",
+  "page": "f33r"
+ },
+ "G3879": {
+  "ms": "voynich",
+  "page": "f33v"
+ },
+ "G7095": {
+  "ms": "voynich",
+  "page": "f34r"
+ },
+ "G4892": {
+  "ms": "voynich",
+  "page": "f34v"
+ },
+ "G5530": {
+  "ms": "voynich",
+  "page": "f35r"
+ },
+ "G1278": {
+  "ms": "voynich",
+  "page": "f36r"
+ },
+ "G8923": {
+  "ms": "voynich",
+  "page": "f36v"
+ },
+ "G9678": {
+  "ms": "voynich",
+  "page": "f37v"
+ },
+ "G8832": {
+  "ms": "voynich",
+  "page": "f38v"
+ },
+ "G5796": {
+  "ms": "voynich",
+  "page": "f39r"
+ },
+ "G4586": {
+  "ms": "voynich",
+  "page": "f39v"
+ },
+ "G6788": {
+  "ms": "voynich",
+  "page": "f40v"
+ },
+ "G9022": {
+  "ms": "voynich",
+  "page": "f42r"
+ },
+ "G4016": {
+  "ms": "voynich",
+  "page": "f42v"
+ },
+ "G8574": {
+  "ms": "voynich",
+  "page": "f43v"
+ },
+ "G9497": {
+  "ms": "voynich",
+  "page": "f46r"
+ },
+ "G9885": {
+  "ms": "voynich",
+  "page": "f46v"
+ },
+ "G4595": {
+  "ms": "voynich",
+  "page": "f47v"
+ },
+ "G2562": {
+  "ms": "voynich",
+  "page": "f48v"
+ },
+ "G1981": {
+  "ms": "voynich",
+  "page": "f49r"
+ },
+ "G9025": {
+  "ms": "voynich",
+  "page": "f4r"
+ },
+ "G4419": {
+  "ms": "voynich",
+  "page": "f4v"
+ },
+ "G5224": {
+  "ms": "voynich",
+  "page": "f51r"
+ },
+ "G7356": {
+  "ms": "voynich",
+  "page": "f52v"
+ },
+ "G8262": {
+  "ms": "voynich",
+  "page": "f54v"
+ },
+ "G7051": {
+  "ms": "voynich",
+  "page": "f55v"
+ },
+ "G3354": {
+  "ms": "voynich",
+  "page": "f57r"
+ },
+ "G9709": {
+  "ms": "voynich",
+  "page": "f5v"
+ },
+ "G5521": {
+  "ms": "voynich",
+  "page": "f65r"
+ },
+ "G9532": {
+  "ms": "voynich",
+  "page": "f65v"
+ },
+ "G4255": {
+  "ms": "voynich",
+  "page": "f6v"
+ },
+ "G7675": {
+  "ms": "voynich",
+  "page": "f7r"
+ },
+ "G7920": {
+  "ms": "voynich",
+  "page": "f7v"
+ },
+ "G3043": {
+  "ms": "voynich",
+  "page": "f87r"
+ },
+ "G7487": {
+  "ms": "voynich",
+  "page": "f8r"
+ },
+ "G1783": {
+  "ms": "voynich",
+  "page": "f8v"
+ },
+ "G2084": {
+  "ms": "voynich",
+  "page": "f90r"
+ },
+ "G4758": {
+  "ms": "voynich",
+  "page": "f90v_part"
+ },
+ "G5685": {
+  "ms": "voynich",
+  "page": "f93r"
+ },
+ "G1064": {
+  "ms": "voynich",
+  "page": "f93v"
+ },
+ "G9487": {
+  "ms": "voynich",
+  "page": "f94r"
+ },
+ "G8691": {
+  "ms": "voynich",
+  "page": "f94v_and_95r"
+ },
+ "G7929": {
+  "ms": "voynich",
+  "page": "f96r"
+ },
+ "G4800": {
+  "ms": "voynich",
+  "page": "f96v"
+ },
+ "G1695": {
+  "ms": "voynich",
+  "page": "f9r"
+ },
+ "G1111": {
+  "ms": "voynich",
+  "page": "f9v"
+ },
+ "G8233": {
+  "ms": "ljs419",
+  "page": "L004"
+ },
+ "G8321": {
+  "ms": "ljs419",
+  "page": "L006"
+ },
+ "G2604": {
+  "ms": "ljs419",
+  "page": "L010"
+ },
+ "G2319": {
+  "ms": "ljs419",
+  "page": "L017"
+ },
+ "G7162": {
+  "ms": "ljs419",
+  "page": "L018"
+ },
+ "G6462": {
+  "ms": "ljs419",
+  "page": "L023"
+ },
+ "G4091": {
+  "ms": "ljs419",
+  "page": "L024"
+ },
+ "G6622": {
+  "ms": "ljs419",
+  "page": "L029"
+ },
+ "G6487": {
+  "ms": "ljs419",
+  "page": "L032"
+ },
+ "G5203": {
+  "ms": "ljs419",
+  "page": "L034"
+ },
+ "G8158": {
+  "ms": "ljs419",
+  "page": "L037"
+ },
+ "G4491": {
+  "ms": "ljs419",
+  "page": "L040"
+ },
+ "G9195": {
+  "ms": "ljs419",
+  "page": "L050"
+ },
+ "G4392": {
+  "ms": "ljs419",
+  "page": "L055"
+ },
+ "G4984": {
+  "ms": "ljs419",
+  "page": "L063"
+ },
+ "G8347": {
+  "ms": "ljs419",
+  "page": "L065"
+ },
+ "G1442": {
+  "ms": "ljs419",
+  "page": "L068"
+ },
+ "G1260": {
+  "ms": "ljs419",
+  "page": "L070"
+ },
+ "G5799": {
+  "ms": "ljs419",
+  "page": "L071"
+ },
+ "G3839": {
+  "ms": "ljs419",
+  "page": "L074"
+ },
+ "G3540": {
+  "ms": "ljs419",
+  "page": "L080"
+ },
+ "G1592": {
+  "ms": "ljs419",
+  "page": "L083"
+ },
+ "G2659": {
+  "ms": "ljs419",
+  "page": "L084"
+ },
+ "G5146": {
+  "ms": "ljs419",
+  "page": "L086"
+ },
+ "G9637": {
+  "ms": "ljs419",
+  "page": "L098"
+ },
+ "G8719": {
+  "ms": "ljs419",
+  "page": "L104"
+ },
+ "G3644": {
+  "ms": "ljs419",
+  "page": "L106"
+ },
+ "G8882": {
+  "ms": "ljs419",
+  "page": "L112"
+ },
+ "G1150": {
+  "ms": "ljs419",
+  "page": "L123"
+ },
+ "G1433": {
+  "ms": "ljs419",
+  "page": "L124"
+ },
+ "G3635": {
+  "ms": "ljs419",
+  "page": "L137"
+ },
+ "G6643": {
+  "ms": "ljs419",
+  "page": "L138"
+ },
+ "G7865": {
+  "ms": "ljs419",
+  "page": "L142"
+ },
+ "G1753": {
+  "ms": "ljs419",
+  "page": "L143"
+ },
+ "G8572": {
+  "ms": "ljs419",
+  "page": "L160"
+ },
+ "G5966": {
+  "ms": "ljs419",
+  "page": "L161"
+ },
+ "G9844": {
+  "ms": "ljs419",
+  "page": "L163"
+ },
+ "G3211": {
+  "ms": "ljs419",
+  "page": "L164"
+ },
+ "G7118": {
+  "ms": "ljs419",
+  "page": "L165"
+ },
+ "G7081": {
+  "ms": "ljs419",
+  "page": "L170"
+ },
+ "G4958": {
+  "ms": "ljs419",
+  "page": "L173"
+ },
+ "G1761": {
+  "ms": "ljs419",
+  "page": "L175"
+ },
+ "G1354": {
+  "ms": "ljs419",
+  "page": "L178"
+ },
+ "G6001": {
+  "ms": "ljs419",
+  "page": "L181"
+ },
+ "G9424": {
+  "ms": "ljs419",
+  "page": "L182"
+ },
+ "G4060": {
+  "ms": "ljs419",
+  "page": "L188"
+ },
+ "G2908": {
+  "ms": "ljs419",
+  "page": "L191"
+ },
+ "G8043": {
+  "ms": "ljs419",
+  "page": "L192"
+ },
+ "G1637": {
+  "ms": "ljs419",
+  "page": "L194"
+ },
+ "G5672": {
+  "ms": "ljs419",
+  "page": "L198"
+ },
+ "G2676": {
+  "ms": "oakspring_1455",
+  "page": 5
+ },
+ "G7283": {
+  "ms": "oakspring_1455",
+  "page": 6
+ },
+ "G5641": {
+  "ms": "oakspring_1455",
+  "page": 10
+ },
+ "G1056": {
+  "ms": "oakspring_1455",
+  "page": 12
+ },
+ "G8704": {
+  "ms": "oakspring_1455",
+  "page": 15
+ },
+ "G6616": {
+  "ms": "oakspring_1455",
+  "page": 19
+ },
+ "G9789": {
+  "ms": "oakspring_1455",
+  "page": 23
+ },
+ "G7671": {
+  "ms": "oakspring_1455",
+  "page": 32
+ },
+ "G9979": {
+  "ms": "oakspring_1455",
+  "page": 37
+ },
+ "G6793": {
+  "ms": "oakspring_1455",
+  "page": 43
+ },
+ "G1259": {
+  "ms": "oakspring_1455",
+  "page": 45
+ },
+ "G7413": {
+  "ms": "oakspring_1455",
+  "page": 65
+ },
+ "G5000": {
+  "ms": "oakspring_1455",
+  "page": 69
+ },
+ "G6642": {
+  "ms": "oakspring_1455",
+  "page": 82
+ },
+ "G9852": {
+  "ms": "oakspring_1455",
+  "page": 84
+ },
+ "G6538": {
+  "ms": "oakspring_1455",
+  "page": 85
+ },
+ "G9900": {
+  "ms": "oakspring_1455",
+  "page": 86
+ },
+ "G2045": {
+  "ms": "oakspring_1455",
+  "page": 94
+ },
+ "G8652": {
+  "ms": "oakspring_1455",
+  "page": 104
+ },
+ "G6970": {
+  "ms": "oakspring_1455",
+  "page": 108
+ },
+ "G4177": {
+  "ms": "oakspring_1455",
+  "page": 117
+ },
+ "G9723": {
+  "ms": "oakspring_1455",
+  "page": 120
+ },
+ "G6755": {
+  "ms": "oakspring_1455",
+  "page": 122
+ },
+ "G1250": {
+  "ms": "oakspring_1455",
+  "page": 130
+ },
+ "G7710": {
+  "ms": "oakspring_1455",
+  "page": 136
+ },
+ "G3657": {
+  "ms": "oakspring_1455",
+  "page": 141
+ },
+ "G1256": {
+  "ms": "oakspring_1455",
+  "page": 143
+ },
+ "G7858": {
+  "ms": "oakspring_1455",
+  "page": 148
+ },
+ "G3056": {
+  "ms": "oakspring_1455",
+  "page": 150
+ },
+ "G7711": {
+  "ms": "oakspring_1455",
+  "page": 155
+ },
+ "G8665": {
+  "ms": "oakspring_1455",
+  "page": 156
+ },
+ "G8430": {
+  "ms": "oakspring_1455",
+  "page": 158
+ },
+ "G7670": {
+  "ms": "oakspring_1455",
+  "page": 160
+ },
+ "G1806": {
+  "ms": "oakspring_1455",
+  "page": 164
+ },
+ "G5490": {
+  "ms": "oakspring_1455",
+  "page": 178
+ },
+ "G2808": {
+  "ms": "oakspring_1455",
+  "page": 184
+ },
+ "G3227": {
+  "ms": "oakspring_1455",
+  "page": 187
+ },
+ "G1933": {
+  "ms": "oakspring_1455",
+  "page": 192
+ },
+ "G2545": {
+  "ms": "oakspring_1455",
+  "page": 195
+ },
+ "G3762": {
+  "ms": "oakspring_1455",
+  "page": 196
+ },
+ "G8467": {
+  "ms": "oakspring_1455",
+  "page": 197
+ },
+ "G6863": {
+  "ms": "oakspring_1455",
+  "page": 199
+ },
+ "G8355": {
+  "ms": "oakspring_1455",
+  "page": 200
+ },
+ "G3243": {
+  "ms": "oakspring_1455",
+  "page": 203
+ },
+ "G9129": {
+  "ms": "oakspring_1455",
+  "page": 204
+ },
+ "G5061": {
+  "ms": "oakspring_1455",
+  "page": 210
+ },
+ "G2446": {
+  "ms": "oakspring_1455",
+  "page": 215
+ },
+ "G1487": {
+  "ms": "oakspring_1455",
+  "page": 222
+ },
+ "G5568": {
+  "ms": "oakspring_1455",
+  "page": 230
+ },
+ "G3974": {
+  "ms": "oakspring_1455",
+  "page": 231
+ },
+ "G8743": {
+  "ms": "ljs46",
+  "page": 8
+ },
+ "G8425": {
+  "ms": "ljs46",
+  "page": 11
+ },
+ "G8817": {
+  "ms": "ljs46",
+  "page": 13
+ },
+ "G2701": {
+  "ms": "ljs46",
+  "page": 14
+ },
+ "G6820": {
+  "ms": "ljs46",
+  "page": 15
+ },
+ "G9520": {
+  "ms": "ljs46",
+  "page": 16
+ },
+ "G6083": {
+  "ms": "ljs46",
+  "page": 17
+ },
+ "G7518": {
+  "ms": "ljs46",
+  "page": 19
+ },
+ "G5300": {
+  "ms": "ljs46",
+  "page": 22
+ },
+ "G7730": {
+  "ms": "ljs46",
+  "page": 23
+ },
+ "G6347": {
+  "ms": "ljs46",
+  "page": 24
+ },
+ "G1594": {
+  "ms": "ljs46",
+  "page": 25
+ },
+ "G7832": {
+  "ms": "ljs46",
+  "page": 28
+ },
+ "G6901": {
+  "ms": "ljs46",
+  "page": 29
+ },
+ "G3664": {
+  "ms": "ljs46",
+  "page": 31
+ },
+ "G4533": {
+  "ms": "ljs46",
+  "page": 34
+ },
+ "G1566": {
+  "ms": "ljs46",
+  "page": 35
+ },
+ "G1955": {
+  "ms": "ljs46",
+  "page": 36
+ },
+ "G8887": {
+  "ms": "ljs46",
+  "page": 38
+ },
+ "G9264": {
+  "ms": "ljs46",
+  "page": 40
+ },
+ "G4508": {
+  "ms": "ljs46",
+  "page": 42
+ },
+ "G3080": {
+  "ms": "ljs46",
+  "page": 48
+ },
+ "G1095": {
+  "ms": "ljs46",
+  "page": 50
+ },
+ "G7040": {
+  "ms": "ljs46",
+  "page": 51
+ },
+ "G4500": {
+  "ms": "ljs46",
+  "page": 53
+ },
+ "G1363": {
+  "ms": "ljs46",
+  "page": 54
+ },
+ "G2944": {
+  "ms": "ljs46",
+  "page": 59
+ },
+ "G5870": {
+  "ms": "ljs46",
+  "page": 60
+ },
+ "G5002": {
+  "ms": "ljs46",
+  "page": 64
+ },
+ "G4270": {
+  "ms": "ljs46",
+  "page": 69
+ },
+ "G5484": {
+  "ms": "ljs46",
+  "page": 70
+ },
+ "G7391": {
+  "ms": "ljs46",
+  "page": 71
+ },
+ "G9099": {
+  "ms": "ljs46",
+  "page": 72
+ },
+ "G6289": {
+  "ms": "ljs46",
+  "page": 74
+ },
+ "G3647": {
+  "ms": "ljs46",
+  "page": 76
+ },
+ "G3064": {
+  "ms": "ljs46",
+  "page": 77
+ },
+ "G5864": {
+  "ms": "ljs46",
+  "page": 81
+ },
+ "G7325": {
+  "ms": "ljs46",
+  "page": 83
+ },
+ "G7500": {
+  "ms": "ljs46",
+  "page": 85
+ },
+ "G2241": {
+  "ms": "ljs46",
+  "page": 88
+ },
+ "G5995": {
+  "ms": "ljs46",
+  "page": 89
+ },
+ "G1893": {
+  "ms": "ljs46",
+  "page": 92
+ },
+ "G3653": {
+  "ms": "ljs46",
+  "page": 96
+ },
+ "G5451": {
+  "ms": "ljs46",
+  "page": 98
+ },
+ "G8625": {
+  "ms": "ljs46",
+  "page": 100
+ },
+ "G2101": {
+  "ms": "ljs46",
+  "page": 103
+ },
+ "G9085": {
+  "ms": "ljs46",
+  "page": 104
+ },
+ "G4206": {
+  "ms": "ljs46",
+  "page": 107
+ },
+ "G9533": {
+  "ms": "ljs46",
+  "page": 108
+ },
+ "G2053": {
+  "ms": "ljs46",
+  "page": 113
+ },
+ "G2677": {
+  "ms": "ljs62",
+  "page": 2
+ },
+ "G5878": {
+  "ms": "ljs62",
+  "page": 4
+ },
+ "G8449": {
+  "ms": "ljs62",
+  "page": 5
+ },
+ "G4982": {
+  "ms": "ljs62",
+  "page": 6
+ },
+ "G9305": {
+  "ms": "ljs62",
+  "page": 7
+ },
+ "G5050": {
+  "ms": "ljs62",
+  "page": 10
+ },
+ "G2382": {
+  "ms": "ljs62",
+  "page": 11
+ },
+ "G2742": {
+  "ms": "ljs62",
+  "page": 12
+ },
+ "G2152": {
+  "ms": "ljs62",
+  "page": 14
+ },
+ "G2597": {
+  "ms": "ljs62",
+  "page": 15
+ },
+ "G3511": {
+  "ms": "ljs62",
+  "page": 16
+ },
+ "G4186": {
+  "ms": "ljs62",
+  "page": 17
+ },
+ "G9708": {
+  "ms": "ljs62",
+  "page": 18
+ },
+ "G9740": {
+  "ms": "ljs62",
+  "page": 19
+ },
+ "G3166": {
+  "ms": "ljs62",
+  "page": 20
+ },
+ "G9654": {
+  "ms": "ljs62",
+  "page": 21
+ }
+}

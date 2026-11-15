@@ -1,0 +1,247 @@
+code,Y1,Y2,note
+G6642,0,1,bulbs rounded
+G5146,0,1,rounded face root
+G1363,0,1,roots merge into stem
+G5966,0,1,fibrous roots
+G1260,0,0,quatrefoil root no rim
+G4984,0,1,spreading roots
+G7710,0,1,rounded tuber
+G3540,0,1,bent root tapering
+G8882,0,1,knotted root
+G7671,0,1,horizontal rhizome
+G5300,0,1,star shaped root
+G6820,0,1,forked roots merge
+G1981,0,1,tubers merge
+G1783,0,1,roots spread
+G4079,0,1,stems merge into roots
+G4491,0,0,swollen stem base no rim
+G1934,0,1,looped root rounded top
+G9264,0,1,mound base
+G5291,0,1,roots spread
+G5224,1,0,flat cupped root top stem inside
+G7670,0,1,bulb
+G3227,0,1,small root
+G2545,0,1,roots taper
+G5490,0,1,rhizome
+G9025,0,1,fibrous root
+G8817,0,1,root tapers
+G6001,0,1,fibrous root
+G1182,1,0,open flat root top stems inside
+G5530,0,0,cup shape is leaf mass not root
+G4586,1,1,elliptical rim at root top
+G9085,0,1,tuber
+G5451,0,1,root merges
+G5641,0,1,small roots
+G8158,0,1,knobby root
+G9520,0,1,forked root
+G2604,0,1,fibrous root
+G8743,0,1,forked root
+G1095,0,1,taproot
+G9709,1,0,small ring at tuber junction
+G9852,0,1,no root
+G5685,0,1,fibrous roots
+G7118,0,1,taproot
+G4060,0,1,runner roots
+G2446,0,1,bulb
+G9885,1,1,red cup mouth at root top
+G2597,0,1,bulb
+G8467,0,1,no root shown
+G6901,0,1,bulb
+G1487,0,1,grass base
+G8233,0,1,tuber
+G1227,0,1,stems merge into roots
+G8704,0,1,no root
+G6970,0,1,no root
+G4392,1,0,flared open root top
+G3879,0,1,roots spread
+G5796,1,1,flat elliptical platform stems inside
+G2659,0,1,forked root
+G9424,1,1,elliptical cut top with fibres
+G4758,0,1,root bends no rim
+G7162,0,1,root tapers
+G2152,0,1,rounded root
+G3762,0,1,fibrous root
+G9533,0,1,root merges
+G3657,0,1,rounded root
+G3511,0,1,bulb
+G1259,0,1,dome base
+G3354,0,1,roots merge
+G3635,0,1,no clear root
+G4595,1,0,flat root top with collar rim
+G1566,0,1,roots merge
+G9637,0,1,no stem rim
+G8430,0,1,fibrous root
+G9532,0,1,roots merge
+G8797,0,1,roots merge
+G9305,0,1,small roots
+G3118,0,1,roots merge
+G4500,0,0,flat scalloped root no rim
+G4075,0,1,fibrous root
+G7099,0,0,cut ends ringed but not stem junction
+G1594,0,1,roots merge
+G9723,0,1,small roots
+G4533,0,1,roots merge
+G4016,0,1,roots merge
+G3662,1,1,stems inside cut root top
+G8262,1,1,ring rim at root top
+G4270,1,1,cylindrical root with elliptical top
+G2045,0,1,roots merge
+G9900,0,1,roots merge
+G3064,0,1,head roots
+G8923,0,1,root merges
+G3647,0,1,roots merge
+G7095,1,0,oval opening at root top stem inside
+G2241,0,1,root tapers
+G9519,0,0,root partly cut off
+G3080,0,1,rounded root
+G4773,0,1,horizontal root
+G6487,0,1,quatrefoil root
+G5484,0,1,roots merge
+G1592,0,1,ground mass
+G2562,0,1,roots merge
+G9740,0,1,small roots
+G7920,0,1,small root
+G2908,0,1,rhizome
+G4958,0,1,tubers
+G8574,0,1,serpentine root
+G7040,0,1,rounded root tops
+G6083,0,1,flower shaped root
+G4186,0,1,serpent root ball top
+G6057,0,1,stem enters root no rim
+G7081,0,1,root mass
+G1031,0,1,roots merge
+G9099,0,1,rounded root
+G9979,0,1,small root
+G4800,0,1,root tapers
+G3166,0,1,small roots
+G6347,0,1,roots merge
+G1278,1,0,pale cup around stem bases above root
+G5061,0,1,no root
+G6863,0,1,small roots
+G1893,0,0,flat top horn root no rim
+G9195,0,1,roots merge
+G2084,0,1,root merges
+G1111,0,1,fibrous root
+G2742,0,1,bulbs
+G2101,0,1,red band collar on stem
+G7487,0,1,roots merge
+G3974,0,1,roots merge
+G5002,0,0,flat dark top no open rim
+G9129,0,1,root tapers
+G6755,0,1,fibrous root
+G9654,0,1,small roots
+G7711,0,1,taproot
+G6289,0,1,rosette root
+G5930,0,1,roots merge
+G4508,0,1,hand shaped root
+G7325,0,1,stems enter flat root no rim
+G1433,0,1,roots merge
+G8449,0,1,bulb
+G8691,1,1,flat elliptical platform leaves inside
+G5050,0,1,bulbs
+G2944,0,1,coiled dragon root no rim at stem
+G1806,0,1,fibrous roots
+G3211,0,1,bulb
+G5827,0,1,roots merge
+G3056,0,1,ground line
+G1753,0,1,small roots
+G7812,0,1,stem enters root no rim
+G1637,0,1,rhizome
+G2701,0,1,roots merge
+G5870,0,1,flat wavy root no rim
+G7518,0,1,roots merge
+G6462,0,1,root tapers
+G6818,0,1,roots merge
+G1455,1,1,stems rise from cut stump tops
+G3644,0,0,tulip shaped collar over diamond root
+G2482,0,1,ground lines
+G9789,0,1,root tapers
+G8832,0,1,forked root
+G5521,0,1,round tuber
+G6643,0,1,horizontal root
+G6725,0,1,roots merge
+G9844,0,1,roots merge
+G1056,0,1,small root
+G2677,0,1,bulbs
+G6793,0,1,no root
+G2053,0,1,rounded root
+G7675,0,0,stem enters root top slight rim
+G8887,0,1,face root
+G6622,0,1,rounded tuber
+G2382,0,1,small roots
+G7832,0,1,roots merge
+G7929,0,1,ring is on stem not root top
+G8321,0,1,rounded base
+G5203,0,1,arched root
+G1256,0,1,no root
+G6557,0,1,ground line
+G8665,0,1,no root
+G7865,0,1,arched root
+G4982,0,1,small roots
+G6538,0,1,rhizome
+G5799,0,1,collar on stem
+G2319,0,1,roots merge
+G8652,0,1,no root
+G5000,0,1,no root
+G3653,0,1,dragon root
+G4255,0,1,roots merge
+G8663,0,1,roots merge
+G9497,1,0,flat platform with stems inside outline
+G8625,0,1,conical root merges
+G4091,0,1,dragon root
+G5568,0,1,root tapers
+G5672,0,0,striped root flat top with leaf collar
+G3664,0,1,roots merge
+G8347,0,1,roots merge
+G4419,0,1,tuber neck no rim
+G4892,1,0,oval opening at root top
+G6935,1,0,open notched root top stem inside
+G1354,0,1,round tuber
+G1761,0,1,horizontal rhizome
+G1955,0,1,human figure root
+G1150,0,1,roots merge
+G1250,0,1,root tapers
+G7283,0,1,small roots
+G9487,0,0,flat root top no clear rim
+G1064,1,1,bowl shaped root top stems inside
+G7500,0,1,roots merge
+G8355,0,1,small root
+G3928,1,1,ring tops on roots stems inside
+G1933,0,1,no root
+G7356,0,1,root merges
+G8572,0,1,roots merge
+G3043,0,1,root merges
+G8716,0,1,horizontal root
+G8719,0,1,looped root no rim
+G3243,0,1,no root
+G9678,1,1,elliptical rim at root top stem inside
+G7391,0,1,horizontal root
+G3839,0,1,human figure root
+G8043,0,1,tuberous roots
+G3682,0,1,curled roots
+G2808,0,1,root tapers
+G7207,0,1,bulb
+G7730,0,0,stacked root top filled no rim
+G9211,0,1,red root merges
+G4177,0,1,rhizome stems merge
+G4206,0,1,fibrous roots
+G6826,0,1,fibrous roots
+G8425,0,1,roots merge
+G7858,0,1,root tapers
+G2676,0,1,stems merge at ground
+G1442,0,1,tubers
+G4309,0,1,roots merge
+G7741,0,1,ground line
+G4751,0,1,roots merge
+G1009,0,1,fibrous root
+G5995,0,1,fibrous root
+G9628,0,1,root merges
+G5878,0,1,leaf base collar only
+G9708,0,1,bulbs
+G5864,0,1,roots merge
+G6616,0,1,root tapers
+G7413,0,1,fibrous roots
+G9022,0,1,root merges
+G6788,0,1,tubers
+G7051,0,1,roots merge
+G1695,1,1,stems rise from open root top
