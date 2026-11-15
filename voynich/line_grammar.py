@@ -6,6 +6,7 @@ G1 位置ごとの語頭・語末の分布 / G2 行の 1 語目と最後の語�
     python3 voynich/line_grammar.py <ラテン語のテキスト …>
     python3 voynich/line_grammar.py --stage2   # 行頭・行末の型は普通の語＋印か
     python3 voynich/line_grammar.py --stage3   # 行の中ほどの語だけでやり直す
+    python3 voynich/line_grammar.py --stage4   # 行頭にしか出ない語
 """
 
 from __future__ import annotations
@@ -105,7 +106,7 @@ def main() -> None:
                   f"p = {pv:.4f}（{n} 行）")
 
 
-if __name__ == "__main__" and not ({"--stage2", "--stage3"} & set(sys.argv)):
+if __name__ == "__main__" and not ({"--stage2", "--stage3", "--stage4"} & set(sys.argv)):
     main()
 
 
@@ -186,3 +187,79 @@ if __name__ == "__main__" and "--stage2" in sys.argv:
     stage2()
 if __name__ == "__main__" and "--stage3" in sys.argv:
     stage3([])
+
+
+# ---------------------------------------------------------------------------
+# 第 4 段階: 行頭にしか出ない語
+# ---------------------------------------------------------------------------
+
+
+def stage4() -> None:
+    rng = random.Random(2026)
+    args = corpus.make_parser("").parse_args([])
+    args.locus = "P"
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    for lang in ("A", "B"):
+        L = [(ln, ivtff.words(ln.raw, opts)) for ln in lines if ln.page.get("L") == lang]
+        L = [(ln, ws) for ln, ws in L if len(ws) >= 3]
+        not_first = set(w for _, ws in L for w in ws[1:])
+        only = set(ws[0] for _, ws in L) - not_first
+        print(f"=== 言語 {lang}: 行頭だけの語 {len(only)} 種類 ===")
+        # I1
+        a = sum(ws[0] in only for ln, ws in L if ln.position == "@")
+        n1 = sum(1 for ln, _ in L if ln.position == "@")
+        c = sum(ws[0] in only for ln, ws in L if ln.position != "@")
+        n2 = len(L) - n1
+        print(f"I1 行頭の語のうち行頭だけの語: 段落の 1 行目 {a}/{n1}（{a / max(1, n1):.0%}）、それ以外 {c}/{n2}（{c / n2:.0%}）、"
+              f"p = {fisher(a, n1 - a, c, n2 - c):.3g}")
+        # I2
+        pages_of = defaultdict(set)
+        count = Counter()
+        for ln, ws in L:
+            for w in ws:
+                pages_of[w].add(ln.page.name)
+                count[w] += 1
+        multi = [w for w in only if count[w] >= 2]
+        obs = sum(len(pages_of[w]) == 1 for w in multi) / max(1, len(multi))
+        mids_by_n = defaultdict(list)
+        for w in set(w for _, ws in L for w in ws[1:-1]):
+            if w not in only:
+                mids_by_n[count[w]].append(w)
+        vals = []
+        for _ in range(200):
+            pick = []
+            for w in multi:
+                pool = mids_by_n.get(count[w]) or mids_by_n[2]
+                pick.append(rng.choice(pool))
+            vals.append(sum(len(pages_of[w]) == 1 for w in pick) / max(1, len(pick)))
+        print(f"I2 2 回以上出る行頭だけの語 {len(multi)} 種類のうち、1 つの頁だけに出る割合 {obs:.0%}、"
+              f"同じ回数の中ほどの語 {statistics.mean(vals):.0%}（200 回の平均）、"
+              f"中ほどの方が同じか高い回 {sum(v >= obs for v in vals)}/200")
+        # I3
+        mids_page = defaultdict(set)
+        for ln, ws in L:
+            mids_page[ln.page.name].update(ws[1:-1])
+        items = [(ln.page.name, "".join(ivtff.glyphs(ws[0])[1:])) for ln, ws in L if ws[0] in only and len(ivtff.glyphs(ws[0])) >= 3]
+        pages = list(mids_page)
+
+        def rate(assign):
+            return sum(rest in mids_page[assign[p]] for p, rest in items) / len(items)
+
+        obs3 = rate({p: p for p in pages})
+        ge = 0
+        null = []
+        for _ in range(2000):
+            sh = pages[:]
+            rng.shuffle(sh)
+            r = rate(dict(zip(pages, sh)))
+            null.append(r)
+            ge += r >= obs3
+        print(f"I3 最初の字形を除いた形が同じ頁の中ほどに出る割合 {obs3:.1%}、頁を入れ替えた場合 {statistics.mean(null):.1%}、"
+              f"p = {(ge + 1) / 2001:.4f}（{len(items)} 語）")
+        print("   例: " + ", ".join(sorted(only, key=lambda w: -count[w])[:12]))
+        print()
+
+
+if __name__ == "__main__" and "--stage4" in sys.argv:
+    stage4()
