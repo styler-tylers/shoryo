@@ -8,6 +8,7 @@
     python3 voynich/null_generator.py                    # 第 1 段階
     python3 voynich/null_generator.py --stage2           # 語の表の大きさ
     python3 voynich/null_generator.py --stage3 <テキスト …>  # 語彙の使い方を自然言語と比べる
+    python3 voynich/null_generator.py --stage4           # 写しの層を除いてやり直す
 """
 
 from __future__ import annotations
@@ -168,7 +169,7 @@ def main() -> None:
         print(f"合う量: {hits}/{len(TOL)}\n")
 
 
-if __name__ == "__main__" and not ({"--stage2", "--stage3"} & set(sys.argv)):
+if __name__ == "__main__" and not ({"--stage2", "--stage3", "--stage4"} & set(sys.argv)):
     main()
 
 
@@ -264,3 +265,80 @@ if __name__ == "__main__" and "--stage2" in sys.argv:
     stage2()
 if __name__ == "__main__" and "--stage3" in sys.argv:
     stage3([Path(p) for p in sys.argv[sys.argv.index("--stage3") + 1:]])
+
+
+# ---------------------------------------------------------------------------
+# 第 4 段階: 写しの層を除いてやり直す
+# ---------------------------------------------------------------------------
+
+
+def remove_copies(pages, window: float = 0.2):
+    """1 つ上の行の、相対位置 window 以内に同じ語か字形 1 つ違いの語がある語を除く。"""
+    out, removed, total = {}, 0, 0
+    for p, ls in pages.items():
+        new = [ls[0][:]]
+        for li in range(1, len(ls)):
+            line, above = ls[li], ls[li - 1]
+            keep = []
+            for wi, w in enumerate(line):
+                total += 1
+                x = wi / (len(line) - 1) if len(line) > 1 else 0.5
+                hit = any(sc.distance(w, a) <= 1 and abs(x - (aj / (len(above) - 1) if len(above) > 1 else 0.5)) <= window
+                          for aj, a in enumerate(above))
+                if hit:
+                    removed += 1
+                else:
+                    keep.append(w)
+            new.append(keep if keep else [])
+        out[p] = [l for l in new if l]
+        total += len(ls[0])
+    return {p: ls for p, ls in out.items() if len(ls) >= 3}, removed / total
+
+
+def stage4() -> None:
+    import section_vocab
+    rng = random.Random(2026)
+    args = corpus.make_parser("").parse_args([])
+    args.locus = None
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    print("R1 写しの候補を除いた後の、k 行上の倍率（同じ頁 ÷ 別の頁）")
+    for lang in ("A", "B"):
+        pl = [ln for ln in lines if ln.page.get("L") == lang and ln.locus_class == "P"]
+        pages = sc.page_lines(pl, opts)
+        clean, frac = remove_copies(pages)
+        before = {k: s / o for k, s, o, _ in sc.decay(pages, 8, rng, 2)}
+        after = {k: s / o for k, s, o, _ in sc.decay(clean, 8, rng, 2)}
+        print(f"  言語 {lang}: 除いた語の割合 {frac:.0%}")
+        print("     k:      " + "".join(f"{k:>7}" for k in range(4, 9)))
+        print("     除く前: " + "".join(f"{before[k]:>7.2f}" for k in range(4, 9)))
+        print("     除いた後: " + "".join(f"{after[k]:>7.2f}" for k in range(4, 9)))
+
+    # R2: 本文（段落）から写しの候補を除いて、第 11 回の L1 をやり直す
+    labels, text, meta = section_vocab.load()
+    para_lines = [ln for ln in lines if ln.locus_class == "P"]
+    clean_para = {}
+    for lang in ("A", "B", None):
+        group = [ln for ln in para_lines if ln.page.get("L") == lang] if lang else \
+            [ln for ln in para_lines if ln.page.get("L") not in ("A", "B")]
+        pages = defaultdict(list)
+        for ln in group:
+            ws = ivtff.words(ln.raw, opts)
+            if ws:
+                pages[ln.page.name].append(ws)
+        for p, ls in pages.items():
+            c, _ = remove_copies({p: ls}) if len(ls) >= 3 else ({p: ls}, 0)
+            clean_para[p] = [w for l in c.get(p, ls) for w in l]
+    other = defaultdict(list)
+    for ln in lines:
+        if ln.locus_class in ("C", "R"):
+            other[ln.page.name] += ivtff.words(ln.raw, opts)
+    new_text = defaultdict(list)
+    for p in set(clean_para) | set(other):
+        new_text[p] = clean_para.get(p, []) + other.get(p, [])
+    print("\nR2 本文から写しの候補を除いて、第 11 回の L1 をやり直す")
+    section_vocab.l1(labels, new_text, meta, random.Random(2026))
+
+
+if __name__ == "__main__" and "--stage4" in sys.argv:
+    stage4()
