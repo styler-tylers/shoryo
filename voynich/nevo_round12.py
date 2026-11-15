@@ -115,7 +115,7 @@ class Compat:
         return rng.choices(hs, [self.G.h[x] for x in hs])[0] + m + e or w
 
 
-def build12(inner_src, edge_src, G, C, rng, c=0.4, beta=0.4, alpha=0.0, compat=True, q=0.25, width=37, cap=30000, lpp=25):
+def build12(inner_src, edge_src, G, C, rng, c=0.4, beta=0.4, alpha=0.0, compat=True, q=0.25, width=37, cap=30000, lpp=25, wfun=None):
     lines, inner, cur, cur_len, total = [], [], [], 0, 0
     W = width
 
@@ -131,7 +131,7 @@ def build12(inner_src, edge_src, G, C, rng, c=0.4, beta=0.4, alpha=0.0, compat=T
             if r <= 0:
                 line = l
                 break
-        return rng.choices(line, [1 / len(w) ** 2 for w in line])[0]
+        return rng.choices(line, [wfun(w) if wfun else 1 / len(w) ** 2 for w in line])[0]
 
     def plain_mutate(w):
         h, m, e = split(w)
