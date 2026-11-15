@@ -74,7 +74,12 @@ def load_manifest() -> dict[str, tuple[str, int, int]]:
         label = "".join(canvas.get("label", {}).get("none", []))
         body = canvas["items"][0]["items"][0]["body"]
         service = body["id"].split("/full/")[0]
-        pages["f" + label] = (service, body["width"], body["height"])
+        key = "f" + label
+        n = 2
+        while key in pages:  # 同じラベルの画像が複数ある（例: '102v (part)' が 2 枚）
+            key = f"f{label} [{n}]"
+            n += 1
+        pages[key] = (service, body["width"], body["height"])
     return pages
 
 
