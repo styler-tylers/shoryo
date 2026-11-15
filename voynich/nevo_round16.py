@@ -26,16 +26,27 @@ SHOW = ["8量", "h2", "歪度", "T1頭", "T1中", "T1末", "G1", "G10", "隣", "
 
 
 def homophone_source(caesar, G, K, rng, n=300000):
+    """平文の語の種類に、型で出やすい語を K 個ずつ当てる。型の語の数が足りないときは、
+    よく出る語から K 個ずつ当て、足りなくなった稀な語には 1 個ずつ当てる（全ての種類に最低 1 個）。"""
     gen = Counter(G.word(rng) for _ in range(n))
     lex = [w for w, _ in gen.most_common()]
     types = [w for w, _ in Counter(caesar).most_common()]
-    while len(lex) < K * len(types):
+    tries = 0
+    while len(lex) < len(types) and tries < 10 * n:
         w = G.word(rng)
+        tries += 1
         if w not in gen:
             gen[w] = 0
             lex.append(w)
-    variants = {t: lex[K * r:K * r + K] for r, t in enumerate(types)}
+    variants, pos = {}, 0
+    for r, t in enumerate(types):
+        left = len(types) - r - 1
+        k = max(1, min(K, len(lex) - pos - left))
+        variants[t] = lex[pos:pos + k] or [lex[-1]]
+        pos += k
     w2t = {w: t for t, vs in variants.items() for w in vs}
+    print(f"     （K = {K}: 型の語 {len(lex)} 種類、平文の語 {len(types)} 種類、K 個を当てた種類 "
+          f"{sum(len(v) == K for v in variants.values())}）")
     half = len(caesar) // 2
     it = iter([rng.choice(variants[w]) for w in caesar[:half]])
     edge = [rng.choice(variants[w]) for w in caesar[half:]]
