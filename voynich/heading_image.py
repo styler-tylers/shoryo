@@ -5,6 +5,7 @@ H1 色の特徴の距離 × 見出しの本体の編集距離 の相関 / H2 根
 同じクワイアの頁の組は除く。
 
     python3 voynich/heading_image.py
+    python3 voynich/heading_image.py --replication <判定のフォルダ>   # 追試（葉の形・花・根の大きさ）
 """
 
 from __future__ import annotations
@@ -104,5 +105,66 @@ def main() -> None:
         print()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and "--replication" not in sys.argv:
     main()
+
+
+# ---------------------------------------------------------------------------
+# 追試（第 18 回 C）: 盲検の判定の 3 つの特徴（葉の形・花・根の大きさ）
+# ---------------------------------------------------------------------------
+
+
+def replication(dirpath: Path) -> None:
+    import json
+    from collections import Counter
+    import rater_aggregate
+    rng = random.Random(2026)
+    key = json.loads((dirpath / "key.json").read_text())
+    raters = [rater_aggregate.read(dirpath / "out" / f"f{i}.csv") for i in (1, 2, 3)]
+    codes = [c for c in key if all(c in r for r in raters)]
+    feats = {}
+    for item in ("leaf", "flower", "root"):
+        votes = [[r[c][item].strip().lower() for r in raters] for c in codes]
+        print(f"判定者間の一致度 {item}: κ = {rater_aggregate.fleiss_kappa(votes):.2f}")
+        for c, v in zip(codes, votes):
+            top, n = Counter(v).most_common(1)[0]
+            feats.setdefault(key[c], {})[item] = top if n >= 2 else None
+    args = corpus.make_parser("").parse_args([])
+    args.locus = "P"
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    head, meta = {}, {}
+    for ln in lines:
+        if ln.page.get("I") != "H" or ln.position != "@" or ln.page.name in head:
+            continue
+        ws = ivtff.words(ln.raw, opts)
+        if ws:
+            head[ln.page.name] = heading(ws)
+            meta[ln.page.name] = ln.page
+    for lang in ("A", "B"):
+        pages = [p for p in feats if p in head and meta[p].get("L") == lang]
+        pairs = [(a, b) for i, a in enumerate(pages) for b in pages[i + 1:] if meta[a].get("Q") != meta[b].get("Q")]
+        match = [sum(1 for it in ("leaf", "flower", "root")
+                     if feats[a][it] is not None and feats[a][it] == feats[b][it]) for a, b in pairs]
+
+        def r_of(asg):
+            return pearson(match, [norm_dist(asg[a], asg[b]) for a, b in pairs])
+
+        obs = r_of(head)
+        le = 0
+        for _ in range(5000):
+            sh = [head[p] for p in pages]
+            rng.shuffle(sh)
+            le += r_of(dict(zip(pages, sh))) <= obs
+        print(f"=== 言語 {lang}（{len(pages)} 頁, 違うクワイアの組 {len(pairs)}）===")
+        print(f"一致する特徴の数 × 見出しの本体の距離 の相関 {obs:+.3f}、p = {(le + 1) / 5001:.4f}（片側, 負の相関）")
+        for it in ("leaf", "flower", "root"):
+            same = [norm_dist(head[a], head[b]) for a, b in pairs if feats[a][it] and feats[a][it] == feats[b][it]]
+            diff = [norm_dist(head[a], head[b]) for a, b in pairs if feats[a][it] and feats[b][it] and feats[a][it] != feats[b][it]]
+            if same and diff:
+                print(f"   {it}: 同じ {sum(same) / len(same):.3f}（{len(same)} 組）、違う {sum(diff) / len(diff):.3f}（{len(diff)} 組）")
+        print("   特徴の分布: " + ", ".join(f"{it} {dict(Counter(feats[p][it] for p in pages))}" for it in ("leaf", "flower", "root")))
+
+
+if __name__ == "__main__" and "--replication" in sys.argv:
+    replication(Path(sys.argv[sys.argv.index("--replication") + 1]))
