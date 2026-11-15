@@ -32,6 +32,8 @@ created: 2026-11-10
 - [[2026-11-10 ヴォイニッチ手稿 自己引用説の検証]] — 上の行を見て書いた形跡はあるが小さい（第 7 回）
 - [[2026-11-15 ヴォイニッチ手稿 自己引用の生成モデルとの比較]] — 写しの量は語の 2 割程度で再現できるが、行の距離による減衰が合わず、単純な自己引用では説明しきれない。頁ごとの語彙の偏りを加えると減衰は近づくが、同じ語の繰り返しが多すぎる。頁ごとに共有されるのは「1 字違いの語の家族」らしい（第 8 回）
 - [[2026-11-15 ヴォイニッチ手稿 書き手ごとの違い]] — 文章の性質はセクション＞クワイア≧書き手の順で変わる。同じクワイア・同じ内容の書き手 2 と 5 は区別できない（第 9 回）
+- [[2026-11-15 ヴォイニッチ手稿 語の家族]] — 1 字違いの語の家族は語頭・語中が変わり、語末は 11〜15%（ラテン語は 60%）（第 10 回）
+- [[2026-11-15 ヴォイニッチ手稿 セクションごとの語彙とラベル]] — ラベルはセクションの単位では本文と語彙を共有する（黄道・生物・宇宙）。薬学・植物では共有しない（第 11 回）
 
 ## 方法論
 
@@ -52,7 +54,7 @@ created: 2026-11-10
 - このリポジトリの `voynich/`: 分析スクリプト一式（使い方は `voynich/README.md`）
   - `word_freq.py` 単語頻度 / `affix.py` 語頭・語尾 / `line_position.py` 行頭・行末 / `vocab_shift.py` 語彙の移り変わり
   - `line_forms.py` 行頭形・行末形の検証 / `compare_transcriptions.py` 転写の比較 / `reorder.py` 元の並びの推定
-  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い
+  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い / `word_families.py` 語の家族 / `section_vocab.py` セクションの語彙とラベル
 
 ## 外部資料
 
