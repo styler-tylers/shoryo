@@ -163,6 +163,24 @@ def positional(word: str) -> list[str]:
     return [c + ("^" if i == 0 else "$" if i == n - 1 else "") for i, c in enumerate(word)]
 
 
+
+def syllable_code_e4(word: str) -> list[str]:
+    """E4: 頭の記号は、次の母音の記号の群（n ÷ 2）ごとに 4 種類ずつ。他は E2 と同じ。"""
+    parts = re.findall(r"[^aeiouy]*[aeiouy]+", word)
+    tail = word[len("".join(parts)):]
+    if not parts:
+        return [CODA[_h(word, 4)]]
+    out = []
+    for p in parts:
+        m = re.match(r"([^aeiouy]*)([aeiouy]+)", p)
+        n = _h("n" + m.group(2), 6)
+        g = n // 2
+        out += [ONSET[g * 4 + _h("o" + m.group(1), 4)], NUCLEUS[n]]
+    if tail:
+        out.append(CODA[_h("c" + tail, 4)])
+    return out
+
+
 def judge(e, v):
     ok = [k for k, (lo, hi) in FULL_RANGE.items() if lo <= e[k] <= hi]
     ok += [k for k, (lo, hi) in V_NAT.items() if v and lo <= v[k] <= hi]
@@ -179,6 +197,7 @@ def stage21(arabic, cherokee, latin) -> None:
         lw = ["".join(w) for w in unit_entropy.latin_words(p)]
         rows.append((f"ラテン語 {p.stem} E2 音節の暗号", [syllable_code(w) for w in lw]))
         rows.append((f"ラテン語 {p.stem} E3 位置の文字", [positional(w) for w in lw]))
+        rows.append((f"ラテン語 {p.stem} E4 隣に合わせる暗号", [syllable_code_e4(w) for w in lw]))
     for name, ws in rows:
         e = unit_entropy.entropies(ws)
         v = null_generator.vocab_stats(["".join(w) for w in ws])
@@ -196,3 +215,4 @@ if __name__ == "__main__" and "--stage21" in sys.argv:
     ap2.add_argument("--latin", nargs="*", type=Path, default=[])
     a2 = ap2.parse_args()
     stage21(a2.arabic, a2.cherokee, a2.latin)
+

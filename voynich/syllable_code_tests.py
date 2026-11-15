@@ -69,7 +69,8 @@ def main() -> None:
         measure(f"ヴォイニッチ {lang}", pages, lambda w: tuple(ivtff.glyphs(w)), rng)
     for p in map(Path, sys.argv[1:]):
         lw = ["".join(w) for w in unit_entropy.latin_words(p)][:30000]
-        for label, words in (("元", lw), ("E2 音節の暗号", ["".join(scripts_compare.syllable_code(w)) for w in lw])):
+        for label, words in (("元", lw), ("E2 音節の暗号", ["".join(scripts_compare.syllable_code(w)) for w in lw]),
+                             ("E4 隣に合わせる暗号", ["".join(scripts_compare.syllable_code_e4(w)) for w in lw])):
             sc.CHAR_MODE = True
             sc.glyph_tuple.cache_clear()
             sc.distance.cache_clear()
