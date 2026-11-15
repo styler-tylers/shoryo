@@ -42,6 +42,7 @@ created: 2026-11-10
 - [[2026-11-15 ヴォイニッチ手稿 行は意味の単位か]] — 行をまたぐと語のつながりが完全に切れる（R ≈ 0。折り返したラテン語は 0.9〜1.1）。行は幅いっぱいに書かれた独立した単位（第 16 回）
 - [[2026-11-15 ヴォイニッチ手稿 行の中の文法]] — 行の 1 語目と最後の語の型は結び付かない（1 行に 1 文のラテン語とは違う）。始めと終わりの型（行頭の y・背の高い字形、行末の -m）を独立に置く。行頭・行末の語を除くと語彙の使い方は自然言語の範囲にほぼ収まる（第 17 回）。段落の始まりの 7〜8 割は行頭だけの語で、頭の字形を除くと同じ頁の本文の語になりやすい
 - [[2026-11-15 ヴォイニッチ手稿 文章の分析のまとめ（第12〜17回）]] — 第 12〜17 回のまとめ。外れた説明と、残った 3 つの層（語の中の規則・自然言語型の語の使い方・独立した行と端の特別な語）
+- [[2026-11-15 ヴォイニッチ手稿 段落の始まりの語と絵、行の単位の先行研究]] — 言語 A の頁の見出し語は、絵が似ている頁ほど似る（p = 0.03, 補正後は有意でない）。行の単位は Currier（1976 年）以来の知見で、第 16 回はそれを数量で確かめたもの（第 18 回）
 
 ## 方法論
 
@@ -62,7 +63,7 @@ created: 2026-11-10
 - このリポジトリの `voynich/`: 分析スクリプト一式（使い方は `voynich/README.md`）
   - `word_freq.py` 単語頻度 / `affix.py` 語頭・語尾 / `line_position.py` 行頭・行末 / `vocab_shift.py` 語彙の移り変わり
   - `line_forms.py` 行頭形・行末形の検証 / `compare_transcriptions.py` 転写の比較 / `reorder.py` 元の並びの推定
-  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い / `word_families.py` 語の家族 / `section_vocab.py` セクションの語彙とラベル / `prefix_order.py` 語頭の入れ替え / `zodiac_labels.py` 黄道のラベル / `word_grammar.py` 語の組み立ての表 / `unit_entropy.py` 文字の単位と情報量 / `zodiac_days.py` 黄道のラベルの並び / `saints_calendar.py` 聖人暦との比較 / `null_generator.py` 意味の無い生成モデル / `function_words.py` `function_words2.py` `function_words3.py` 機能語らしい語 / `line_unit.py` 行の単位 / `line_grammar.py` 行の中の文法
+  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い / `word_families.py` 語の家族 / `section_vocab.py` セクションの語彙とラベル / `prefix_order.py` 語頭の入れ替え / `zodiac_labels.py` 黄道のラベル / `word_grammar.py` 語の組み立ての表 / `unit_entropy.py` 文字の単位と情報量 / `zodiac_days.py` 黄道のラベルの並び / `saints_calendar.py` 聖人暦との比較 / `null_generator.py` 意味の無い生成モデル / `function_words.py` `function_words2.py` `function_words3.py` 機能語らしい語 / `line_unit.py` 行の単位 / `line_grammar.py` 行の中の文法 / `heading_image.py` 見出し語と絵
 
 ## 外部資料
 
