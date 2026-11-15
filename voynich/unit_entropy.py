@@ -5,6 +5,7 @@ U0 EVA の文字 / U1 字形 / U2 よく一緒に出る字形の組をまとめ�
 h0, h1, h2（前の単位が分かったときの条件つきエントロピー）を測り、自然言語の文章と比べる。
 
     python3 voynich/unit_entropy.py --control <ラテン語などのテキスト …>
+    python3 voynich/unit_entropy.py --stage2 <テキスト …>   # 書き方を変えた自然言語
 """
 
 from __future__ import annotations
@@ -130,5 +131,59 @@ def main(argv=None) -> None:
               f"h2/h1 {min(r['h2/h1'] for r in res):.2f}〜{max(r['h2/h1'] for r in res):.2f}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and "--stage2" not in sys.argv:
     main()
+
+
+# ---------------------------------------------------------------------------
+# 第 2 段階: 書き方を変えた自然言語（子音だけ / 音節 / 冗長な暗号）
+# ---------------------------------------------------------------------------
+
+VOWELS = set("aeiouy")
+
+
+def consonants_only(words):
+    out = [[c for c in w if c not in VOWELS] for w in words]
+    return [w for w in out if w]
+
+
+def syllables(words):
+    out = []
+    for w in words:
+        s = "".join(w)
+        parts = re.findall(r"[^aeiouy]*[aeiouy]+", s)
+        tail = s[len("".join(parts)):]
+        if parts and tail:
+            parts[-1] += tail
+        elif not parts:
+            parts = [s]
+        out.append(parts)
+    return out
+
+
+def verbose(words, seed: int = 2026, alphabet: str = "abcdefghijkl"):
+    import random as _r
+    rng = _r.Random(seed)
+    letters = sorted({c for w in words for c in w})
+    pairs = [a + b for a in alphabet for b in alphabet]
+    rng.shuffle(pairs)
+    code = dict(zip(letters, pairs))
+    return [[ch for c in w for ch in code[c]] for w in words]
+
+
+def stage2(paths) -> None:
+    print(f"{'文章':<28}{'種類':>5}{'h0':>7}{'h1':>7}{'h2':>7}{'h2/h1':>8}{'語の長さ':>6}")
+    for name, f in (("T1 子音だけ", consonants_only), ("T2 音節", syllables), ("T3 冗長な暗号", verbose)):
+        rs = []
+        for path in paths:
+            r = entropies(f(latin_words(path)))
+            rs.append(r)
+            show(f"{name} {path.stem}", r)
+        hits = sum(1 for r in rs if 1.83 <= r["h2"] <= 2.52 and 0.32 <= r["h2/h1"] <= 0.80
+                   and 3.54 <= r["h1"] <= 4.19)
+        print(f"   → h2・h2/h1・h1 がヴォイニッチの範囲（±0.2・±0.3）に入る言語: {hits}/{len(rs)}\n")
+
+
+if __name__ == "__main__" and "--stage2" in sys.argv:
+    i = sys.argv.index("--stage2")
+    stage2([Path(p) for p in sys.argv[i + 1:]])
