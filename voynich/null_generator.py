@@ -5,7 +5,9 @@
 手順に入れていない性質（語彙の広がり、Zipf、語の家族の変わる位置、語頭の群の偏り、写しの減衰など）を、
 本物のヴォイニッチと比べる。
 
-    python3 voynich/null_generator.py
+    python3 voynich/null_generator.py                    # 第 1 段階
+    python3 voynich/null_generator.py --stage2           # 語の表の大きさ
+    python3 voynich/null_generator.py --stage3 <テキスト …>  # 語彙の使い方を自然言語と比べる
 """
 
 from __future__ import annotations
@@ -166,5 +168,99 @@ def main() -> None:
         print(f"合う量: {hits}/{len(TOL)}\n")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and not ({"--stage2", "--stage3"} & set(sys.argv)):
     main()
+
+
+# ---------------------------------------------------------------------------
+# 第 2 段階: 語の表 / 第 3 段階: 語彙の使い方を自然言語と比べる
+# ---------------------------------------------------------------------------
+
+
+class LexiconMarkov(Markov):
+    """マルコフ連鎖で作った L 個の語の表から、語ができる確率に比例して新しい語を選ぶ。"""
+
+    def __init__(self, words, L: int, rng):
+        super().__init__(words)
+        lex = {}
+        tries = 0
+        while len(lex) < L and tries < 50 * L:
+            w = Markov.word(self, rng)
+            tries += 1
+            if w not in lex:
+                g = [START] + list(ivtff.glyphs(w)) + [END]
+                lex[w] = math.prod(self.p(a, b) for a, b in zip(g, g[1:]))
+        self.lex_words = list(lex)
+        self.lex_weights = [lex[w] for w in self.lex_words]
+
+    def word(self, rng) -> str:
+        return rng.choices(self.lex_words, self.lex_weights)[0]
+
+
+def stage2() -> None:
+    rng = random.Random(2026)
+    args = corpus.make_parser("").parse_args([])
+    args.locus = "P"
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    for lang in ("A", "B"):
+        real = sc.page_lines([ln for ln in lines if ln.page.get("L") == lang], opts)
+        shape = {p: [len(l) for l in ls] for p, ls in real.items()}
+        words = [w for ls in real.values() for l in ls for w in l]
+        r = stats(real, rng)
+        print(f"=== 言語 {lang}: 本物 Q1 {r['Q1 異なり/1万語']:.0f}, Q3 {r['Q3 Zipf の傾き']:.3f} ===")
+        for L in (500, 1000, 2000, 4000, 8000):
+            mk = LexiconMarkov(words, L, random.Random(1))
+            g = stats(generate(shape, mk, random.Random(1), **PARAMS), rng)
+            res = {k: ok(k, r[k], g[k]) for k in TOL}
+            hits = sum(v == "合う" for v in res.values())
+            both = res["Q1 異なり/1万語"] == "合う" and res["Q3 Zipf の傾き"] == "合う"
+            print(f"  L {L:>5}: Q1 {g['Q1 異なり/1万語']:>5.0f}（{res['Q1 異なり/1万語']}）  Q3 {g['Q3 Zipf の傾き']:.3f}（{res['Q3 Zipf の傾き']}）"
+                  f"  合う量 {hits}/{len(TOL)}" + ("  ← Q1・Q3 とも合う" if both else "")
+                  + "  外れ: " + ", ".join(k for k, v in res.items() if v != "合う"))
+        print()
+
+
+def vocab_stats(tokens: list[str]) -> dict[str, float]:
+    toks = tokens[:10000]
+    freq = Counter(toks)
+    pts = []
+    seen = set()
+    for i, w in enumerate(toks, 1):
+        seen.add(w)
+        if i % 1000 == 0:
+            pts.append((math.log(i), math.log(len(seen))))
+    mx = sum(x for x, _ in pts) / len(pts)
+    my = sum(y for _, y in pts) / len(pts)
+    heaps = sum((x - mx) * (y - my) for x, y in pts) / sum((x - mx) ** 2 for x, _ in pts)
+    return {"V1 異なり語": len(freq), "V2 1回だけ": sum(v == 1 for v in freq.values()) / len(freq),
+            "V3 Zipf": zipf_slope(freq), "V4 Heaps": heaps}
+
+
+def stage3(paths) -> None:
+    args = corpus.make_parser("").parse_args([])
+    args.locus = "P"
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    rows = {}
+    for lang in ("A", "B"):
+        rows[f"ヴォイニッチ {lang}"] = vocab_stats(
+            [w for ln in lines if ln.page.get("L") == lang for w in ivtff.words(ln.raw, opts)])
+    nat = {}
+    for p in paths:
+        nat[p.stem] = vocab_stats(["".join(w) for w in unit_entropy.latin_words(p)])
+    keys = list(next(iter(rows.values())))
+    print(f"{'文章':<18}" + "".join(f"{k:>12}" for k in keys))
+    for name, r in list(rows.items()) + list(nat.items()):
+        print(f"{name:<18}" + "".join(f"{r[k]:>12.3f}" for k in keys))
+    print("\n自然言語の範囲: " + ", ".join(
+        f"{k} {min(r[k] for r in nat.values()):.3f}〜{max(r[k] for r in nat.values()):.3f}" for k in keys))
+    for name, r in rows.items():
+        out = [k for k in keys if not (min(x[k] for x in nat.values()) <= r[k] <= max(x[k] for x in nat.values()))]
+        print(f"{name}: 範囲の外 → {', '.join(out) if out else 'なし'}")
+
+
+if __name__ == "__main__" and "--stage2" in sys.argv:
+    stage2()
+if __name__ == "__main__" and "--stage3" in sys.argv:
+    stage3([Path(p) for p in sys.argv[sys.argv.index("--stage3") + 1:]])
