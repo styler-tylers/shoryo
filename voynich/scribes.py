@@ -5,7 +5,8 @@ notes/2026-11-15 ヴォイニッチ手稿 書き手ごとの違い.md の事前�
 頁ごとの文体の特徴（語頭・語末の字形の分布、語の長さ、よく出る語 30 語の頻度）を標準化し、
 1 頁ずつ抜いて、残りの頁の重心に最も近い書き手を当てる。
 
-    python3 voynich/scribes.py
+    python3 voynich/scribes.py            # 第 1 段階
+    python3 voynich/scribes.py --stage2   # 第 2 段階（4 種類の組の比較）
 """
 
 from __future__ import annotations
@@ -149,5 +150,53 @@ def main() -> None:
         print(f"W4 書き手 3 の言語 A の頁 {p}: 書き手 1 の A まで {dist(Xa[p], c1A):.2f}、書き手 3 の B まで {dist(Xa[p], c3B):.2f}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and "--stage2" not in sys.argv:
     main()
+
+
+# ---------------------------------------------------------------------------
+# 第 2 段階: 違いの大きさを 4 種類の組で比べる
+# ---------------------------------------------------------------------------
+
+
+def separability(xa, xb, rng, per: int = 4, runs: int = 300) -> float:
+    """両群から per 頁ずつ選び、1 頁ずつ抜いて群を当てる。偶然を除いた当たり方の平均。"""
+    vals = []
+    for _ in range(runs):
+        a, b = rng.sample(xa, per), rng.sample(xb, per)
+        acc = loo_balanced_accuracy(a + b, ["a"] * per + ["b"] * per)
+        vals.append((acc - 0.5) / 0.5)
+    return sum(vals) / len(vals)
+
+
+def stage2() -> None:
+    rng = random.Random(2026)
+    words, meta = load("P")
+    pb = sorted(p for p, m in meta.items() if m.get("L") == "B" and words.get(p))
+    feat = Features([words[p] for p in pb])
+    X = dict(zip(pb, standardize([feat.vector(words[p]) for p in pb])))
+
+    def g(h, i, q):
+        return [X[p] for p in pb if meta[p].get("H") == h and meta[p].get("I") == i and meta[p].get("Q") == q]
+
+    herb2 = {q: g("2", "H", q) for q in "DEFG"}
+    kinds = {
+        "a クワイアだけ": [(f"2植物{x}–2植物{y}", herb2[x], herb2[y]) for x, y in
+                        [("D", "E"), ("D", "F"), ("D", "G"), ("E", "F"), ("E", "G"), ("F", "G")]],
+        "b 書き手": [("2植物F–5植物F", herb2["F"], g("5", "H", "F"))]
+                  + [(f"2植物{q}–3植物Q", herb2[q], g("3", "H", "Q")) for q in "DEFG"],
+        "c セクション": [(f"2植物{q}–2生物M", herb2[q], g("2", "B", "M")) for q in "DEFG"],
+        "d 書き手とセクション": [("2生物M–3星T", g("2", "B", "M"), g("3", "S", "T"))],
+    }
+    print("=== 第 2 段階: 違いの大きさ（偶然を除いた当たり方, 4 頁ずつ, 300 回の平均）===")
+    for k, pairs in kinds.items():
+        vals = []
+        for name, a, b in pairs:
+            v = separability(a, b, rng)
+            vals.append(v)
+            print(f"  {k:<14} {name:<16} {len(a):>2} 頁 / {len(b):>2} 頁  {v:.2f}")
+        print(f"  → {k}: 平均 {sum(vals) / len(vals):.2f}、範囲 {min(vals):.2f}〜{max(vals):.2f}\n")
+
+
+if __name__ == "__main__" and "--stage2" in sys.argv:
+    stage2()

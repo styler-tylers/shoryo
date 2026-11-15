@@ -73,17 +73,30 @@ class Lexicon:
         return rng.choices(cand, wt)[0] if cand else w
 
 
-def generate(shape: dict[str, list[int]], lex: Lexicon, p_new, p_above, sigma, p_mut, rng):
+def topic_words(lex: Lexicon, K: int, rng) -> tuple[list[str], list[int]]:
+    """頁の話題の語 K 語（頻度に比例して重複なしで選ぶ）。"""
+    chosen: set[str] = set()
+    while len(chosen) < min(K, len(lex.words)):
+        chosen.add(lex.draw(rng))
+    ws = sorted(chosen)
+    return ws, [lex.freq[w] for w in ws]
+
+
+def generate(shape: dict[str, list[int]], lex: Lexicon, p_new, p_above, sigma, p_mut, rng, t=0.0, K=0):
     out: dict[str, list[list[str]]] = {}
     prev_page_last: list[list[str]] = []
     for page, lens in shape.items():
+        topic = topic_words(lex, K, rng) if t > 0 else None
         lines: list[list[str]] = []
         for li, n in enumerate(lens):
             line: list[str] = []
             for wi in range(n):
                 above_pool = (prev_page_last + lines)  # 上の行の候補（新しいほど後ろ）
                 if rng.random() < p_new or (not line and not above_pool):
-                    line.append(lex.draw(rng))
+                    if topic and rng.random() < t:
+                        line.append(rng.choices(topic[0], topic[1])[0])
+                    else:
+                        line.append(lex.draw(rng))
                     continue
                 use_above = above_pool and (rng.random() < p_above or not line)
                 if use_above:
@@ -128,6 +141,8 @@ def main(argv=None) -> None:
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--out", type=Path, default=NOTES / "selfcite_model_grid.csv")
     ap.add_argument("--p-new", type=float, nargs="+", help="p_new の格子を置き換える（格子の拡張用）")
+    ap.add_argument("--topic", action="store_true",
+                    help="第 2 段階: 頁ごとの話題の語を加える（p_above 0.5, σ 0.3, p_mut 0.8 に固定し、p_new・t・K の格子）")
     args = ap.parse_args(argv)
     rng = random.Random(1)
     real = voynich_pages("A")
@@ -137,6 +152,9 @@ def main(argv=None) -> None:
     print(f"ヴォイニッチ言語 A（{len(real)} 頁, {sum(map(sum, shape.values()))} 語）: "
           + ", ".join(f"{k} {x:.3f}" for k, x in v.items()))
     grid = dict(GRID)
+    if args.topic:
+        grid = {"p_new": [0.8, 0.85, 0.9], "p_above": [0.5], "sigma": [0.3], "p_mut": [0.8],
+                "t": [0.2, 0.4, 0.6], "K": [30, 100]}
     if args.p_new:
         grid["p_new"] = args.p_new
     combos = list(itertools.product(*grid.values()))
