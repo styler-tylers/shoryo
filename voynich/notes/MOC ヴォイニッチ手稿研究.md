@@ -37,6 +37,7 @@ created: 2026-11-10
 - [[2026-11-15 ヴォイニッチ手稿 文章の分析のまとめ（第8〜11回）]] — 第 8〜11 回のまとめ。語の作り・頁ごとのまとまり・文章を変える要因・絵と文章
 - [[2026-11-15 ヴォイニッチ手稿 文字の単位の数え直し]] — 字形の組をまとめ直しても、文字の並びは自然言語よりずっと予測しやすいまま。単純な冗長な暗号では説明できない。子音だけ・音節・2 字の組の暗号に書き換えた自然言語でも再現できない（第 12 回）
 - [[2026-11-15 ヴォイニッチ手稿 黄道のラベルは日付か名前か]] — ラベルは 1 星座ちょうど 30 個だが、日付を同じ語で書いたものではない。隣どうしが似る一覧。繰り返しの少なさは聖人暦と同じ（9% 対 11%）だが、聖人暦では隣どうしは似ない（第 13 回）
+- [[2026-11-15 ヴォイニッチ手稿 意味の無い生成モデルの検証]] — 字形の隣どうしの規則＋2 割の写しで、語頭の規則・語の家族の型・写しの減衰は再現される。語彙の広がり（異なり語・Zipf）だけは再現できず、語を選ぶ仕組みが要る（第 14 回）
 
 ## 方法論
 
@@ -57,7 +58,7 @@ created: 2026-11-10
 - このリポジトリの `voynich/`: 分析スクリプト一式（使い方は `voynich/README.md`）
   - `word_freq.py` 単語頻度 / `affix.py` 語頭・語尾 / `line_position.py` 行頭・行末 / `vocab_shift.py` 語彙の移り変わり
   - `line_forms.py` 行頭形・行末形の検証 / `compare_transcriptions.py` 転写の比較 / `reorder.py` 元の並びの推定
-  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い / `word_families.py` 語の家族 / `section_vocab.py` セクションの語彙とラベル / `prefix_order.py` 語頭の入れ替え / `zodiac_labels.py` 黄道のラベル / `word_grammar.py` 語の組み立ての表 / `unit_entropy.py` 文字の単位と情報量 / `zodiac_days.py` 黄道のラベルの並び / `saints_calendar.py` 聖人暦との比較
+  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い / `word_families.py` 語の家族 / `section_vocab.py` セクションの語彙とラベル / `prefix_order.py` 語頭の入れ替え / `zodiac_labels.py` 黄道のラベル / `word_grammar.py` 語の組み立ての表 / `unit_entropy.py` 文字の単位と情報量 / `zodiac_days.py` 黄道のラベルの並び / `saints_calendar.py` 聖人暦との比較 / `null_generator.py` 意味の無い生成モデル
 
 ## 外部資料
 
