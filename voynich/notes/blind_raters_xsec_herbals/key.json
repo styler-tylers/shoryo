@@ -1,0 +1,626 @@
+{
+ "H6982": {
+  "ms": "oakspring_1455",
+  "page": 5
+ },
+ "H3235": {
+  "ms": "oakspring_1455",
+  "page": 6
+ },
+ "H5622": {
+  "ms": "oakspring_1455",
+  "page": 10
+ },
+ "H5837": {
+  "ms": "oakspring_1455",
+  "page": 12
+ },
+ "H3666": {
+  "ms": "oakspring_1455",
+  "page": 15
+ },
+ "H6169": {
+  "ms": "oakspring_1455",
+  "page": 19
+ },
+ "H3348": {
+  "ms": "oakspring_1455",
+  "page": 23
+ },
+ "H6375": {
+  "ms": "oakspring_1455",
+  "page": 32
+ },
+ "H6960": {
+  "ms": "oakspring_1455",
+  "page": 37
+ },
+ "H8478": {
+  "ms": "oakspring_1455",
+  "page": 43
+ },
+ "H6861": {
+  "ms": "oakspring_1455",
+  "page": 45
+ },
+ "H4081": {
+  "ms": "oakspring_1455",
+  "page": 65
+ },
+ "H8523": {
+  "ms": "oakspring_1455",
+  "page": 69
+ },
+ "H7345": {
+  "ms": "oakspring_1455",
+  "page": 82
+ },
+ "H8709": {
+  "ms": "oakspring_1455",
+  "page": 84
+ },
+ "H3677": {
+  "ms": "oakspring_1455",
+  "page": 85
+ },
+ "H9827": {
+  "ms": "oakspring_1455",
+  "page": 86
+ },
+ "H3618": {
+  "ms": "oakspring_1455",
+  "page": 94
+ },
+ "H9488": {
+  "ms": "oakspring_1455",
+  "page": 104
+ },
+ "H9825": {
+  "ms": "oakspring_1455",
+  "page": 108
+ },
+ "H4714": {
+  "ms": "oakspring_1455",
+  "page": 117
+ },
+ "H2655": {
+  "ms": "oakspring_1455",
+  "page": 120
+ },
+ "H6103": {
+  "ms": "oakspring_1455",
+  "page": 122
+ },
+ "H4170": {
+  "ms": "oakspring_1455",
+  "page": 130
+ },
+ "H7819": {
+  "ms": "oakspring_1455",
+  "page": 136
+ },
+ "H3234": {
+  "ms": "oakspring_1455",
+  "page": 141
+ },
+ "H9266": {
+  "ms": "oakspring_1455",
+  "page": 143
+ },
+ "H5527": {
+  "ms": "oakspring_1455",
+  "page": 148
+ },
+ "H3135": {
+  "ms": "oakspring_1455",
+  "page": 150
+ },
+ "H4799": {
+  "ms": "oakspring_1455",
+  "page": 155
+ },
+ "H5162": {
+  "ms": "oakspring_1455",
+  "page": 156
+ },
+ "H6055": {
+  "ms": "oakspring_1455",
+  "page": 158
+ },
+ "H7690": {
+  "ms": "oakspring_1455",
+  "page": 160
+ },
+ "H2262": {
+  "ms": "oakspring_1455",
+  "page": 164
+ },
+ "H1544": {
+  "ms": "oakspring_1455",
+  "page": 178
+ },
+ "H5001": {
+  "ms": "oakspring_1455",
+  "page": 184
+ },
+ "H1670": {
+  "ms": "oakspring_1455",
+  "page": 187
+ },
+ "H2036": {
+  "ms": "oakspring_1455",
+  "page": 192
+ },
+ "H7196": {
+  "ms": "oakspring_1455",
+  "page": 195
+ },
+ "H1101": {
+  "ms": "oakspring_1455",
+  "page": 196
+ },
+ "H9406": {
+  "ms": "oakspring_1455",
+  "page": 197
+ },
+ "H6423": {
+  "ms": "oakspring_1455",
+  "page": 199
+ },
+ "H3679": {
+  "ms": "oakspring_1455",
+  "page": 200
+ },
+ "H2377": {
+  "ms": "oakspring_1455",
+  "page": 203
+ },
+ "H9887": {
+  "ms": "oakspring_1455",
+  "page": 204
+ },
+ "H8043": {
+  "ms": "oakspring_1455",
+  "page": 210
+ },
+ "H1516": {
+  "ms": "oakspring_1455",
+  "page": 215
+ },
+ "H3871": {
+  "ms": "oakspring_1455",
+  "page": 222
+ },
+ "H9016": {
+  "ms": "oakspring_1455",
+  "page": 230
+ },
+ "H8142": {
+  "ms": "oakspring_1455",
+  "page": 231
+ },
+ "H5543": {
+  "ms": "ljs46",
+  "page": 8
+ },
+ "H9856": {
+  "ms": "ljs46",
+  "page": 11
+ },
+ "H4764": {
+  "ms": "ljs46",
+  "page": 13
+ },
+ "H4612": {
+  "ms": "ljs46",
+  "page": 14
+ },
+ "H7767": {
+  "ms": "ljs46",
+  "page": 15
+ },
+ "H6671": {
+  "ms": "ljs46",
+  "page": 16
+ },
+ "H2317": {
+  "ms": "ljs46",
+  "page": 17
+ },
+ "H6940": {
+  "ms": "ljs46",
+  "page": 19
+ },
+ "H1051": {
+  "ms": "ljs46",
+  "page": 22
+ },
+ "H1105": {
+  "ms": "ljs46",
+  "page": 23
+ },
+ "H5199": {
+  "ms": "ljs46",
+  "page": 24
+ },
+ "H3744": {
+  "ms": "ljs46",
+  "page": 25
+ },
+ "H8879": {
+  "ms": "ljs46",
+  "page": 28
+ },
+ "H7392": {
+  "ms": "ljs46",
+  "page": 29
+ },
+ "H7022": {
+  "ms": "ljs46",
+  "page": 31
+ },
+ "H7035": {
+  "ms": "ljs46",
+  "page": 34
+ },
+ "H3309": {
+  "ms": "ljs46",
+  "page": 35
+ },
+ "H3435": {
+  "ms": "ljs46",
+  "page": 36
+ },
+ "H6561": {
+  "ms": "ljs46",
+  "page": 38
+ },
+ "H9628": {
+  "ms": "ljs46",
+  "page": 40
+ },
+ "H7615": {
+  "ms": "ljs46",
+  "page": 42
+ },
+ "H8174": {
+  "ms": "ljs46",
+  "page": 48
+ },
+ "H6932": {
+  "ms": "ljs46",
+  "page": 50
+ },
+ "H9535": {
+  "ms": "ljs46",
+  "page": 51
+ },
+ "H9079": {
+  "ms": "ljs46",
+  "page": 53
+ },
+ "H4924": {
+  "ms": "ljs46",
+  "page": 54
+ },
+ "H2463": {
+  "ms": "ljs46",
+  "page": 59
+ },
+ "H2406": {
+  "ms": "ljs46",
+  "page": 60
+ },
+ "H2865": {
+  "ms": "ljs46",
+  "page": 64
+ },
+ "H4418": {
+  "ms": "ljs46",
+  "page": 69
+ },
+ "H2459": {
+  "ms": "ljs46",
+  "page": 70
+ },
+ "H3381": {
+  "ms": "ljs46",
+  "page": 71
+ },
+ "H7032": {
+  "ms": "ljs46",
+  "page": 72
+ },
+ "H1610": {
+  "ms": "ljs46",
+  "page": 74
+ },
+ "H6877": {
+  "ms": "ljs46",
+  "page": 76
+ },
+ "H5879": {
+  "ms": "ljs46",
+  "page": 77
+ },
+ "H6552": {
+  "ms": "ljs46",
+  "page": 81
+ },
+ "H8615": {
+  "ms": "ljs46",
+  "page": 83
+ },
+ "H8496": {
+  "ms": "ljs46",
+  "page": 85
+ },
+ "H9372": {
+  "ms": "ljs46",
+  "page": 88
+ },
+ "H6422": {
+  "ms": "ljs46",
+  "page": 89
+ },
+ "H4153": {
+  "ms": "ljs46",
+  "page": 92
+ },
+ "H6334": {
+  "ms": "ljs46",
+  "page": 96
+ },
+ "H9415": {
+  "ms": "ljs46",
+  "page": 98
+ },
+ "H2305": {
+  "ms": "ljs46",
+  "page": 100
+ },
+ "H5468": {
+  "ms": "ljs46",
+  "page": 103
+ },
+ "H8751": {
+  "ms": "ljs46",
+  "page": 104
+ },
+ "H1812": {
+  "ms": "ljs46",
+  "page": 107
+ },
+ "H6345": {
+  "ms": "ljs46",
+  "page": 108
+ },
+ "H2512": {
+  "ms": "ljs46",
+  "page": 113
+ },
+ "H4490": {
+  "ms": "ljs62",
+  "page": 2
+ },
+ "H3752": {
+  "ms": "ljs62",
+  "page": 4
+ },
+ "H5502": {
+  "ms": "ljs62",
+  "page": 5
+ },
+ "H3131": {
+  "ms": "ljs62",
+  "page": 6
+ },
+ "H7451": {
+  "ms": "ljs62",
+  "page": 7
+ },
+ "H3430": {
+  "ms": "ljs62",
+  "page": 10
+ },
+ "H1633": {
+  "ms": "ljs62",
+  "page": 11
+ },
+ "H1452": {
+  "ms": "ljs62",
+  "page": 12
+ },
+ "H5595": {
+  "ms": "ljs62",
+  "page": 14
+ },
+ "H7851": {
+  "ms": "ljs62",
+  "page": 15
+ },
+ "H2973": {
+  "ms": "ljs62",
+  "page": 16
+ },
+ "H9725": {
+  "ms": "ljs62",
+  "page": 17
+ },
+ "H3484": {
+  "ms": "ljs62",
+  "page": 18
+ },
+ "H1504": {
+  "ms": "ljs62",
+  "page": 19
+ },
+ "H3450": {
+  "ms": "ljs62",
+  "page": 20
+ },
+ "H9649": {
+  "ms": "ljs62",
+  "page": 21
+ },
+ "H1961": {
+  "ms": "voynich",
+  "page": "f10r"
+ },
+ "H6508": {
+  "ms": "voynich",
+  "page": "f10v"
+ },
+ "H9241": {
+  "ms": "voynich",
+  "page": "f13v"
+ },
+ "H4427": {
+  "ms": "voynich",
+  "page": "f15v"
+ },
+ "H4733": {
+  "ms": "voynich",
+  "page": "f16v"
+ },
+ "H2170": {
+  "ms": "voynich",
+  "page": "f17v"
+ },
+ "H2278": {
+  "ms": "voynich",
+  "page": "f18v"
+ },
+ "H6543": {
+  "ms": "voynich",
+  "page": "f19v"
+ },
+ "H1818": {
+  "ms": "voynich",
+  "page": "f20v"
+ },
+ "H8639": {
+  "ms": "voynich",
+  "page": "f24r"
+ },
+ "H6895": {
+  "ms": "voynich",
+  "page": "f24v"
+ },
+ "H3240": {
+  "ms": "voynich",
+  "page": "f25r"
+ },
+ "H8897": {
+  "ms": "voynich",
+  "page": "f28r"
+ },
+ "H7104": {
+  "ms": "voynich",
+  "page": "f29v"
+ },
+ "H8377": {
+  "ms": "voynich",
+  "page": "f31r"
+ },
+ "H6926": {
+  "ms": "voynich",
+  "page": "f32r"
+ },
+ "H5087": {
+  "ms": "voynich",
+  "page": "f33v"
+ },
+ "H4843": {
+  "ms": "voynich",
+  "page": "f36r"
+ },
+ "H8036": {
+  "ms": "voynich",
+  "page": "f38r"
+ },
+ "H2535": {
+  "ms": "voynich",
+  "page": "f41r"
+ },
+ "H2923": {
+  "ms": "voynich",
+  "page": "f44v"
+ },
+ "H7450": {
+  "ms": "voynich",
+  "page": "f45r"
+ },
+ "H3513": {
+  "ms": "voynich",
+  "page": "f46r"
+ },
+ "H9514": {
+  "ms": "voynich",
+  "page": "f47r"
+ },
+ "H6354": {
+  "ms": "voynich",
+  "page": "f47v"
+ },
+ "H7996": {
+  "ms": "voynich",
+  "page": "f51r"
+ },
+ "H4369": {
+  "ms": "voynich",
+  "page": "f51v"
+ },
+ "H9457": {
+  "ms": "voynich",
+  "page": "f55r"
+ },
+ "H2341": {
+  "ms": "voynich",
+  "page": "f56r"
+ },
+ "H8517": {
+  "ms": "voynich",
+  "page": "f56v"
+ },
+ "H1679": {
+  "ms": "voynich",
+  "page": "f65r"
+ },
+ "H1651": {
+  "ms": "voynich",
+  "page": "f65v"
+ },
+ "H4965": {
+  "ms": "voynich",
+  "page": "f66v"
+ },
+ "H8550": {
+  "ms": "voynich",
+  "page": "f6v"
+ },
+ "H1877": {
+  "ms": "voynich",
+  "page": "f7v"
+ },
+ "H1315": {
+  "ms": "voynich",
+  "page": "f87r"
+ },
+ "H1336": {
+  "ms": "voynich",
+  "page": "f8v"
+ },
+ "H8486": {
+  "ms": "voynich",
+  "page": "f93r"
+ },
+ "H5453": {
+  "ms": "voynich",
+  "page": "f93v"
+ },
+ "H7160": {
+  "ms": "voynich",
+  "page": "f9r"
+ }
+}
