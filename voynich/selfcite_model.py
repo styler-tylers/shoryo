@@ -127,6 +127,7 @@ def main(argv=None) -> None:
     ap = argparse.ArgumentParser(description="自己引用の生成モデルとの比較")
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--out", type=Path, default=NOTES / "selfcite_model_grid.csv")
+    ap.add_argument("--p-new", type=float, nargs="+", help="p_new の格子を置き換える（格子の拡張用）")
     args = ap.parse_args(argv)
     rng = random.Random(1)
     real = voynich_pages("A")
@@ -135,12 +136,15 @@ def main(argv=None) -> None:
     v = measure(real, rng)
     print(f"ヴォイニッチ言語 A（{len(real)} 頁, {sum(map(sum, shape.values()))} 語）: "
           + ", ".join(f"{k} {x:.3f}" for k, x in v.items()))
-    combos = list(itertools.product(*GRID.values()))
+    grid = dict(GRID)
+    if args.p_new:
+        grid["p_new"] = args.p_new
+    combos = list(itertools.product(*grid.values()))
     if args.quick:
         combos = combos[:2]
     rows = []
     for c in combos:
-        prm = dict(zip(GRID, c))
+        prm = dict(zip(grid, c))
         g = generate(shape, lex, rng=random.Random(1), **prm)
         m = measure(g, rng)
         fit = abs(m["S1"] - v["S1"]) <= 0.05 and abs(m["S2"] - v["S2"]) <= 0.2 * v["S2"]
