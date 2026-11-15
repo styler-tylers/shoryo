@@ -1,0 +1,344 @@
+#!/usr/bin/env python3
+"""意味の無い最小の生成モデルの検証（第 14 回）。
+
+語は字形の 1 次マルコフ連鎖で作り、語の 20% は上の行・同じ行から写して、位置を選ばずに 1 字形を変える。
+手順に入れていない性質（語彙の広がり、Zipf、語の家族の変わる位置、語頭の群の偏り、写しの減衰など）を、
+本物のヴォイニッチと比べる。
+
+    python3 voynich/null_generator.py                    # 第 1 段階
+    python3 voynich/null_generator.py --stage2           # 語の表の大きさ
+    python3 voynich/null_generator.py --stage3 <テキスト …>  # 語彙の使い方を自然言語と比べる
+    python3 voynich/null_generator.py --stage4           # 写しの層を除いてやり直す
+"""
+
+from __future__ import annotations
+
+import math
+import random
+import sys
+from collections import Counter, defaultdict
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import corpus  # noqa: E402
+import ivtff  # noqa: E402
+import prefix_order  # noqa: E402
+import self_citation as sc  # noqa: E402
+import selfcite_model  # noqa: E402
+import unit_entropy  # noqa: E402
+import word_families  # noqa: E402
+
+START, END = "^", "$"
+PARAMS = {"p_new": 0.8, "p_above": 0.5, "sigma": 0.3, "p_mut": 0.8}
+
+
+class Markov:
+    def __init__(self, words: list[str]):
+        self.t: dict[str, Counter] = defaultdict(Counter)
+        for w in words:
+            g = [START] + list(ivtff.glyphs(w)) + [END]
+            for a, b in zip(g, g[1:]):
+                self.t[a][b] += 1
+        self.keys = {a: (list(c), list(c.values())) for a, c in self.t.items()}
+
+    def p(self, a: str, b: str) -> float:
+        c = self.t.get(a)
+        return c[b] / sum(c.values()) if c else 0.0
+
+    def word(self, rng) -> str:
+        while True:
+            g, cur = [], START
+            while True:
+                ks, ws = self.keys[cur]
+                cur = rng.choices(ks, ws)[0]
+                if cur == END:
+                    break
+                g.append(cur)
+                if len(g) > 12:
+                    break
+            if 1 <= len(g) <= 12 and cur == END:
+                return "".join(g)
+
+    def mutate(self, w: str, rng) -> str:
+        g = list(ivtff.glyphs(w))
+        i = rng.randrange(len(g))
+        prev = g[i - 1] if i > 0 else START
+        nxt = g[i + 1] if i + 1 < len(g) else END
+        ks, ws = self.keys[prev]
+        cand = [(k, x) for k, x in zip(ks, ws) if k not in (END, g[i]) and self.p(k, nxt) > 0]
+        if not cand:
+            return w
+        g[i] = rng.choices([k for k, _ in cand], [x for _, x in cand])[0]
+        return "".join(g)
+
+
+def generate(shape, mk: Markov, rng, p_new, p_above, sigma, p_mut):
+    out = {}
+    prev_last: list[list[str]] = []
+    for page, lens in shape.items():
+        lines: list[list[str]] = []
+        for n in lens:
+            line: list[str] = []
+            for wi in range(n):
+                pool = prev_last + lines
+                if rng.random() < p_new or (not line and not pool):
+                    line.append(mk.word(rng))
+                    continue
+                if pool and (rng.random() < p_above or not line):
+                    ks = [k for k, _ in selfcite_model.DEPTH if k <= len(pool)]
+                    k = rng.choices(ks, [p for kk, p in selfcite_model.DEPTH if kk in ks])[0]
+                    src = pool[-k]
+                    x = wi / (n - 1) if n > 1 else 0.5
+                    pos = [(j / (len(src) - 1) if len(src) > 1 else 0.5) for j in range(len(src))]
+                    w = rng.choices(src, [math.exp(-abs(x - q) / sigma) for q in pos])[0]
+                else:
+                    w = rng.choice(line)
+                if rng.random() < p_mut:
+                    w = mk.mutate(w, rng)
+                line.append(w)
+            lines.append(line)
+        out[page] = lines
+        prev_last = lines[-1:]
+    return out
+
+
+def zipf_slope(freq: Counter, top: int = 100) -> float:
+    vals = sorted(freq.values(), reverse=True)[:top]
+    xs = [math.log(r) for r in range(1, len(vals) + 1)]
+    ys = [math.log(v) for v in vals]
+    mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+    return sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sum((x - mx) ** 2 for x in xs)
+
+
+def head_skew(pages) -> float:
+    c = defaultdict(Counter)
+    for ls in pages.values():
+        for l in ls:
+            for w in l:
+                s = prefix_order.split(w)
+                if s and s[0] in prefix_order.GROUP:
+                    c[s[1]][prefix_order.GROUP[s[0]]] += 1
+    big = [b for b, x in c.items() if sum(x.values()) >= 10]
+    return sum(max(c[b].values()) / sum(c[b].values()) >= 0.8 for b in big) / len(big) if big else float("nan")
+
+
+def stats(pages, rng) -> dict[str, float]:
+    toks = [w for ls in pages.values() for l in ls for w in l]
+    freq = Counter(toks)
+    same, _ = word_families.pairs(pages)
+    pos = Counter(p for p, _, _ in same)
+    n = max(1, len(same))
+    m = selfcite_model.measure(pages, rng, null_runs=2, trials=100)
+    return {"Q1 異なり/1万語": len(set(toks[:10000])), "Q2 1回だけの割合": sum(v == 1 for v in freq.values()) / len(freq),
+            "Q3 Zipf の傾き": zipf_slope(freq), "Q4 語の長さ": sum(len(ivtff.glyphs(w)) for w in toks) / len(toks),
+            "Q5 語頭": pos["語頭"] / n, "Q5 語中": pos["語中"] / n, "Q5 語末": pos["語末"] / n,
+            "Q6 語頭の群の偏り": head_skew(pages), "Q7 S1": m["S1"], "Q7 S2": m["S2"], "Q8 P2": m["P2"],
+            "h2": unit_entropy.entropies([list(ivtff.glyphs(w)) for w in toks])["h2"]}
+
+
+TOL = {"Q1 異なり/1万語": ("rel", 0.2), "Q2 1回だけの割合": ("abs", 0.10), "Q3 Zipf の傾き": ("abs", 0.15),
+       "Q4 語の長さ": ("abs", 0.3), "Q5 語頭": ("abs", 0.10), "Q5 語中": ("abs", 0.10), "Q5 語末": ("abs", 0.10),
+       "Q6 語頭の群の偏り": ("abs", 0.10), "Q7 S1": ("abs", 0.1), "Q7 S2": ("rel", 0.2), "Q8 P2": ("abs", 0.15)}
+
+
+def ok(k, real, gen) -> str:
+    if k not in TOL:
+        return ""
+    kind, t = TOL[k]
+    good = abs(gen - real) <= (t * abs(real) if kind == "rel" else t)
+    return "合う" if good else "外れ"
+
+
+def main() -> None:
+    rng = random.Random(2026)
+    args = corpus.make_parser("").parse_args([])
+    args.locus = "P"
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    for lang in ("A", "B"):
+        real = sc.page_lines([ln for ln in lines if ln.page.get("L") == lang], opts)
+        shape = {p: [len(l) for l in ls] for p, ls in real.items()}
+        mk = Markov([w for ls in real.values() for l in ls for w in l])
+        gen = generate(shape, mk, random.Random(1), **PARAMS)
+        r, g = stats(real, rng), stats(gen, rng)
+        print(f"=== 言語 {lang}（{len(real)} 頁）===")
+        print(f"{'量':<18}{'本物':>9}{'生成':>9}  判定")
+        for k in r:
+            print(f"{k:<18}{r[k]:>9.3f}{g[k]:>9.3f}  {ok(k, r[k], g[k])}")
+        hits = sum(ok(k, r[k], g[k]) == "合う" for k in TOL)
+        print(f"合う量: {hits}/{len(TOL)}\n")
+
+
+if __name__ == "__main__" and not ({"--stage2", "--stage3", "--stage4"} & set(sys.argv)):
+    main()
+
+
+# ---------------------------------------------------------------------------
+# 第 2 段階: 語の表 / 第 3 段階: 語彙の使い方を自然言語と比べる
+# ---------------------------------------------------------------------------
+
+
+class LexiconMarkov(Markov):
+    """マルコフ連鎖で作った L 個の語の表から、語ができる確率に比例して新しい語を選ぶ。"""
+
+    def __init__(self, words, L: int, rng):
+        super().__init__(words)
+        lex = {}
+        tries = 0
+        while len(lex) < L and tries < 50 * L:
+            w = Markov.word(self, rng)
+            tries += 1
+            if w not in lex:
+                g = [START] + list(ivtff.glyphs(w)) + [END]
+                lex[w] = math.prod(self.p(a, b) for a, b in zip(g, g[1:]))
+        self.lex_words = list(lex)
+        self.lex_weights = [lex[w] for w in self.lex_words]
+
+    def word(self, rng) -> str:
+        return rng.choices(self.lex_words, self.lex_weights)[0]
+
+
+def stage2() -> None:
+    rng = random.Random(2026)
+    args = corpus.make_parser("").parse_args([])
+    args.locus = "P"
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    for lang in ("A", "B"):
+        real = sc.page_lines([ln for ln in lines if ln.page.get("L") == lang], opts)
+        shape = {p: [len(l) for l in ls] for p, ls in real.items()}
+        words = [w for ls in real.values() for l in ls for w in l]
+        r = stats(real, rng)
+        print(f"=== 言語 {lang}: 本物 Q1 {r['Q1 異なり/1万語']:.0f}, Q3 {r['Q3 Zipf の傾き']:.3f} ===")
+        for L in (500, 1000, 2000, 4000, 8000):
+            mk = LexiconMarkov(words, L, random.Random(1))
+            g = stats(generate(shape, mk, random.Random(1), **PARAMS), rng)
+            res = {k: ok(k, r[k], g[k]) for k in TOL}
+            hits = sum(v == "合う" for v in res.values())
+            both = res["Q1 異なり/1万語"] == "合う" and res["Q3 Zipf の傾き"] == "合う"
+            print(f"  L {L:>5}: Q1 {g['Q1 異なり/1万語']:>5.0f}（{res['Q1 異なり/1万語']}）  Q3 {g['Q3 Zipf の傾き']:.3f}（{res['Q3 Zipf の傾き']}）"
+                  f"  合う量 {hits}/{len(TOL)}" + ("  ← Q1・Q3 とも合う" if both else "")
+                  + "  外れ: " + ", ".join(k for k, v in res.items() if v != "合う"))
+        print()
+
+
+def vocab_stats(tokens: list[str]) -> dict[str, float]:
+    toks = tokens[:10000]
+    freq = Counter(toks)
+    pts = []
+    seen = set()
+    for i, w in enumerate(toks, 1):
+        seen.add(w)
+        if i % 1000 == 0:
+            pts.append((math.log(i), math.log(len(seen))))
+    mx = sum(x for x, _ in pts) / len(pts)
+    my = sum(y for _, y in pts) / len(pts)
+    heaps = sum((x - mx) * (y - my) for x, y in pts) / sum((x - mx) ** 2 for x, _ in pts)
+    return {"V1 異なり語": len(freq), "V2 1回だけ": sum(v == 1 for v in freq.values()) / len(freq),
+            "V3 Zipf": zipf_slope(freq), "V4 Heaps": heaps}
+
+
+def stage3(paths) -> None:
+    args = corpus.make_parser("").parse_args([])
+    args.locus = "P"
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    rows = {}
+    for lang in ("A", "B"):
+        rows[f"ヴォイニッチ {lang}"] = vocab_stats(
+            [w for ln in lines if ln.page.get("L") == lang for w in ivtff.words(ln.raw, opts)])
+    nat = {}
+    for p in paths:
+        nat[p.stem] = vocab_stats(["".join(w) for w in unit_entropy.latin_words(p)])
+    keys = list(next(iter(rows.values())))
+    print(f"{'文章':<18}" + "".join(f"{k:>12}" for k in keys))
+    for name, r in list(rows.items()) + list(nat.items()):
+        print(f"{name:<18}" + "".join(f"{r[k]:>12.3f}" for k in keys))
+    print("\n自然言語の範囲: " + ", ".join(
+        f"{k} {min(r[k] for r in nat.values()):.3f}〜{max(r[k] for r in nat.values()):.3f}" for k in keys))
+    for name, r in rows.items():
+        out = [k for k in keys if not (min(x[k] for x in nat.values()) <= r[k] <= max(x[k] for x in nat.values()))]
+        print(f"{name}: 範囲の外 → {', '.join(out) if out else 'なし'}")
+
+
+if __name__ == "__main__" and "--stage2" in sys.argv:
+    stage2()
+if __name__ == "__main__" and "--stage3" in sys.argv:
+    stage3([Path(p) for p in sys.argv[sys.argv.index("--stage3") + 1:]])
+
+
+# ---------------------------------------------------------------------------
+# 第 4 段階: 写しの層を除いてやり直す
+# ---------------------------------------------------------------------------
+
+
+def remove_copies(pages, window: float = 0.2):
+    """1 つ上の行の、相対位置 window 以内に同じ語か字形 1 つ違いの語がある語を除く。"""
+    out, removed, total = {}, 0, 0
+    for p, ls in pages.items():
+        new = [ls[0][:]]
+        for li in range(1, len(ls)):
+            line, above = ls[li], ls[li - 1]
+            keep = []
+            for wi, w in enumerate(line):
+                total += 1
+                x = wi / (len(line) - 1) if len(line) > 1 else 0.5
+                hit = any(sc.distance(w, a) <= 1 and abs(x - (aj / (len(above) - 1) if len(above) > 1 else 0.5)) <= window
+                          for aj, a in enumerate(above))
+                if hit:
+                    removed += 1
+                else:
+                    keep.append(w)
+            new.append(keep if keep else [])
+        out[p] = [l for l in new if l]
+        total += len(ls[0])
+    return {p: ls for p, ls in out.items() if len(ls) >= 3}, removed / total
+
+
+def stage4() -> None:
+    import section_vocab
+    rng = random.Random(2026)
+    args = corpus.make_parser("").parse_args([])
+    args.locus = None
+    _, lines = corpus.load_lines(args)
+    opts = corpus.word_options(args)
+    print("R1 写しの候補を除いた後の、k 行上の倍率（同じ頁 ÷ 別の頁）")
+    for lang in ("A", "B"):
+        pl = [ln for ln in lines if ln.page.get("L") == lang and ln.locus_class == "P"]
+        pages = sc.page_lines(pl, opts)
+        clean, frac = remove_copies(pages)
+        before = {k: s / o for k, s, o, _ in sc.decay(pages, 8, rng, 2)}
+        after = {k: s / o for k, s, o, _ in sc.decay(clean, 8, rng, 2)}
+        print(f"  言語 {lang}: 除いた語の割合 {frac:.0%}")
+        print("     k:      " + "".join(f"{k:>7}" for k in range(4, 9)))
+        print("     除く前: " + "".join(f"{before[k]:>7.2f}" for k in range(4, 9)))
+        print("     除いた後: " + "".join(f"{after[k]:>7.2f}" for k in range(4, 9)))
+
+    # R2: 本文（段落）から写しの候補を除いて、第 11 回の L1 をやり直す
+    labels, text, meta = section_vocab.load()
+    para_lines = [ln for ln in lines if ln.locus_class == "P"]
+    clean_para = {}
+    for lang in ("A", "B", None):
+        group = [ln for ln in para_lines if ln.page.get("L") == lang] if lang else \
+            [ln for ln in para_lines if ln.page.get("L") not in ("A", "B")]
+        pages = defaultdict(list)
+        for ln in group:
+            ws = ivtff.words(ln.raw, opts)
+            if ws:
+                pages[ln.page.name].append(ws)
+        for p, ls in pages.items():
+            c, _ = remove_copies({p: ls}) if len(ls) >= 3 else ({p: ls}, 0)
+            clean_para[p] = [w for l in c.get(p, ls) for w in l]
+    other = defaultdict(list)
+    for ln in lines:
+        if ln.locus_class in ("C", "R"):
+            other[ln.page.name] += ivtff.words(ln.raw, opts)
+    new_text = defaultdict(list)
+    for p in set(clean_para) | set(other):
+        new_text[p] = clean_para.get(p, []) + other.get(p, [])
+    print("\nR2 本文から写しの候補を除いて、第 11 回の L1 をやり直す")
+    section_vocab.l1(labels, new_text, meta, random.Random(2026))
+
+
+if __name__ == "__main__" and "--stage4" in sys.argv:
+    stage4()
