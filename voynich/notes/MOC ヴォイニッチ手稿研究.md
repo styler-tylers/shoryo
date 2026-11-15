@@ -30,6 +30,8 @@ created: 2026-11-10
 - [[2026-11-10 ヴォイニッチ手稿 絵と文章の対応（色の予備実験）]] — 絵の色と語彙の対応は植物セクション内では見られず（第 5 回）
 - [[2026-11-10 ヴォイニッチ手稿 ラベルの分析]] — ラベルは本文と形が違うが、同じ頁の本文での言及は偶然並み（第 6 回）
 - [[2026-11-10 ヴォイニッチ手稿 自己引用説の検証]] — 上の行を見て書いた形跡はあるが小さい（第 7 回）
+- [[2026-11-15 ヴォイニッチ手稿 自己引用の生成モデルとの比較]] — 自己引用の手順で作った人工のテキストとの比較（第 8 回, 進行中）
+- [[2026-11-15 ヴォイニッチ手稿 書き手ごとの違い]] — 同じ言語・内容でも書き手で文体が違うが、クワイアの違いと同じ大きさ（第 9 回）
 
 ## 方法論
 
@@ -50,7 +52,7 @@ created: 2026-11-10
 - このリポジトリの `voynich/`: 分析スクリプト一式（使い方は `voynich/README.md`）
   - `word_freq.py` 単語頻度 / `affix.py` 語頭・語尾 / `line_position.py` 行頭・行末 / `vocab_shift.py` 語彙の移り変わり
   - `line_forms.py` 行頭形・行末形の検証 / `compare_transcriptions.py` 転写の比較 / `reorder.py` 元の並びの推定
-  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較
+  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い
 
 ## 外部資料
 
