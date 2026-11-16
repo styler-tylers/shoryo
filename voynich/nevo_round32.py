@@ -256,6 +256,28 @@ def n95(V):
             print(f"    割合で重みを付けた平均: 挿絵 {avg(3):.2f}  綴じ {avg(4):.2f}  書き手 {avg(5):.2f}   挿絵を引いたあと 綴じ {avg(6):.2f}  書き手 {avg(7):.2f}")
 
 
+def n95b(V):
+    """事後: N95 (1) を、各頁 60 語にそろえて測り直す（頁の長さの影響を除く）。"""
+    meta = meta_of()
+    print("=== N95 (1') 各頁 60 語にそろえた測り直し（事後）===")
+    for lang in ("A", "B"):
+        pt = {k: ls for k, ls in V[lang][0].items() if sum(len(l) for l in ls) >= 60}
+        sect = {k: meta[k]["I"] for k in pt}
+
+        def eq(P, seed):
+            r = random.Random(seed)
+            return {k: [r.sample([w for l in ls for w in l], 60)] for k, ls in P.items()}
+
+        for scope, f in (("全ての組", lambda P: __import__("nevo_round30").ratio(P)), ("同じ挿絵の種類の組", lambda P: ratio_same(P, sect)[0])):
+            r0 = statistics.mean(f(eq(pt, s)) for s in range(10))
+            out = [f"  ヴォイニッチ {lang} {scope}  元 {r0:.2f}"]
+            for label, key in (("語頭・語末を保つ", V_AFF), ("芯を保つ", V_CORE)):
+                rs = [f(eq(surrogate(pt, key, random.Random(s))[0], s)) for s in range(10)]
+                m = statistics.mean(rs)
+                out.append(f"{label} {m:.2f}[{min(rs):.2f}〜{max(rs):.2f}] 残る {(m - 1) / (r0 - 1):.0%}")
+            print("   ".join(out), flush=True)
+
+
 def n96(V, rng):
     print("=== N96 頁の半分で作り、偶数番目の頁で採点 ===", flush=True)
     for lang in ("A", "B"):
@@ -288,4 +310,4 @@ def n96(V, rng):
 if __name__ == "__main__":
     V = voynich()
     rng = random.Random(2026)
-    {"n94": lambda: n94(V, rng), "n95": lambda: n95(V), "n96": lambda: n96(V, rng)}[sys.argv[1]]()
+    {"n94": lambda: n94(V, rng), "n95": lambda: n95(V), "n95b": lambda: n95b(V), "n96": lambda: n96(V, rng)}[sys.argv[1]]()
