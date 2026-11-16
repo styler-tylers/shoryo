@@ -60,7 +60,7 @@ def family_keep(P, G, gen, by_tail, dists, eps, rng, freq):
     return P
 
 
-def build_fav(G, C, pt, rng, phi, rho=0.05, size=300, mu=0.1, c=0.4, gamma=2.0, q=0.25, width=37, cap=30000, lpp=25, n=300000):
+def build_fav(G, C, pt, rng, phi, rho=0.05, size=300, kappa=0.0, mu=0.1, c=0.4, gamma=2.0, q=0.25, width=37, cap=30000, lpp=25, n=300000):
     """N77 の作り方 ＋ 確率 phi で「いま好んで使う語」から選ぶ。頁ごとに rho を入れ替える。"""
     gen = Counter(G.word(rng) for _ in range(n))
     top = {w for w, _ in gen.most_common(50)}
@@ -115,6 +115,9 @@ def build_fav(G, C, pt, rng, phi, rho=0.05, size=300, mu=0.1, c=0.4, gamma=2.0, 
             if gs:
                 g = rng.choices(gs, [d[x] for x in gs])[0]
                 if usefav and fg[g][0]:
+                    if kappa and prev:
+                        f = follow[prev]
+                        return rng.choices(fg[g][0], [k * (1 + kappa * f[w]) for w, k in zip(*fg[g])])[0]
                     return rng.choices(*fg[g])[0]
                 return rng.choices(*byg[g])[0]
         if usefav:
