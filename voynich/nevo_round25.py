@@ -138,7 +138,8 @@ def main() -> None:
             runs73.append(with_strength(measure(P, lastf(P), rng), P))
         summarize("N73 平文なし・写しあり", runs73)
         sys.stdout.flush()
-        gen = Counter(LG.word(random.Random(7)) for _ in range(300000))
+        gr = random.Random(7)
+        gen = Counter(LG.word(gr) for _ in range(300000))
         by_tail = defaultdict(set)
         for w in gen:
             by_tail[w[1:]].add(w)

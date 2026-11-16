@@ -146,7 +146,8 @@ def main() -> None:
         sys.stdout.flush()
         LG = LengthGrammar(pt)
         LC = Compat(LG, pt)
-        gen = Counter(LG.word(random.Random(7)) for _ in range(300000))
+        gr = random.Random(7)
+        gen = Counter(LG.word(gr) for _ in range(300000))
         by_tail = defaultdict(set)
         for w in gen:
             by_tail[w[1:]].add(w)
