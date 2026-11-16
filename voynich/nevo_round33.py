@@ -173,6 +173,10 @@ def run(V, rng, title, confs, sim=True):
                     retain(f"{name} {lang} 種 {seed}", P, V_CORE, V_AFF)
                 runs.append(with_strength(measure(P, lastf(P), rng), P))
             summarize(name, runs)
+            for r in runs:  # 定義できない値（語 × 語の結び付きが 0 以下）は外れとして数える
+                for k, v in r.items():
+                    if isinstance(v, float) and v != v:
+                        r[k] = -9.0
             score(name, runs, ref)
             sys.stdout.flush()
 
