@@ -25,7 +25,7 @@ from nevo_round25 import first_table  # noqa: E402
 lastf = lambda P: [k == len(ls) - 1 for ls in P.values() for k in range(len(ls))]  # noqa: E731
 
 
-def build_cond2(G, C, pt, rng, mu=0.0, c=0.4, q=0.25, width=37, cap=30000, lpp=25, n=300000):
+def build_cond2(G, C, pt, rng, mu=0.0, c=0.4, q=0.25, width=37, cap=30000, lpp=25, n=300000, gamma=1.0):
     gen = Counter(G.word(rng) for _ in range(n))
     byg = defaultdict(lambda: ([], []))
     for w, k in gen.items():
@@ -73,7 +73,7 @@ def build_cond2(G, C, pt, rng, mu=0.0, c=0.4, q=0.25, width=37, cap=30000, lpp=2
             if r <= 0:
                 line = l
                 break
-        return rng.choices(line, [wfun(w) * cond_w(prev, w) for w in line])[0]
+        return rng.choices(line, [wfun(w) * cond_w(prev, w) ** gamma for w in line])[0]
 
     def close(line):
         k = rng.randrange(len(line))
