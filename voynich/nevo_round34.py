@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from nevo_round9 import voynich  # noqa: E402
-from nevo_round10 import measure  # noqa: E402
+from nevo_round10 import measure, split  # noqa: E402
 from nevo_round12 import Compat  # noqa: E402
 from nevo_round13 import gram_prob  # noqa: E402
 from nevo_round16 import boundary_dists, summarize, with_strength  # noqa: E402
@@ -29,7 +29,7 @@ C_LANG = {"A": 0.4, "B": 0.6}
 REF_SIM = {"A": 1.35, "B": 1.41}
 
 
-def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5, favpos=False, rot=True, t2=False, headmut=True,
+def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5, favpos=False, rot=True, t2=False, headmut=True, headfit=False, favcontent=False,
             mu=0.1, gamma=2.0, width=37, cap=30000, lpp=25, n=300000):
     """N98 の「土台 ＋ 位置」に、頭の印（mark）・位置の語の言い回しのくり返し（mu2）・好みの語と芯（phis）・
     毎回型から作る（live）・写しを替える割合（mut）を足したもの。"""
@@ -42,6 +42,7 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
     # 好みの語・芯
     keys, skips = (lambda w: w, V_CORE), (50, 10)
     members, pools, favs, fgs = [], [], [], []
+    topw = {w for w, _ in gen.most_common(50)}
     for key, sk in zip(keys, skips):
         cnt, mem = Counter(), defaultdict(list)
         for w, k in gen.items():
@@ -117,6 +118,10 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
             return fresh(prev)
         g = rng.choices(gs, [fd[x] for x in gs])[0]
         if favpos and fgs[0][g][0] and rng.random() < phis[0]:  # 第 35 巡 N103: 位置で選ぶときも好みの語から
+            if favcontent:  # 第 37 巡 N110: 普通に選んだ語が上位 50 語なら替えない
+                w0 = rng.choices(byg[g][0], posw[p][g])[0]
+                if w0 in topw:
+                    return w0
             ws, ks = fgs[0][g]
             return rng.choices(ws, [k * pratio[p][w[-1]] for w, k in zip(ws, ks)])[0]
         return rng.choices(byg[g][0], posw[p][g])[0]
@@ -151,6 +156,10 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
             if gs:
                 g = rng.choices(gs, [d[x] for x in gs])[0]
                 if which is not None and fgs[which][g][0]:
+                    if favcontent and which == 0:
+                        w0 = rng.choices(*byg[g])[0]
+                        if w0 in topw:
+                            return w0
                     return rng.choices(*fgs[which][g])[0]
                 if live:
                     for _ in range(40):
@@ -208,6 +217,12 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
             if w is not None and rng.random() < mut:
                 w2 = C.mutate(w, rng)
                 w = w2 if (headmut or w2[0] == w[0]) else w
+            if w is not None and headfit and prev:  # 第 37 巡 N109: 写した語の頭を前の語に合わせて選び直す
+                _, m_, e_ = split(w)
+                cands = [x + m_ + e_ for x in C.heads_for(m_) if x + m_ + e_]
+                if cands:
+                    hw = [G.h[split(x)[0]] + 0.5 for x in cands]
+                    w = rng.choices(cands, [a * cond_w(prev, x) ** (1 / gamma) for a, x in zip(hw, cands)])[0]
         if w is None:
             w = fresh(prev)
         add = len(w) + (1 if cur else 0)
