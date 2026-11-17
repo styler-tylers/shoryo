@@ -29,7 +29,7 @@ C_LANG = {"A": 0.4, "B": 0.6}
 REF_SIM = {"A": 1.35, "B": 1.41}
 
 
-def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5, favpos=False,
+def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5, favpos=False, rot=True, t2=False, headmut=True,
             mu=0.1, gamma=2.0, width=37, cap=30000, lpp=25, n=300000):
     """N98 の「土台 ＋ 位置」に、頭の印（mark）・位置の語の言い回しのくり返し（mu2）・好みの語と芯（phis）・
     毎回型から作る（live）・写しを替える割合（mut）を足したもの。"""
@@ -77,6 +77,19 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
     mt = sum(marg.values())
     wfun = gram_prob(G)
     follow = defaultdict(Counter)
+    # 第 36 巡 N108: 最後の 2 字形 → 最初の 2 字形の表
+    T2, marg2, byg2 = defaultdict(Counter), Counter(), defaultdict(lambda: ([], []))
+    if t2:
+        for ls in pt.values():
+            for l in ls:
+                if len(l) >= 4:
+                    for a, b in zip(l[1:-1], l[2:-1]):
+                        T2[a[-2:]][b[:2]] += 1
+                        marg2[b[:2]] += 1
+        for w, k in gen.items():
+            byg2[w[:2]][0].append(w)
+            byg2[w[:2]][1].append(k)
+    mt2 = sum(marg2.values())
     first, firstp, last = boundary_dists(pt)
     first1 = Counter(l[0][0] for ls in pt.values() for l in ls if len(l) >= 4)
     lastall = Counter()
@@ -109,6 +122,9 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
         return rng.choices(byg[g][0], posw[p][g])[0]
 
     def cond_w(prev, w):
+        d2 = T2.get(prev[-2:]) if (t2 and prev) else None
+        if d2 and sum(d2.values()) >= 20:
+            return ((d2[w[:2]] + 0.5) / sum(d2.values()) / ((marg2[w[:2]] + 0.5) / mt2)) ** gamma
         d = T.get(prev[-1]) if prev else None
         if not d:
             return 1.0
@@ -124,6 +140,11 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
                 which = i
                 break
             r -= phis[i]
+        d2 = T2.get(prev[-2:]) if (t2 and prev) else None
+        if d2 and sum(d2.values()) >= 20:
+            gs = [g for g in d2 if byg2[g][0]]
+            if gs:
+                return rng.choices(*byg2[rng.choices(gs, [d2[x] for x in gs])[0]])[0]
         d = T.get(prev[-1]) if prev else None
         if d:
             gs = [g for g in d if byg[g][0]]
@@ -157,8 +178,9 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
         return rng.choices(line, [wfun(w) * cond_w(prev, w) for w in line])[0]
 
     def close(line):
-        k = rng.randrange(len(line))
-        line = line[k:] + line[:k]
+        if rot:
+            k = rng.randrange(len(line))
+            line = line[k:] + line[:k]
         full = [None] + list(line) + [None]
         full[0] = pos_word(POS[0], None)
         if mark and rng.random() < mark:
@@ -184,7 +206,8 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
         if rng.random() < c:
             w = pick(prev)
             if w is not None and rng.random() < mut:
-                w = C.mutate(w, rng)
+                w2 = C.mutate(w, rng)
+                w = w2 if (headmut or w2[0] == w[0]) else w
         if w is None:
             w = fresh(prev)
         add = len(w) + (1 if cur else 0)
