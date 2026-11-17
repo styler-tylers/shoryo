@@ -29,7 +29,7 @@ C_LANG = {"A": 0.4, "B": 0.6}
 REF_SIM = {"A": 1.35, "B": 1.41}
 
 
-def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5, favpos=False, rot=True, t2=False, headmut=True, headfit=False, favcontent=False,
+def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5, favpos=False, rot=True, t2=False, headmut=True, headfit=False, favcontent=False, widepick=False,
             mu=0.1, gamma=2.0, width=37, cap=30000, lpp=25, n=300000):
     """N98 の「土台 ＋ 位置」に、頭の印（mark）・位置の語の言い回しのくり返し（mu2）・好みの語と芯（phis）・
     毎回型から作る（live）・写しを替える割合（mut）を足したもの。"""
@@ -177,6 +177,9 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
         ws = [(1 / (len(recent) - i), l) for i, l in enumerate(recent) if l]
         if not ws:
             return None
+        if widepick:  # 第 38 巡 N113: 近くの 10 行の全ての語から、前の語に合うものを写す
+            cs = [(x, w) for x, l in ws for w in l]
+            return rng.choices([w for _, w in cs], [x * wfun(w) * cond_w(prev, w) for x, w in cs])[0]
         r = rng.random() * sum(x for x, _ in ws)
         line = ws[-1][1]
         for x, l in ws:
