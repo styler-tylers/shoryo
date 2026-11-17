@@ -29,7 +29,7 @@ C_LANG = {"A": 0.4, "B": 0.6}
 REF_SIM = {"A": 1.35, "B": 1.41}
 
 
-def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5,
+def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300, 60), rho=0.05, live=False, mut=0.5, favpos=False,
             mu=0.1, gamma=2.0, width=37, cap=30000, lpp=25, n=300000):
     """N98 の「土台 ＋ 位置」に、頭の印（mark）・位置の語の言い回しのくり返し（mu2）・好みの語と芯（phis）・
     毎回型から作る（live）・写しを替える割合（mut）を足したもの。"""
@@ -103,6 +103,9 @@ def build34(G, C, pt, rng, c=0.4, mark=0.0, mu2=0.0, phis=(0.0, 0.0), sizes=(300
         if not gs:
             return fresh(prev)
         g = rng.choices(gs, [fd[x] for x in gs])[0]
+        if favpos and fgs[0][g][0] and rng.random() < phis[0]:  # 第 35 巡 N103: 位置で選ぶときも好みの語から
+            ws, ks = fgs[0][g]
+            return rng.choices(ws, [k * pratio[p][w[-1]] for w, k in zip(ws, ks)])[0]
         return rng.choices(byg[g][0], posw[p][g])[0]
 
     def cond_w(prev, w):
