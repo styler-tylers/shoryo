@@ -35,32 +35,36 @@ def mi(J):
     return float((P[m] * np.log2(P[m] / E[m])).sum())
 
 
-def stats3(lines, K):
-    """lines: 種類の番号の行のリスト。隣どうし・1 つ飛び・鎖で説明できる分。"""
-    AB, AC, BC = np.zeros((K, K)), np.zeros((K, K)), np.zeros((K, K))
-    for l in lines:
-        if len(l) >= 3:
-            a = np.asarray(l)
-            np.add.at(AB, (a[:-2], a[1:-1]), 1)
-            np.add.at(AC, (a[:-2], a[2:]), 1)
-            np.add.at(BC, (a[1:-1], a[2:]), 1)
-    rs = BC.sum(1, keepdims=True)
-    rs[rs == 0] = 1
-    return mi(AB), mi(AC), mi(AB @ (BC / rs))
+def joint(x, y, K):
+    J = np.zeros((K, K))
+    np.add.at(J, (x, y), 1)
+    return J
 
 
-def excess(lines, K, rng, shuf=5):
-    obs = np.array(stats3(lines, K))
-    nul = np.zeros(3)
-    for _ in range(shuf):
-        nul += np.array(stats3([rng.sample(l, len(l)) for l in lines], K))
-    adj, skp, ch = obs - nul / shuf
-    return adj, skp, skp - ch
-
-
-def boot(f, lines, rng, B=100):
-    vals = np.array([f([lines[rng.randrange(len(lines))] for _ in lines]) for _ in range(B)])
-    return np.percentile(vals, [2.5, 97.5], axis=0)
+def excess(lines, K, rng, runs=200):
+    """行の内側の 3 語 (a, b, c)。余り ＝ a と c の結び付き − 「b が同じ 3 語の間で c を入れ替えた」ときの平均。
+    入れ替えは「b を知れば a と c は無関係」という鎖の仮定をそのまま作る。z ＝ 余り ÷ 入れ替えの値の標準偏差。
+    隣どうし・1 つ飛びは、行の中でかき混ぜた値（5 回）を引いたもの。"""
+    tri = np.array([(l[i], l[i + 1], l[i + 2]) for l in lines for i in range(len(l) - 2)])
+    a, b, c = tri[:, 0], tri[:, 1], tri[:, 2]
+    obs = mi(joint(a, c, K))
+    order = np.argsort(b, kind="stable")
+    bounds = np.flatnonzero(np.diff(b[order])) + 1
+    groups = np.split(order, bounds)
+    nul = []
+    nprng = np.random.default_rng(rng.randrange(1 << 30))
+    for _ in range(runs):
+        cp = c.copy()
+        for g in groups:
+            cp[g] = c[nprng.permutation(g)]
+        nul.append(mi(joint(a, cp, K)))
+    ex, sd = obs - float(np.mean(nul)), float(np.std(nul))
+    sh = [0.0, 0.0]
+    for _ in range(5):
+        t = np.array([(x[i], x[i + 1], x[i + 2]) for x in (rng.sample(l, len(l)) for l in lines) for i in range(len(x) - 2)])
+        sh[0] += mi(joint(t[:, 0], t[:, 1], K)) / 5
+        sh[1] += mi(joint(t[:, 0], t[:, 2], K)) / 5
+    return mi(joint(a, b, K)) - sh[0], obs - sh[1], ex, ex / sd if sd > 0 else float("nan")
 
 
 CLASSERS = {
@@ -86,10 +90,9 @@ def report118(name, P, kind, rng):
     out = []
     for cname, mk in CLASSERS.items():
         inner, K = coded_lines(P, mk(words, kind))
-        adj, skp, ex = excess(inner, K, rng)
-        lo, hi = boot(lambda ls: excess(ls, K, rng, shuf=3)[2], inner, rng)
-        out.append((lo, hi))
-        print(f"  {name:<30} {cname:<8} 隣どうし {adj:+.4f}  1 つ飛び {skp:+.4f}  余り {ex:+.4f}［{lo:+.4f}〜{hi:+.4f}］", flush=True)
+        adj, skp, ex, z = excess(inner, K, rng)
+        out.append((ex, z))
+        print(f"  {name:<30} {cname:<8} 隣どうし {adj:+.4f}  1 つ飛び {skp:+.4f}  余り {ex:+.4f}  z {z:+.1f}", flush=True)
     return out
 
 
@@ -116,11 +119,11 @@ def n118(base, base3):
         _, _, coded = matched_source(caesar, LG, random.Random(1))
         res["符号表だけ"] = report118("符号表だけ（Caesar）", dict(line_unit.wrap(coded[:cap], 37)), "v", rng)
         v = report118(f"ヴォイニッチ {lang}", pt, "v", rng)
-        ok = [v[i][0] <= 0 and all(r[i][0] > 0 for r in res.values()) for i in range(3)]
-        print(f"  → 分け方ごとの判定（ヴォイニッチの幅が 0 を含み、平文ありの全てで下の端 > 0）: {ok}  {'確かめられた' if sum(ok) >= 2 else '確かめられない'}", flush=True)
+        ok = [v[i][1] < 2 and all(r[i][1] > 2 for r in res.values()) for i in range(3)]
+        print(f"  → 分け方ごとの判定（ヴォイニッチ z < 2、平文ありの全てで z > 2）: {ok}  {'確かめられた' if sum(ok) >= 2 else '確かめられない'}", flush=True)
         for i, cname in enumerate(CLASSERS):
-            bad = [k for k, r in res.items() if r[i][0] <= 0]
-            print(f"     {cname}: ヴォイニッチ［{v[i][0]:+.4f}〜{v[i][1]:+.4f}］  下の端が 0 以下の平文あり: {bad or 'なし'}", flush=True)
+            bad = [k for k, r in res.items() if not r[i][1] > 2]
+            print(f"     {cname}: ヴォイニッチ 余り {v[i][0]:+.4f} z {v[i][1]:+.1f}  z が 2 以下の平文あり: {bad or 'なし'}", flush=True)
         Pc = dict(line_unit.wrap(nat["Caesar（ラテン語）"], 37))
         r2 = random.Random(5)
         rot = {k: [(lambda l, j: l[j:] + l[:j])(l, r2.randrange(len(l))) for l in ls] for k, ls in Pc.items()}
@@ -145,39 +148,27 @@ def n119():
                 P = build34(LG, LC, pt, random.Random(seed), **{**dict(c=c, cap=cap), **kw, **over})
                 words = [w for ls in P.values() for l in ls for w in l]
                 inner, K = coded_lines(P, top_k(words, 30))
-                adj, skp, ex = excess(inner, K, rng)
-                lo, hi = boot(lambda ls: excess(ls, K, rng, shuf=3)[2], inner, rng)
-                print(f"  {name:<14} 種 {seed}: 隣どうし {adj:+.4f}  1 つ飛び {skp:+.4f}  余り {ex:+.4f}［{lo:+.4f}〜{hi:+.4f}］", flush=True)
+                adj, skp, ex, z = excess(inner, K, rng)
+                print(f"  {name:<14} 種 {seed}: 隣どうし {adj:+.4f}  1 つ飛び {skp:+.4f}  余り {ex:+.4f}  z {z:+.1f}", flush=True)
 
 
-def cross(P, rng, B=100, shuf=20):
+def cross(P, rng, runs=200):
+    """行の最後の語 × 次の行の最初の語の結び付き − 同じ頁の別の行の最初の語と組ませたときの平均。z ＝ ÷ その標準偏差。"""
     words = [w for ls in P.values() for l in ls for w in l]
     cls = top_k(words, 30)
     ids = {}
     pages = [[[ids.setdefault(cls(w), len(ids)) for w in l] for l in ls if len(l) >= 3] for ls in P.values()]
     pages = [p for p in pages if len(p) >= 3]
     K = len(ids)
-    pairs = [(p[i][-1], p[i + 1][0], pi) for pi, p in enumerate(pages) for i in range(len(p) - 1)]
+    a = np.array([p[i][-1] for p in pages for i in range(len(p) - 1)])
+    b = np.array([p[i + 1][0] for p in pages for i in range(len(p) - 1)])
     firsts = [[l[0] for l in p] for p in pages]
-
-    def val(sample):
-        J = np.zeros((K, K))
-        for a, b, _ in sample:
-            J[a, b] += 1
-        nul = 0.0
-        for _ in range(shuf):
-            N = np.zeros((K, K))
-            for a, _, pi in sample:
-                N[a, rng.choice(firsts[pi])] += 1
-            nul += mi(N)
-        return mi(J) - nul / shuf
-
-    v = val(pairs)
-    bs = [val([pairs[rng.randrange(len(pairs))] for _ in pairs]) for _ in range(B)]
-    lo, hi = np.percentile(bs, [2.5, 97.5])
-    inner = [l for p in pages for l in p]
-    adj = excess(inner, K, rng)[0]
-    return v, lo, hi, adj
+    owner = [pi for pi, p in enumerate(pages) for _ in range(len(p) - 1)]
+    obs = mi(joint(a, b, K))
+    nul = [mi(joint(a, np.array([rng.choice(firsts[pi]) for pi in owner]), K)) for _ in range(runs)]
+    v, sd = obs - float(np.mean(nul)), float(np.std(nul))
+    adj = excess([l for p in pages for l in p], K, rng, runs=5)[0]
+    return v, v / sd, adj
 
 
 def n120(base, base3):
@@ -206,11 +197,11 @@ def n120(base, base3):
         for g, ps in groups.items():
             vals[g] = []
             for name, P in ps:
-                v, lo, hi, adj = cross(P, rng)
+                v, z, adj = cross(P, rng)
                 vals[g].append(v)
-                print(f"  {g}・{name:<28} 行をまたぐ {v:+.4f}［{lo:+.4f}〜{hi:+.4f}］  行の中の隣どうし {adj:+.4f}", flush=True)
-        v, lo, hi, adj = cross(pt, rng)
-        print(f"  ヴォイニッチ {lang:<32} 行をまたぐ {v:+.4f}［{lo:+.4f}〜{hi:+.4f}］  行の中の隣どうし {adj:+.4f}", flush=True)
+                print(f"  {g}・{name:<28} 行をまたぐ {v:+.4f}  z {z:+.1f}  行の中の隣どうし {adj:+.4f}", flush=True)
+        v, z, adj = cross(pt, rng)
+        print(f"  ヴォイニッチ {lang:<32} 行をまたぐ {v:+.4f}  z {z:+.1f}  行の中の隣どうし {adj:+.4f}", flush=True)
         a, b = vals["平文あり"], vals["平文なし"]
         gap = max(min(a) - max(b), min(b) - max(a))
         spread = max(max(a) - min(a), max(b) - min(b))
