@@ -33,9 +33,10 @@ created: 2026-11-15
 
 ## 次の作業
 
-- 圧縮点は `・₄₀`（詳しい記録の第 126〜127 節）。**第 1・2・4 段は閉じた**。第 2 段の到達点: 平文なしのモデルで A 17/22・B 20/22。第 4 段の結論: 語・行・頁の統計では平文の有無は決まらない（分類 ⑤）。第 3 段（物の側との突き合わせ）は途中
-- いまの最良のモデル: `nevo_round34.py` の `build34`。A は `c=0.4, mark=0.25`（または `t2=True, widepick=True`）、B は `c=0.6, mark=0.12, live=True`
-- 次（第 5 段: まとめる）: (1) 全体を 1 本の文章にまとめ直す（第 30 巡までのまとめに継ぎ足した第 31〜40 巡の追加を、1 つの筋に）、(2) 先行研究（Currier、Stolfi、Timm & Schinner、Rozanova & Temerev、Layfield & Davis）との一致とずれの表、(3) スクリプトの整理（主な検定を 1 つの入口から再現）
+- 圧縮点は `・₄₀`（詳しい記録の第 126〜128 節）。**第 1・2・4・5 段は閉じた**。第 3 段（物の側との突き合わせ）は途中
+- **最新のまとめ: [[2026-11-17 ヴォイニッチ手稿 研究全体のまとめ（nēvo 第40巡まで）]]**（観察・構造類似・棄却・平文の有無・分からないことの分類・先行研究との表・方法・残した問い）
+- 第 2 段の到達点: 平文なしのモデルで A 17/22・B 20/22（`nevo_round34.py` の `build34`。A は `c=0.4, mark=0.25`、B は `c=0.6, mark=0.12, live=True`）。第 4 段の結論: 語・行・頁の統計では平文の有無は決まらない（分類 ⑤）
+- 次に開くなら: まとめの第 9 節「残した問い」から（隣り合う語のつながりの残り半分、語の順番に固有のつながり、言語 A の「少し替えて写す」の中身、第 3 段、原典の確認）。どれも測り方を作り物のデータで先に確かめてから
 - 注意:
   - 頁どうしの語の重なりは**頁の長さに左右される**。言語 B は必ず各頁の語の数をそろえて測る（N90・N95 で 2 度訂正した）
   - モデルは**ヴォイニッチと同じ語の数**（A 11300・B 23091）で作って採点する（N99）。最新のモデルは `nevo_round34.py` の `build34`
@@ -61,7 +62,9 @@ created: 2026-11-15
 git clone https://github.com/styler-tylers/shoryo && cd shoryo
 git checkout claude/voynich-manuscript-research-csb1hd
 python3 -m unittest discover voynich        # 51 件
-python3 voynich/nevo_round40.py n119    # または n118|n120 <langs の場所> <langs3 の場所>  # 最新の巡（部分ごとに 20〜40 分）
+python3 voynich/reproduce.py list           # 主な検定 16 個の一覧（記録の節・目安の時間つき）
+python3 voynich/reproduce.py fetch          # 比べる文章 6 冊を voynich/data/texts に取ってくる
+python3 voynich/reproduce.py run n104       # 例: 最良のモデルの採点（40 分ほど）
 ```
 
 - 転写ファイル（ZL3b-n.txt, IT2a-n.txt）は初回に voynich.nu から自動で取得して `voynich/data/` に置く（git には入れない）
