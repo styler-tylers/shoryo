@@ -3897,6 +3897,12 @@ I3（行頭だけの語から最初の字形を除いた形が、同じ頁の中
 - 音楽理論の図の特徴（音程の比を弧で結ぶ、手・指、モノコルドの目盛り）は、ヴォイニッチの図に 1 つも無い
 - **ヴォイニッチの円形の図は、形の上では天文・暦の回転盤や風の図の仲間で、音楽理論の図の仲間ではない**（観察, 目視）。ただし、天文と音楽を同じ「比の調和」で結ぶ考え方（ボエティウスの「宇宙の音楽」）は、図の形には出ないので、この比較では問えない
 
+### 第 43 巡の出典（N131 の比べた図, Wikimedia Commons, 2026-11-17 取得。画像はリポジトリに入れていない）
+
+- 音楽理論: 「Boethius's Instutione Musica, Cambridge University Library Ii 3.12 fol 61v」／「Einsiedeln, MS Codex 358 (610) fol. 106v-107r Boethius De institutione musica」／「Einsiedeln, MS Codex 358 (610) fol. 91v-92r」／「Guidonian hand」／「The Hand of Guido」／「Pythagoras and King David, BSB CLM 2599, folio 96v」
+- 天文・暦: 「P.9 a volvella of the moon」／「Ghent, Universiteitsbibliotheek, Ms. 92, fol. 24r (Compass Rose or Wind Diagram)」／「Medieval four elements」（ビルフトフェルトの図）／「Horæ diei. Horæ noctis.」（刊本の回転盤）
+- 多声部の曲: music21（cuthbertLab/music21）の `corpus/trecento/`・`ciconia/`・`luca/`（PMFC = Polyphonic Music of the Fourteenth Century の校訂による）
+
 ## 137. 再配置（`・₄₂` → `・₄₃`）
 
 > `・₄₃` = 「音楽の仮説を 2 巡で 6 つの形にして試した（旋律をそのまま、音程、定量記譜の長さと高さ、移高、周期、声部の位置のそろい）。**どの形でも、音楽の書き方に固有の跡は出なかった**。音楽の記号に近いのは字形の決まりやすさ（h2）の 1 点だけで、語の長さの形・行の独立・語彙の使い方は、旋律より自然言語のほうがまだ近い。図の形も、音楽理論の図ではなく天文・暦の図の仲間」
