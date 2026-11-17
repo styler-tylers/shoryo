@@ -40,6 +40,9 @@ TESTS = {
               lambda: ["texts", T("caesar"), T("dante"), T("culpeper")]),
     "n118":  ("1 つ飛びの独立（直した測り方, 第 40 巡）", "§126", "20 分", "nevo_round40.py", lambda: ["n118", str(TEXTS), str(TEXTS)]),
     "n120":  ("行をまたぐ結び付き（第 40 巡）", "§126", "20 分", "nevo_round40.py", lambda: ["n120", str(TEXTS), str(TEXTS)]),
+    "n122":  ("隣り合う語のつながりが、どの組で足りないか（第 41 巡）", "§130", "5 分", "nevo_round41.py", lambda: ["n122"]),
+    "n123":  ("少し替えて写すの中身（第 41 巡）", "§130", "10 分", "nevo_round41.py", lambda: ["n123"]),
+    "n124":  ("芯で綴じの中の並びを推定する（第 41 巡）", "§130", "1 分", "nevo_round41.py", lambda: ["n124"]),
 }
 
 
