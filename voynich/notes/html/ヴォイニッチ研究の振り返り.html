@@ -129,7 +129,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 <div class="wrap">
 
 <header class="hero">
-  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜41 巡</small></h1>
+  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜45 巡</small></h1>
   <div class="hero-body">
     <div class="hero-fig">
       <figure style="margin:0">
@@ -147,8 +147,8 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
       </div>
     </div>
     <div class="stats" aria-label="研究の規模">
-      <div class="stat"><b class="num">41</b><span>巡（nēvo）</span></div>
-      <div class="stat"><b class="num">125</b><span>事前に記録した検定</span></div>
+      <div class="stat"><b class="num">45</b><span>巡（nēvo）</span></div>
+      <div class="stat"><b class="num">135</b><span>事前に記録した検定</span></div>
       <div class="stat"><b class="num">5 / 5</b><span>閉じたロードマップの段</span></div>
       <div class="stat"><b class="num">9</b><span>結論を変えた訂正</span></div>
     </div>
@@ -169,6 +169,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><span class="phase">V</span><div><span class="when">第 27〜31 巡</span><h3>頁と綴じの大きさを見る</h3><p>語彙のまとまりは綴じの単位に従い、言語 A では語の芯が担う。</p></div></li>
     <li><span class="phase">VI</span><div><span class="when">第 32〜38 巡</span><h3>1 つのモデルにまとめる</h3><p>平文なしで A 17/22・B 20/22。3 巡続けて上がらず、決めた目安で閉じた。</p></div></li>
     <li><span class="phase">VII</span><div><span class="when">第 39〜41 巡</span><h3>平文の有無を問い、残した問いを進める</h3><p>5 つの量を試して分かれたものは 0。統計では決まらない、で閉じた。</p></div></li>
+    <li><span class="phase">VIII</span><div><span class="when">第 42〜45 巡</span><h3>同時代の書物と比べる</h3><p>音楽・暗号・医学書の仮説を 10 の形で試した。見た目は天文・医学の書物の仲間、文章の型はどれとも違う。</p></div></li>
   </ol>
 </section>
 
@@ -286,6 +287,33 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
   </div>
 </section>
 
+<section class="sec" aria-labelledby="h-books">
+  <div class="sec-head">
+    <div class="eyebrow">CONTEMPORARY BOOKS</div>
+    <h2 id="h-books">同時代の書物と比べる</h2>
+    <p class="lead">「音楽と関係があるのでは」という思いつきと、15 世紀初頭の音楽・宗教・医学の調べから、確かめられる形を 10 つ作りました。比べた相手は、聖歌 700 曲、14〜15 世紀の多声部 28 曲、1390 年頃の処方集、当時の外交暗号の形、そして中世の図 16 枚です。</p>
+  </div>
+  <div class="table-box">
+    <table>
+      <thead><tr><th>比べたもの</th><th>何を見たか</th><th>結果</th></tr></thead>
+      <tbody>
+        <tr><td>聖歌の旋律をそのまま書いた文章</td><td>音符の群を語として 8 つの量で比べる</td><td class="res"><span class="chip">合わない</span></td></tr>
+        <tr><td>定量記譜の形の多声部の曲</td><td>音の長さを語の端、高さを芯に置く</td><td class="res"><span class="chip">合わない</span></td></tr>
+        <tr><td>移高・周期・声部のそろい</td><td>同じ置き換えのくり返し、決まった間隔、行どうしの位置</td><td class="res"><span class="chip">跡なし</span></td></tr>
+        <tr><td>当時の外交暗号の形</td><td>同音字・よく使う語の専用記号・空文字</td><td class="res"><span class="chip">逆の向き</span></td></tr>
+        <tr><td>処方集の決まり文句</td><td>書き出し（「取れ」95%）と締め（「盛って出せ」）</td><td class="res"><span class="chip">無い</span></td></tr>
+        <tr><td>段落の長さ</td><td>短い項目が並ぶか</td><td class="res"><span class="chip ok">合う</span></td></tr>
+        <tr><td>円形の図の形（目視）</td><td>暦の回転盤 0.74・宇宙の輪 0.60・獣帯人体図 0.17・音楽理論 0.09・錬金術 0.05</td><td class="res"><span class="chip ok">暦・宇宙の図の仲間</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="verdict">
+    <h3>見た目は同時代の天文・医学の書物、文章の型はどれとも違う</h3>
+    <p>図と段落の形は同時代の書物に合いますが、文章の書き方は、旋律にも、暗号にも、処方集にも合いませんでした。<em>音楽や医学の中身が別の方法で書かれた可能性は残ります。</em>それを問うには統計の外の手がかりが要ります。</p>
+    <p class="note">図の判定は分析補助の AI の目視です。別のページ「図の判定の見直し」で直せます。</p>
+  </div>
+</section>
+
 <section class="sec" aria-labelledby="h-fix">
   <div class="sec-head">
     <div class="eyebrow">CORRECTIONS ON RECORD</div>
@@ -354,7 +382,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 </section>
 
 <footer>
-  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜131 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
+  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜143 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
   <span>転写: René Zandbergen, ZL transliteration file 3b ほか。図版: Beinecke Rare Book and Manuscript Library, Yale University, MS 408（パブリックドメイン）。</span>
 </footer>
 
