@@ -129,7 +129,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 <div class="wrap">
 
 <header class="hero">
-  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜69 巡</small></h1>
+  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜73 巡</small></h1>
   <div class="hero-body">
     <div class="hero-fig">
       <figure style="margin:0">
@@ -147,8 +147,8 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
       </div>
     </div>
     <div class="stats" aria-label="研究の規模">
-      <div class="stat"><b class="num">69</b><span>巡（nēvo）</span></div>
-      <div class="stat"><b class="num">208</b><span>事前に記録した検定</span></div>
+      <div class="stat"><b class="num">73</b><span>巡（nēvo）</span></div>
+      <div class="stat"><b class="num">219</b><span>事前に記録した検定</span></div>
       <div class="stat"><b class="num">5 / 5</b><span>閉じたロードマップの段</span></div>
       <div class="stat"><b class="num">12</b><span>結論を変えた訂正</span></div>
     </div>
@@ -174,6 +174,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><span class="phase">X</span><div><span class="when">第 53〜55 巡</span><h3>暗号に工夫を足し、語の長さと語頭を詰める</h3><p>音節の暗号に「長い語の中ほどを略す」を足すと 3 つの性質がそろうが、設定は別の文章に移らない。語頭の変わり方はタガログ語・モデルと同じで、暗号とは違う。</p></div></li>
     <li><span class="phase">XI</span><div><span class="when">第 56〜61 巡</span><h3>二面が 1 つの作り方で両立するかを確かめる</h3><p>平文なしのモデルは、語末の欄の同じ決まりで文字の性質を出す。言語 B の文字だけの 5 頁は語の長さが右に裾を引く（平均は短い）が、ほかの性質は同じ。行をまたいで境目の規則は続かない。過去の行をまたぐ量を点検し、行の独立は偏りの無い順位の形でも保たれた。段落の最初の行は芯が長く、<code>k/t</code> が <code>p/f</code> に替わる（モデルは出さない）。</p></div></li>
     <li><span class="phase">XII</span><div><span class="when">第 62〜69 巡</span><h3>平文ありの冗長な暗号を試す</h3><p>Naibbe 暗号の元の表（著者の補足資料）で、3 つの性質と Zipf が平文ありで出ることを確かめた。語尾の幅・段落の最初の行・字形の在庫の増え続けは、性質から逆に組んだ暗号（VT）で出た。2 つを合わせた VTN は、平文なしのモデルとほぼ同じところまで近づいた。</p></div></li>
+    <li><span class="phase">XIII</span><div><span class="when">第 70〜73 巡</span><h3>挿絵のラベルと、半分の頁での確かめ</h3><p>ラベルは本文から少し離れた長い芯の語で、挿絵の位置と結び付かない。半分の頁だけから作った平文ありの暗号は、残りの半分に対して 8 つの量で 6。隣の行どうしの語が似る性質だけは、平文ありの暗号に無い。</p></div></li>
   </ol>
 </section>
 
@@ -389,6 +390,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
         <tr><td><b>Naibbe 暗号（元の表）</b></td><td>字形の決まりやすさ・語の長さの対称・空白の位置・Zipf の傾き。別の文章にも移る</td><td>語尾の幅（2.01 対 1.48）、1 回だけの語、隣の語の長さ、行の語彙、段落の最初の行の <code>p/f</code></td></tr>
         <tr><td>Naibbe ＋ 語尾側も同じ表</td><td>語尾の幅（1.30）</td><td>語彙（語の種類が 3 分の 1）</td></tr>
         <tr><td><b>VTN（VT ＋ Naibbe の単独の語, 1 文字の単位 0.60〜0.75）</b></td><td>3 つの性質が言語 B の範囲、8 つの量で 5（平文なしのモデルは 6）、Zipf・語尾の幅・在庫の増え続け・段落の最初の行。在庫を字形の型から作っても合う</td><td>1 回だけの語（0.60 対 0.69）、隣の語の長さ</td></tr>
+        <tr><td><b>VTN・半分の頁から作る（字形の型の在庫、語の長さと出る数を結び付ける）</b></td><td>残りの半分の頁に対して、3 つの性質（言語 B の範囲）・8 つの量で 6・語尾の幅・在庫の増え続け</td><td>隣の行どうしの語の似かた（G1）、隣の語の長さのつながり</td></tr>
         <tr><td><b>VT（性質から逆に組んだ暗号）</b></td><td>語尾の幅（1.35）・段落の最初の行の <code>p/f</code> と長い芯・字形の在庫の増え続け（n^0.59、ヴォイニッチ n^0.68）・読み戻し 100%</td><td>字形の決まりやすさ（h2 2.48）・Zipf</td></tr>
       </tbody>
     </table>
@@ -467,13 +469,14 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><b>Stolfi の層で検定し直す。</b>この研究の欄とは切り方が違う</li>
     <li><b>言語 B の文字だけの頁。</b>語の長さの分布が他の題材より右に裾を引く（+0.33, 平均は短い）。書き手・綴じ・段落の長さではなく、芯の短い語が増える。何を書いた頁かと合わせて読む</li>
     <li><b>段落の最初の行。</b>芯が長く、<code>k/t</code> が <code>p/f</code> に替わる。平文なしのモデルに位置の規則を足して出せるか、<code>p/f</code> が行のどの語で起きるかを確かめる</li>
-    <li><b>挿絵のラベル。</b>同じものに同じ語が付くか、ラベルの語が本文で「その頁の題材の語」として出るか。統計の外から平文の有無を問う次の段</li>
+    <li><b>挿絵のラベル。</b>ラベルは 87% が 1 語、本文の語の家族から少し離れた長い芯の語で、黄道の輪・時計の位置・薬学の容器と結び付かない。続けて書いたラベルどうしが少し似る。画像で「同じ物に同じ名前」を確かめる作業が残る</li>
+    <li><b>隣の行どうしの似かた。</b>語の並びはつながらないのに、隣の行には形の近い語が使われる。平文ありの暗号で出すには「前の行の語の形を見て書き方を選ぶ」決まりが要るか</li>
     <li><b>統計の外の手がかり。</b>挿絵と語の対応、綴じ目の絵、汚れの写り。平文の有無を問い直すにはこちらが要る</li>
   </ul>
 </section>
 
 <footer>
-  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜215 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
+  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜227 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
   <span>転写: René Zandbergen, ZL transliteration file 3b ほか。図版: Beinecke Rare Book and Manuscript Library, Yale University, MS 408（パブリックドメイン）。</span>
 </footer>
 
