@@ -106,6 +106,9 @@ def main(tdir):
     V = voynich()
     cae, des = letters_of(T / "pg218.txt"), letters_of(T / "pg23306.txt")
     alphabet = [c for c, _ in Counter(cae).most_common()]
+    extra = Counter(c for c in des if c not in alphabet)
+    des = [c for c in des if c in alphabet]  # 直し: Caesar の字の一覧に無い字（w など）は Descartes から除く
+    print(f"Descartes から除いた字: {dict(extra)}", flush=True)
     print(f"平文 Caesar {len(cae)} 字、字の種類 {len(alphabet)}：{''.join(alphabet)}", flush=True)
     for lang in ("A", "B"):
         p_ = V[lang][0]
