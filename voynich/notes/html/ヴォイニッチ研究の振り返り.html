@@ -129,7 +129,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 <div class="wrap">
 
 <header class="hero">
-  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜67 巡</small></h1>
+  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜69 巡</small></h1>
   <div class="hero-body">
     <div class="hero-fig">
       <figure style="margin:0">
@@ -147,8 +147,8 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
       </div>
     </div>
     <div class="stats" aria-label="研究の規模">
-      <div class="stat"><b class="num">67</b><span>巡（nēvo）</span></div>
-      <div class="stat"><b class="num">202</b><span>事前に記録した検定</span></div>
+      <div class="stat"><b class="num">69</b><span>巡（nēvo）</span></div>
+      <div class="stat"><b class="num">208</b><span>事前に記録した検定</span></div>
       <div class="stat"><b class="num">5 / 5</b><span>閉じたロードマップの段</span></div>
       <div class="stat"><b class="num">12</b><span>結論を変えた訂正</span></div>
     </div>
@@ -173,7 +173,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><span class="phase">IX</span><div><span class="when">第 46〜52 巡</span><h3>近年の研究・欧州以外の言語と比べる</h3><p>「ヴォイニッチだけ」の性質を一つずつ対照で確かめ直した。語の作りはタガログ語に似、字形の性質は規則で作った暗号に似る。</p></div></li>
     <li><span class="phase">X</span><div><span class="when">第 53〜55 巡</span><h3>暗号に工夫を足し、語の長さと語頭を詰める</h3><p>音節の暗号に「長い語の中ほどを略す」を足すと 3 つの性質がそろうが、設定は別の文章に移らない。語頭の変わり方はタガログ語・モデルと同じで、暗号とは違う。</p></div></li>
     <li><span class="phase">XI</span><div><span class="when">第 56〜61 巡</span><h3>二面が 1 つの作り方で両立するかを確かめる</h3><p>平文なしのモデルは、語末の欄の同じ決まりで文字の性質を出す。言語 B の文字だけの 5 頁は語の長さが右に裾を引く（平均は短い）が、ほかの性質は同じ。行をまたいで境目の規則は続かない。過去の行をまたぐ量を点検し、行の独立は偏りの無い順位の形でも保たれた。段落の最初の行は芯が長く、<code>k/t</code> が <code>p/f</code> に替わる（モデルは出さない）。</p></div></li>
-    <li><span class="phase">XII</span><div><span class="when">第 62〜67 巡</span><h3>平文ありの冗長な暗号を試す</h3><p>Naibbe 暗号の元の表（著者の補足資料）で、3 つの性質と Zipf が平文ありで出ることを確かめた。語尾の幅・段落の最初の行・字形の在庫の増え続けは、性質から逆に組んだ暗号（VT）で出たが、こちらは字形の決まりやすさと Zipf が出ない。</p></div></li>
+    <li><span class="phase">XII</span><div><span class="when">第 62〜69 巡</span><h3>平文ありの冗長な暗号を試す</h3><p>Naibbe 暗号の元の表（著者の補足資料）で、3 つの性質と Zipf が平文ありで出ることを確かめた。語尾の幅・段落の最初の行・字形の在庫の増え続けは、性質から逆に組んだ暗号（VT）で出た。2 つを合わせた VTN は、平文なしのモデルとほぼ同じところまで近づいた。</p></div></li>
   </ol>
 </section>
 
@@ -388,13 +388,14 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
         <tr><td>表 2 ＋ 書くたびに少し変える</td><td>語彙の増え方（V2・V4）</td><td>字形の決まりやすさ（h2 2.57）</td></tr>
         <tr><td><b>Naibbe 暗号（元の表）</b></td><td>字形の決まりやすさ・語の長さの対称・空白の位置・Zipf の傾き。別の文章にも移る</td><td>語尾の幅（2.01 対 1.48）、1 回だけの語、隣の語の長さ、行の語彙、段落の最初の行の <code>p/f</code></td></tr>
         <tr><td>Naibbe ＋ 語尾側も同じ表</td><td>語尾の幅（1.30）</td><td>語彙（語の種類が 3 分の 1）</td></tr>
+        <tr><td><b>VTN（VT ＋ Naibbe の単独の語, 1 文字の単位 0.60〜0.75）</b></td><td>3 つの性質が言語 B の範囲、8 つの量で 5（平文なしのモデルは 6）、Zipf・語尾の幅・在庫の増え続け・段落の最初の行。在庫を字形の型から作っても合う</td><td>1 回だけの語（0.60 対 0.69）、隣の語の長さ</td></tr>
         <tr><td><b>VT（性質から逆に組んだ暗号）</b></td><td>語尾の幅（1.35）・段落の最初の行の <code>p/f</code> と長い芯・字形の在庫の増え続け（n^0.59、ヴォイニッチ n^0.68）・読み戻し 100%</td><td>字形の決まりやすさ（h2 2.48）・Zipf</td></tr>
       </tbody>
     </table>
   </div>
   <div class="verdict">
-    <h3>性質の多くは平文ありの暗号で出る。ただし全てを同時に出す作り方はまだ無い</h3>
-    <p>Naibbe 暗号では、語尾の幅の狭さと語彙の豊かさが引き換えになります。ヴォイニッチは両方を持ち、語彙の豊かさを語頭と芯の種類から得ています。別の研究者の点検（Morgallet 2026, Zenodo）も、ヴォイニッチの字形の在庫が増え続け、Naibbe の上限 138 を超えることを示しています。Naibbe 暗号と VT は互いに逆の性質を出します。<em>平文の有無は、ここでもまだ決まりません。</em></p>
+    <h3>平文ありの暗号も、平文なしのモデルとほぼ同じところまで近づく</h3>
+    <p>Naibbe 暗号では、語尾の幅の狭さと語彙の豊かさが引き換えになります。ヴォイニッチは両方を持ち、語彙の豊かさを語頭と芯の種類から得ています。別の研究者の点検（Morgallet 2026, Zenodo）も、ヴォイニッチの字形の在庫が増え続け、Naibbe の上限 138 を超えることを示しています。Naibbe 暗号と VT は互いに逆の性質を出し、合わせた VTN は平文なしのモデルとほぼ同じところまで近づきました。<em>統計では平文の有無は決まらない、という結論が、平文ありの側からも裏付けられました。次の問いは、統計の外の手がかり（挿絵のラベル）です。</em></p>
   </div>
 </section>
 
@@ -466,13 +467,13 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><b>Stolfi の層で検定し直す。</b>この研究の欄とは切り方が違う</li>
     <li><b>言語 B の文字だけの頁。</b>語の長さの分布が他の題材より右に裾を引く（+0.33, 平均は短い）。書き手・綴じ・段落の長さではなく、芯の短い語が増える。何を書いた頁かと合わせて読む</li>
     <li><b>段落の最初の行。</b>芯が長く、<code>k/t</code> が <code>p/f</code> に替わる。平文なしのモデルに位置の規則を足して出せるか、<code>p/f</code> が行のどの語で起きるかを確かめる</li>
-    <li><b>2 つの暗号を合わせる。</b>VT に Naibbe の「多い字に多くの単独の語」を入れて、字形の決まりやすさと Zipf まで同時に出るか。平文の言語を替えるとどう動くか</li>
+    <li><b>挿絵のラベル。</b>同じものに同じ語が付くか、ラベルの語が本文で「その頁の題材の語」として出るか。統計の外から平文の有無を問う次の段</li>
     <li><b>統計の外の手がかり。</b>挿絵と語の対応、綴じ目の絵、汚れの写り。平文の有無を問い直すにはこちらが要る</li>
   </ul>
 </section>
 
 <footer>
-  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜209 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
+  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜215 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
   <span>転写: René Zandbergen, ZL transliteration file 3b ほか。図版: Beinecke Rare Book and Manuscript Library, Yale University, MS 408（パブリックドメイン）。</span>
 </footer>
 
