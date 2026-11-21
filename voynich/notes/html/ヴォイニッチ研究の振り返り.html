@@ -129,7 +129,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 <div class="wrap">
 
 <header class="hero">
-  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜45 巡</small></h1>
+  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜52 巡</small></h1>
   <div class="hero-body">
     <div class="hero-fig">
       <figure style="margin:0">
@@ -147,8 +147,8 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
       </div>
     </div>
     <div class="stats" aria-label="研究の規模">
-      <div class="stat"><b class="num">45</b><span>巡（nēvo）</span></div>
-      <div class="stat"><b class="num">135</b><span>事前に記録した検定</span></div>
+      <div class="stat"><b class="num">52</b><span>巡（nēvo）</span></div>
+      <div class="stat"><b class="num">155</b><span>事前に記録した検定</span></div>
       <div class="stat"><b class="num">5 / 5</b><span>閉じたロードマップの段</span></div>
       <div class="stat"><b class="num">9</b><span>結論を変えた訂正</span></div>
     </div>
@@ -170,6 +170,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><span class="phase">VI</span><div><span class="when">第 32〜38 巡</span><h3>1 つのモデルにまとめる</h3><p>平文なしで A 17/22・B 20/22。3 巡続けて上がらず、決めた目安で閉じた。</p></div></li>
     <li><span class="phase">VII</span><div><span class="when">第 39〜41 巡</span><h3>平文の有無を問い、残した問いを進める</h3><p>5 つの量を試して分かれたものは 0。統計では決まらない、で閉じた。</p></div></li>
     <li><span class="phase">VIII</span><div><span class="when">第 42〜45 巡</span><h3>同時代の書物と比べる</h3><p>音楽・暗号・医学書の仮説を 10 の形で試した。見た目は天文・医学の書物の仲間、文章の型はどれとも違う。</p></div></li>
+    <li><span class="phase">IX</span><div><span class="when">第 46〜52 巡</span><h3>近年の研究・欧州以外の言語と比べる</h3><p>「ヴォイニッチだけ」の性質を一つずつ対照で確かめ直した。語の作りはタガログ語に似、字形の性質は規則で作った暗号に似る。</p></div></li>
   </ol>
 </section>
 
@@ -314,6 +315,32 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
   </div>
 </section>
 
+<section class="sec" aria-labelledby="h-only">
+  <div class="sec-head">
+    <div class="eyebrow">WHAT IS REALLY VOYNICH-ONLY</div>
+    <h2 id="h-only">本当に「ヴォイニッチだけ」なのはどれか</h2>
+    <p class="lead">初期に「欧州の言語と違う」と見た性質を、欧州以外の言語（ヘブライ語・ギリシア語・アラビア語・タガログ語・セブアノ語・フィンランド語・ハンガリー語）と、言語でないもの（人が書いた意味のない文章・暗号・旋律）で確かめ直しました。途中で前の巡の読みを 4 度直しています。</p>
+  </div>
+  <div class="table-box">
+    <table>
+      <thead><tr><th>性質</th><th>欧州以外・言語でないもので確かめた結果</th><th>いま</th></tr></thead>
+      <tbody>
+        <tr><td>1 回だけの語が多い</td><td>ヘブライ語・タガログ語も同じくらい</td><td class="res"><span class="chip">共通</span></td></tr>
+        <tr><td>語の家族が語頭・語中で変わり、語尾の活用が無い</td><td>タガログ語・セブアノ語と同じ型（事前の予測つき）</td><td class="res"><span class="chip">共通</span></td></tr>
+        <tr><td>行の独立</td><td>人が書いた意味のない文章も独立。散文はどの言語でもつながる</td><td class="res"><span class="chip">書き方の性質</span></td></tr>
+        <tr><td>境目の字形の結び付きの強さ</td><td>タガログ語のほうが強い</td><td class="res"><span class="chip">共通</span></td></tr>
+        <tr><td>空白の位置が字形から分かる（70〜77%）</td><td>自然の書き方は最高 54%。規則で作った暗号は 69〜83%</td><td class="res"><span class="chip ok">暗号と共通</span></td></tr>
+        <tr><td>字形の並びがとても決まりやすい（h2 2.0〜2.3）</td><td>自然の書き方は全て高い。旋律と暗号の一部は届く</td><td class="res"><span class="chip ok">暗号と共通</span></td></tr>
+        <tr><td>語の長さが左右対称（歪度 0.1〜0.3）</td><td>比べた全ての言語は右に長い。暗号も多くは右に長い</td><td class="res"><span class="chip ok">ほぼヴォイニッチだけ</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="verdict">
+    <h3>文字の性質は規則で作った記号の体系に近く、そのうえ語の長さをそろえる何かがある</h3>
+    <p>空白の当てやすさと字形の決まりやすさは、語末の欄の決まりから出ます。語末の欄の中身を無作為な字に替えると、自然言語並みに落ちます。<em>語の長さの対称は別の仕組みで、この 2 つを両方持つ書き方は、比べた中にはありませんでした。</em></p>
+  </div>
+</section>
+
 <section class="sec" aria-labelledby="h-fix">
   <div class="sec-head">
     <div class="eyebrow">CORRECTIONS ON RECORD</div>
@@ -382,7 +409,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 </section>
 
 <footer>
-  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜144 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
+  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜165 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
   <span>転写: René Zandbergen, ZL transliteration file 3b ほか。図版: Beinecke Rare Book and Manuscript Library, Yale University, MS 408（パブリックドメイン）。</span>
 </footer>
 
