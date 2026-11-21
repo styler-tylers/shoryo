@@ -50,17 +50,27 @@ class Naibbe:
         self.dec_pre = {v: k.split("_")[1] for k, v in self.ps.items() if k.endswith("_prefix")}
         self.dec_suf = {v: k.split("_")[1] for k, v in self.ps.items() if k.endswith("_suffix")}
 
-    def encrypt(self, letters, rng):
-        out, i = [], 0
+    def encrypt(self, letters, rng, with_units=False):
+        out, units, i = [], [], 0
         while i < len(letters):
             if i + 1 < len(letters) and rng.random() >= P_UNI:
                 a, b = rng.choices(TABLES, CARDS, k=2)
                 out.append(self.ps[f"{a}_{letters[i]}_prefix"] + self.ps[f"{b}_{letters[i + 1]}_suffix"])
+                units.append(letters[i] + letters[i + 1])
                 i += 2
             else:
                 out.append(self.uni[f"unigram_{rng.choices(TABLES, CARDS)[0]}_{letters[i]}"])
+                units.append(letters[i])
                 i += 1
-        return out
+        return (out, units) if with_units else out
+
+    def readings(self, w):
+        """語 1 つの読み方の集合（単独の語として、語頭側 ＋ 語尾側として）"""
+        r = set()
+        if w in self.dec_uni:
+            r.add(self.dec_uni[w])
+        r |= {self.dec_pre[w[:i]] + self.dec_suf[w[i:]] for i in range(1, len(w)) if w[:i] in self.dec_pre and w[i:] in self.dec_suf}
+        return r
 
     def decrypt(self, words):
         res, bad = [], 0
@@ -142,9 +152,13 @@ def main(tdir, tables, rows):
         block("(i) 著者の暗号文", author[:cap], refs[lang], None, lang)
         block("(ii) Caesar", cw, refs[lang], None, lang)
         three("(iii) Descartes", [l for _, ls in line_unit.wrap([g(w) for w in nb.encrypt(des, random.Random(2))[:cap]], 37) for l in ls])
-    back, bad = nb.decrypt(nb.encrypt(cae, random.Random(1))[:23091])
-    plain = cae[:len(back)]
-    print(f"  読み戻し（Caesar, 23091 語）: 切り方が決まらない語 {bad}  字の一致 {sum(a == b for a, b in zip(back, plain)) / len(plain):.2%}", flush=True)
+    ws_, us_ = nb.encrypt(cae, random.Random(1), with_units=True)
+    ws_, us_ = ws_[:23091], us_[:23091]
+    rd = [nb.readings(w) for w in ws_]
+    uniq = sum(len(r) == 1 and u in r for r, u in zip(rd, us_))
+    amb = sum(len(r) > 1 and u in r for r, u in zip(rd, us_))
+    print(f"  読み戻し（Caesar, 23091 語, 1 語ずつ, 事後に直した測り方）: 読みが 1 つで正しい {uniq / len(ws_):.2%}  読みが 2 つ以上（正しい読みを含む）{amb / len(ws_):.2%}"
+          f"  正しい読みを含まない {(len(ws_) - uniq - amb) / len(ws_):.2%}", flush=True)
 
     print("=== N195 書くたびに少し変える（表 2・言語 B）===", flush=True)
     p_ = V["B"][0]
@@ -179,7 +193,12 @@ def main(tdir, tables, rows):
         out.append(tuple(x for k in ks for x in k) + rng.choices(ek, ev)[0])
         if len(out) >= cap:
             break
-    block("語の切れ目を残す", out, refs["B"], None, "B")
+    # 事後の直し: 語が長く 1 行あたりの語が少ないため、8 つの量（report）は計算できない。予測に要る量だけを直接測る
+    import null_generator
+    v = null_generator.vocab_stats(["".join(w) for w in out])
+    three("語の切れ目を残す", [l for _, ls in line_unit.wrap(out, 37) for l in ls])
+    print(f"    V2 {v['V2 1回だけ']:.2f}  V3 {v['V3 Zipf']:.2f}  V4 {v['V4 Heaps']:.2f}  語の長さの平均 {sum(map(len, out)) / len(out):.2f}  語の種類 {len(set(out))}"
+          f"（ヴォイニッチ B: V2 {refs['B']['V2']:.2f}  V3 {refs['B']['V3']:.2f}  V4 {refs['B']['V4']:.2f}）", flush=True)
 
 
 if __name__ == "__main__":
