@@ -129,7 +129,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 <div class="wrap">
 
 <header class="hero">
-  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜59 巡</small></h1>
+  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜61 巡</small></h1>
   <div class="hero-body">
     <div class="hero-fig">
       <figure style="margin:0">
@@ -147,8 +147,8 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
       </div>
     </div>
     <div class="stats" aria-label="研究の規模">
-      <div class="stat"><b class="num">59</b><span>巡（nēvo）</span></div>
-      <div class="stat"><b class="num">176</b><span>事前に記録した検定</span></div>
+      <div class="stat"><b class="num">61</b><span>巡（nēvo）</span></div>
+      <div class="stat"><b class="num">182</b><span>事前に記録した検定</span></div>
       <div class="stat"><b class="num">5 / 5</b><span>閉じたロードマップの段</span></div>
       <div class="stat"><b class="num">12</b><span>結論を変えた訂正</span></div>
     </div>
@@ -172,7 +172,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><span class="phase">VIII</span><div><span class="when">第 42〜45 巡</span><h3>同時代の書物と比べる</h3><p>音楽・暗号・医学書の仮説を 10 の形で試した。見た目は天文・医学の書物の仲間、文章の型はどれとも違う。</p></div></li>
     <li><span class="phase">IX</span><div><span class="when">第 46〜52 巡</span><h3>近年の研究・欧州以外の言語と比べる</h3><p>「ヴォイニッチだけ」の性質を一つずつ対照で確かめ直した。語の作りはタガログ語に似、字形の性質は規則で作った暗号に似る。</p></div></li>
     <li><span class="phase">X</span><div><span class="when">第 53〜55 巡</span><h3>暗号に工夫を足し、語の長さと語頭を詰める</h3><p>音節の暗号に「長い語の中ほどを略す」を足すと 3 つの性質がそろうが、設定は別の文章に移らない。語頭の変わり方はタガログ語・モデルと同じで、暗号とは違う。</p></div></li>
-    <li><span class="phase">XI</span><div><span class="when">第 56〜59 巡</span><h3>二面が 1 つの作り方で両立するかを確かめる</h3><p>平文なしのモデルは、語末の欄の同じ決まりで文字の性質を出す。言語 B の文字だけの 5 頁は語の長さが右に裾を引く（平均は短い）が、ほかの性質は同じ。行をまたいで境目の規則は続かない。過去の行をまたぐ量を点検し、行の独立は保たれた。</p></div></li>
+    <li><span class="phase">XI</span><div><span class="when">第 56〜61 巡</span><h3>二面が 1 つの作り方で両立するかを確かめる</h3><p>平文なしのモデルは、語末の欄の同じ決まりで文字の性質を出す。言語 B の文字だけの 5 頁は語の長さが右に裾を引く（平均は短い）が、ほかの性質は同じ。行をまたいで境目の規則は続かない。過去の行をまたぐ量を点検し、行の独立は偏りの無い順位の形でも保たれた。段落の最初の行は芯が長く、<code>k/t</code> が <code>p/f</code> に替わる（モデルは出さない）。</p></div></li>
   </ol>
 </section>
 
@@ -362,6 +362,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
         <tr><td>二面は 1 つの作り方で両立するか</td><td>平文なしのモデルは語末の欄 12 種類。欄の中身を崩すと、ヴォイニッチと同じく空白 28〜37%・h2 3.0〜3.2 に落ちる</td><td class="res"><span class="chip ok">同じ仕組みで両立</span></td></tr>
         <tr><td>言語 B の文字だけの 5 頁</td><td>語の長さの歪度 +0.33（同じ書き手・同じ綴じの図のある頁は 0〜+0.09）。平均はむしろ短く（4.49 対 4.63 字形）、芯の短い語が増える。段落の長さでは差が出ない。字形の性質・空白・語末の欄・行のつながりは同じ</td><td class="res"><span class="chip">長さの分布の形だけ違う</span></td></tr>
         <tr><td>語の種類の多さを生む場所</td><td>どの文章でも 6 割を芯（中ほど）が生む。ヴォイニッチとモデルの差は語末で 0.02</td><td class="res"><span class="chip">共通</span></td></tr>
+        <tr><td>段落の最初の行</td><td>芯が 0.40〜0.59 字形長い。<code>p</code>・<code>f</code> が 13〜16 倍で <code>k</code>・<code>t</code> が減り、<code>ch</code>・<code>sh</code> を含む芯の字形も増える。平文なしのモデルの頁の 1 行目には無い</td><td class="res"><span class="chip">モデルに足りない</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -438,13 +439,13 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><b>少し替えて写す。</b>語末の欄と欄の境目も替えると、言語 A の形が出るか</li>
     <li><b>Stolfi の層で検定し直す。</b>この研究の欄とは切り方が違う</li>
     <li><b>言語 B の文字だけの頁。</b>語の長さの分布が他の題材より右に裾を引く（+0.33, 平均は短い）。書き手・綴じ・段落の長さではなく、芯の短い語が増える。何を書いた頁かと合わせて読む</li>
-    <li><b>段落の最初の行。</b>語が 0.35〜0.45 字形長く、絞首台の字形で始まる語が 2〜3 倍。長いのは語頭のぶんだけかを確かめる</li>
+    <li><b>段落の最初の行。</b>芯が長く、<code>k/t</code> が <code>p/f</code> に替わる。平文なしのモデルに位置の規則を足して出せるか、<code>p/f</code> が行のどの語で起きるかを確かめる</li>
     <li><b>統計の外の手がかり。</b>挿絵と語の対応、綴じ目の絵、汚れの写り。平文の有無を問い直すにはこちらが要る</li>
   </ul>
 </section>
 
 <footer>
-  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜186 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
+  <span>詳しい記録: 「nēvo Research Method による解析」第 1〜192 節。まとめ: 「研究全体のまとめ（nēvo 第 40 巡まで）」。主な検定は <code>python3 voynich/reproduce.py</code> から再現できる。</span>
   <span>転写: René Zandbergen, ZL transliteration file 3b ほか。図版: Beinecke Rare Book and Manuscript Library, Yale University, MS 408（パブリックドメイン）。</span>
 </footer>
 
