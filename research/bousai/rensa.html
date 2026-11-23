@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>連鎖図 v1.0 — 大地震×サイバー攻撃</title>
+
+<!-- changelog
+v1.0 (2026-10-30) 初版
+  - 東京・山梨・山口の3地域について、大地震からサイバー攻撃を経て社会影響に至る連鎖を時間軸(4段)で表示
+  - 項目を選ぶと上流(原因)と下流(帰結)の連鎖が灯る(見せ場)
+  - 分類レイヤー(物理被害/インフラ途絶/サイバー/社会影響)の切替、対策の重ね表示
+  - 各項目に確度(根拠/推定/仮説)と出典を付記。3地域の比較表
+-->
+
+<style>
+:root{
+  /* 玄冬 */
+  --ji:#171F2B; --men:#202A3C; --moji:#EAEFF5; --hojo:#8A93A5;
+  --hi:#C8963E; --shu:#B3402E; --seiji:#6AA89D; --fuji:#8B7FA6;
+  --sen:#303C53;
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  --gothic:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+  --mono:"SF Mono","Menlo",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ji);color:var(--moji);font-family:var(--gothic);font-size:16px;line-height:1.8;
+  -webkit-text-size-adjust:100%;min-height:100dvh}
+
+header{padding:24px 24px 16px;padding-top:calc(24px + env(safe-area-inset-top));border-bottom:1px solid var(--sen)}
+header h1{font-family:var(--mincho);font-weight:600;letter-spacing:.24em;font-size:28px;margin:0;line-height:1.4}
+header h1 .ver{font-family:var(--mono);font-size:12px;letter-spacing:0;color:var(--hojo);margin-left:12px;vertical-align:middle}
+header .sub{margin:4px 0 0;font-size:13px;color:var(--hojo);letter-spacing:.04em}
+
+.ctrl{padding:16px 24px;border-bottom:1px solid var(--sen);display:flex;flex-direction:column;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row .lab{font-size:12px;color:var(--hojo);width:4.5em;flex:none}
+button{font-family:var(--gothic);font-size:14px;line-height:1;min-height:44px;padding:0 16px;
+  background:transparent;color:var(--hojo);border:1px solid var(--sen);border-radius:2px;
+  cursor:pointer;touch-action:manipulation;letter-spacing:.04em}
+button.on{color:var(--hi);border-color:var(--hi)}
+button.layer{display:inline-flex;align-items:center;gap:8px}
+button.layer i{width:10px;height:10px;border-radius:50%;background:var(--c);opacity:.35}
+button.layer.on{color:var(--moji);border-color:var(--c)}
+button.layer.on i{opacity:1}
+
+.wrap{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:960px){.wrap{grid-template-columns:minmax(0,1fr) 380px}}
+
+.summary{padding:20px 24px;border-bottom:1px solid var(--sen)}
+.summary h2{font-family:var(--mincho);font-weight:600;font-size:20px;letter-spacing:.04em;margin:0 0 4px}
+.summary .scen{font-size:14px;color:var(--hojo);margin:0 0 12px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 24px;margin:0;padding:0;list-style:none}
+.facts li{font-size:14px}
+.facts b{font-family:var(--mono);font-weight:500;color:var(--moji)}
+.facts span{color:var(--hojo);font-size:12px;margin-right:6px}
+.summary .note{font-size:12px;color:var(--hojo);margin:12px 0 0}
+
+.flow{position:relative;padding:8px 24px 32px}
+.flow svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.band{position:relative;padding:20px 0 8px}
+.band+.band{border-top:1px dashed var(--sen)}
+.bandhead{font-family:var(--mincho);font-size:13px;letter-spacing:.12em;color:var(--hojo);margin-bottom:12px}
+.nodes{display:flex;flex-wrap:wrap;gap:16px 12px}
+.node{position:relative;z-index:1;min-height:44px;padding:8px 12px 8px 14px;text-align:left;
+  background:var(--men);color:var(--moji);border:1px solid var(--sen);border-left:3px solid var(--c);
+  font-size:14px;line-height:1.5;max-width:100%;transition:opacity .2s}
+.node.vuln{border-style:dashed;border-left-style:solid}
+.node small{display:block;font-size:11px;color:var(--hojo);letter-spacing:.04em}
+.node .mc{font-family:var(--mono);font-size:11px;color:var(--hi);margin-left:6px}
+.node.dim{opacity:.22}
+.node.sel{border-color:var(--hi);box-shadow:0 0 0 1px var(--hi),0 0 18px rgba(200,150,62,.45)}
+.empty{color:var(--hojo);font-size:14px;padding:24px 0}
+
+aside{border-left:1px solid var(--sen);background:var(--ji)}
+.panel{padding:24px;position:sticky;top:0;max-height:100dvh;overflow:auto}
+.panel h3{font-family:var(--mincho);font-weight:600;font-size:20px;letter-spacing:.04em;margin:0 0 8px;line-height:1.5}
+.panel .meta{font-size:12px;color:var(--hojo);margin:0 0 16px;display:flex;flex-wrap:wrap;gap:8px}
+.tag{border:1px solid var(--sen);padding:0 8px;border-radius:2px}
+.tag.c-根拠{color:var(--seiji);border-color:var(--seiji)}
+.tag.c-推定{color:var(--hi);border-color:var(--hi)}
+.tag.c-仮説{color:var(--fuji);border-color:var(--fuji)}
+.panel h4{font-size:12px;color:var(--hojo);font-weight:500;letter-spacing:.12em;margin:24px 0 8px}
+.panel p{margin:0;font-size:15px}
+.panel ul{margin:0;padding-left:1.2em;font-size:15px}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links button{min-height:36px;font-size:13px;padding:0 10px}
+.panel a{color:var(--hi)}
+.panel .close{display:none}
+.hint{color:var(--hojo);font-size:14px}
+
+@media(max-width:959px){
+  aside{border-left:0}
+  aside.open{position:fixed;left:0;right:0;bottom:0;z-index:10;border-top:1px solid var(--hi);
+    max-height:62dvh;overflow:auto;padding-bottom:env(safe-area-inset-bottom)}
+  aside:not(.open){display:none}
+  .panel{position:static;max-height:none}
+  .panel .close{display:inline-flex;align-items:center;float:right;margin:-8px -8px 0 8px}
+}
+
+.cmp{padding:20px 24px 40px;overflow-x:auto}
+.cmp table{border-collapse:collapse;min-width:720px;width:100%;font-size:14px}
+.cmp th,.cmp td{border-bottom:1px solid var(--sen);padding:12px;vertical-align:top;text-align:left}
+.cmp th{font-family:var(--mincho);font-weight:600;letter-spacing:.04em}
+.cmp td:first-child{color:var(--hojo);font-size:12px;width:7em}
+.cmp .note{font-size:12px;color:var(--hojo);margin-top:16px}
+
+footer{padding:24px;border-top:1px solid var(--sen);font-size:12px;color:var(--hojo)}
+footer a{color:var(--hojo)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>連鎖図<span class="ver">v1.0</span></h1>
+  <p class="sub">大地震 × サイバー攻撃 — 東京・山梨・山口の被害連鎖と対策</p>
+</header>
+
+<div class="ctrl">
+  <div class="row"><span class="lab">地域</span><div class="row" id="regions"></div></div>
+  <div class="row" id="layerRow"><span class="lab">分類</span><div class="row" id="layers"></div></div>
+  <div class="row" id="optRow"><span class="lab">表示</span><div class="row">
+    <button id="tgMeasure">対策を重ねる</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="main">
+  <div>
+    <section class="summary" id="summary"></section>
+    <section class="flow" id="flow"><svg id="edges"></svg><div id="bands"></div></section>
+  </div>
+  <aside id="aside"><div class="panel" id="panel"></div></aside>
+</div>
+<section class="cmp" id="cmp" hidden></section>
+
+<footer>
+  確度の凡例: <b>根拠</b>=公的想定・実例で裏付けあり / <b>推定</b>=根拠から推した連鎖 / <b>仮説</b>=検証が必要な研究上の仮説。
+  数値は各想定の最大ケースで、前提条件(季節・時刻・風速)は出典を参照。研究ノート: <a href="README.md">README.md</a>
+</footer>
+
+<script>
+/* ═══════════ DATA — 改修時はここだけ触ればよい ═══════════ */
+const DATA = {
+  stages:["発災〜数時間","〜1日","〜1週間","1週間以降"],
+  cats:{
+    dmg:   {name:"物理被害",   color:"var(--shu)"},
+    infra: {name:"インフラ途絶", color:"var(--fuji)"},
+    cyber: {name:"サイバー",   color:"var(--seiji)"},
+    impact:{name:"社会影響",   color:"var(--hojo)"}
+  },
+  regions:{
+    tokyo:{
+      name:"東京", scen:"都心南部直下地震(M7.3)・冬の夕方・風速8m/s",
+      facts:[["30年確率","70%程度(南関東のM7級)"],["死者","最大 約1.8万人(都内 約8千)"],
+             ["全壊・焼失","約40万棟"],["避難者","約480万人(2週間後)"],
+             ["帰宅困難者","約840万人"],["経済被害","約83兆円"]],
+      note:"国の新被害想定(2025年12月)。死者の約3分の2は火災。報告書本体の数値は未照合【要確認】",
+      src:["tk2025","tk2025b"]
+    },
+    yamanashi:{
+      name:"山梨", scen:"南海トラフの巨大地震(東側ケース, M9)・冬",
+      facts:[["30年確率","60〜90%程度以上(別法20〜50%)"],["県内最大震度","7"],["死者","3,019人"],
+             ["全壊・全焼","60,017棟"],["避難者","140,329人"],["県内最大の想定","曽根丘陵断層帯 死者3,843人"]],
+      note:"山梨県地震被害想定(令和5年)。南海トラフでは死者の93.1%が揺れによる。首都直下(立川市直下M7)では死者202人",
+      src:["ym_r5","nankai2025"]
+    },
+    yamaguchi:{
+      name:"山口", scen:"南海トラフ巨大地震(陸側ケース)・夏12時/冬18時",
+      facts:[["30年確率","60〜90%程度以上(別法20〜50%)"],["死者","614人(うち津波582人)"],
+             ["全壊・焼失","5,926棟(うち津波3,454棟)"],["断水","直後 約21万人"],
+             ["避難者","1日後 約16.8万人"],["経済被害","約1.2兆円"]],
+      note:"山口県 南海トラフ巨大地震の被害想定(平成26年3月)。津波は「堤防が機能しない」条件。別に安芸灘〜伊予灘〜豊後水道のプレート内地震(M6.7〜7.4)が30年40%程度",
+      src:["yg_h26","nankai2025","akinada"]
+    }
+  },
+  /* r: 対象地域 / rd: 地域別の説明 / conf: 根拠・推定・仮説 / vuln: 攻撃を招く脆弱状態 / m: 対策 / src: 出典キー */
+  nodes:[
+    {id:"quake",cat:"dmg",stage:0,label:"大地震の発生",r:["tokyo","yamanashi","yamaguchi"],conf:"根拠",
+      desc:"連鎖の起点。日時を特定する予知はできないため、発生を前提に連鎖を断つ設計をする。",
+      rd:{tokyo:"都心南部直下地震(M7.3)。行政・金融・通信の中枢の直下で起きる。",
+          yamanashi:"南海トラフ巨大地震で県内最大震度7。東海〜西日本が同時に被災する広域災害。",
+          yamaguchi:"南海トラフ巨大地震。揺れは比較的小さいが、瀬戸内沿岸に津波が来る。"},
+      m:["業務継続計画(BCP)を自然災害とサイバーで共通化する","机上訓練に「地震中のサイバー攻撃」を入れる"],src:["tk2025","ym_r5","yg_h26"]},
+    {id:"collapse",cat:"dmg",stage:0,label:"建物倒壊・火災",r:["tokyo","yamanashi","yamaguchi"],conf:"根拠",
+      desc:"人的被害の主因。庁舎・データ拠点・要員そのものが被災する。",
+      rd:{tokyo:"全壊・焼失 約40万棟。死者の約3分の2が火災による。",
+          yamanashi:"全壊・全焼 60,017棟。死者3,019人の93.1%が揺れによる。",
+          yamaguchi:"揺れによる全壊は609棟と少なく、液状化による全壊1,771棟が目立つ(埋立地)。"},
+      m:["耐震化率100%で倒壊による死者はほぼ0(山梨・山口の試算)","家具固定(山梨試算で死者60%減)","初期消火率の向上(山梨試算で死者53%減)"],src:["ym_r5","yg_h26","tk2025"]},
+    {id:"fire",cat:"dmg",stage:1,label:"木造密集地の延焼",r:["tokyo"],conf:"根拠",
+      desc:"風が強い冬の夕方が最悪ケース。延焼が救助・通信・道路の復旧を数日単位で遅らせる。",
+      m:["木造密集地域の解消","感震ブレーカーの普及","初期消火"],src:["tk2025"]},
+    {id:"tsunami",cat:"dmg",stage:0,label:"瀬戸内沿岸の津波浸水",r:["yamaguchi"],conf:"根拠",
+      desc:"最高津波水位は下関港(長府)・柳井港・平生港で3.8m。周南(徳山下松港)3.5m、岩国2.8〜3.0m。早期避難率が低い条件で津波死者582人。【水位は県の津波浸水想定(2013年12月)による。要確認】",
+      m:["全員がすぐに避難すれば津波死者は582人→0人(県試算)","港湾・工場の避難計画"],src:["yg_h26"]},
+    {id:"kombinat",cat:"dmg",stage:1,label:"コンビナートの火災・漏えい",r:["yamaguchi"],conf:"推定",
+      desc:"周南・岩国大竹・宇部の臨海工業地帯。津波と液状化が重なると、設備の損傷から火災や有害物質の漏えいにつながりうる。",
+      m:["緊急遮断・停止手順の訓練","液状化対策","石油コンビナート等防災計画との連動"],src:["yg_h26"]},
+    {id:"power",cat:"infra",stage:0,label:"停電",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"通信・データ拠点・監視の土台。停電の長さが、後段のサイバー上の脆弱状態の長さを決める。",
+      rd:{tokyo:"首都圏の大規模停電。電力・上下水道の大部分の解消に1か月程度とされ、さらに長引く可能性も指摘されている。",
+          yamanashi:"東京電力管内(50Hz)で首都圏と同じ系統。2011年の東日本大震災では山梨県も計画停電の対象になった。首都圏の被災が山梨の電力に波及しうる。",
+          yamaguchi:"直後14,432軒(1.6%)、1週間後に解消の想定。停電は比較的短い。"},
+      m:["非常用発電と72時間以上の燃料備蓄","蓄電池・分散電源"],src:["yg_h26","tk2025b"]},
+    {id:"telecom",cat:"infra",stage:1,label:"通信の途絶",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"停電から数時間〜1日で携帯基地局の予備電源が尽き、通信が途絶・輻輳する。正しい情報が届かない空白に偽情報が入り込む。",
+      rd:{yamaguchi:"固定電話の不通 直後9,381回線(2.0%)。"},
+      m:["衛星通信など複数系統の確保","連絡手段と集合場所の事前取り決め","災害用公衆無線LAN(00000JAPAN)の周知"],src:["yg_h26"]},
+    {id:"transport",cat:"infra",stage:0,label:"道路・鉄道の寸断",r:["tokyo","yamanashi","yamaguchi"],conf:"根拠",
+      desc:"人・燃料・物資・復旧要員の移動が止まる。",
+      rd:{tokyo:"帰宅困難者 約840万人。一斉帰宅が救助・緊急輸送を妨げる。",
+          yamanashi:"中央道・国道20号・中央本線・身延線など、少数の山越えルートに依存。",
+          yamaguchi:"道路の被害459箇所、新幹線5箇所、在来線235箇所(津波浸水域を含む)。"},
+      m:["代替ルートの事前指定","一斉帰宅の抑制(企業内待機)"],src:["yg_h26","tk2025b"]},
+    {id:"isolation",cat:"impact",stage:1,label:"孤立集落・観光客の滞留",r:["yamanashi"],conf:"推定",
+      desc:"山間部の集落や富士五湖周辺の観光地で、道路寸断による孤立と、帰れない観光客の滞留が起きる。",
+      m:["孤立が想定される集落への衛星電話・備蓄","観光客向けの多言語の情報発信"],src:["ym_r5"]},
+    {id:"supportgap",cat:"impact",stage:2,label:"外部支援の空白",r:["yamanashi"],conf:"仮説",
+      desc:"南海トラフでは東海〜西日本が同時に被災し、首都直下では首都圏が自らの対応で手一杯になる。山梨は「支援を受ける側」と「首都圏の後方支援拠点」を同時に担い、支援が届かない期間が長引く。",
+      m:["受援計画の具体化","7日分以上の自立備蓄","被災しにくい遠方の自治体との相互応援協定"],src:[]},
+    {id:"kanmon",cat:"infra",stage:2,label:"関門ルートの途絶",r:["yamaguchi"],conf:"推定",
+      desc:"関門橋・関門トンネル・山陽新幹線は本州と九州を結ぶ結節点。止まると西日本の物流全体に波及する。",
+      m:["海上輸送への代替","重要物資の分散在庫"],src:[]},
+    {id:"fuel",cat:"infra",stage:2,label:"非常用発電の燃料切れ",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"庁舎・病院・データセンターの非常用発電は燃料補給が前提。道路寸断で補給が止まると、数日後にシステムが落ちる。",
+      rd:{tokyo:"データセンターと通信の結節点が集中しており、燃料切れの影響が全国に及ぶ。"},
+      m:["燃料の優先供給協定","システムとバックアップの地理的分散(東日本と西日本)"],src:[]},
+    {id:"exception",cat:"cyber",stage:1,vuln:true,label:"緊急時の例外運用",r:["tokyo","yamanashi","yamaguchi"],conf:"仮説",
+      desc:"業務を止めないため、私物端末の利用、共有アカウント、多要素認証の一時解除、仮設ネットワーク、遠隔接続口の開放が行われる。平時の防御が最も薄くなる状態で、この研究の中心仮説。",
+      m:["例外運用を事前に設計する(誰が許可し、いつ元に戻すか)","緊急用アカウントを平時に発行・保管","復旧後に例外の棚卸しをする"],src:[]},
+    {id:"soc",cat:"cyber",stage:1,vuln:true,label:"監視とセキュリティ要員の不在",r:["tokyo","yamanashi","yamaguchi"],conf:"仮説",
+      desc:"担当者の被災、委託先の監視拠点(SOC)の被災、停電によるログ収集の停止で、侵入に気づけない期間が生じる。",
+      m:["遠隔地の代替監視拠点","委託先の被災時体制を契約で確認","ログを遠隔地に保管"],src:[]},
+    {id:"latent",cat:"cyber",stage:0,label:"潜伏型攻撃の起動",r:["tokyo"],conf:"仮説",
+      desc:"平時から重要インフラに潜伏し、危機時に起動する型(米国でVolt Typhoonとして警告された手口)。地震の混乱に合わせて電力・通信を止められると、復旧がさらに遅れる。",
+      m:["侵害されている前提での定期点検(脅威ハンティング)","重要インフラの制御系の分離"],src:[]},
+    {id:"fakeinfo",cat:"cyber",stage:1,label:"偽の救助要請・偽情報",r:["tokyo","yamanashi","yamaguchi"],conf:"根拠",
+      desc:"能登半島地震(2024年1月)では、発生後24時間の救助要請 約1,100件のうち104件が偽と推定された(NICT)。金銭目的の投稿もあった。一方、救助活動を妨げたことを示す消防庁の文書はないとの報道もあり、影響の評価は分かれる。",
+      m:["公式発信の窓口を一本化し平時に周知","救助要請を照合する手順","プラットフォーム事業者との連携"],src:["noto_soumu","noto_news"]},
+    {id:"ddos",cat:"cyber",stage:1,label:"安否・自治体サイトへのDDoS",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"災害時は正当なアクセス集中と攻撃が重なり、区別が難しい。2024年末〜2025年初頭には平時でも航空会社・金融機関へのDDoSが相次いだ。",
+      m:["DDoS防御・配信網(CDN)を平時に契約","軽量な災害時版サイトの用意"],src:[]},
+    {id:"phishing",cat:"cyber",stage:2,label:"義援金・給付金を装う詐欺",r:["tokyo","yamanashi","yamaguchi"],conf:"根拠",
+      desc:"義援金・支援金・罹災証明を装うフィッシングや詐欺。能登半島地震でも警察庁が震災便乗の悪質事犯に注意を呼びかけた。",
+      m:["公式の支援窓口一覧を周知","「振込や暗証番号を求めない」と事前に告知"],src:["noto_soumu"]},
+    {id:"ransom",cat:"cyber",stage:3,label:"復旧中のランサムウェア侵入",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"例外運用で開いた遠隔接続口や監視の空白を突いた侵入。平時でもアサヒグループ(2025年9月)とアスクル(2025年10月)はランサムウェアで受注・出荷が長期停止した。被災中なら復旧はさらに難しい。",
+      m:["オフラインで改ざんできないバックアップ","VPN機器などの修正を最優先(実際に悪用された脆弱性から)","多要素認証","紙・手作業の代替手順(アスクルは手作業で一部出荷を再開)"],src:["asahi","askul"]},
+    {id:"ot",cat:"cyber",stage:2,label:"制御システム(OT)への侵入",r:["yamaguchi"],conf:"仮説",
+      desc:"コンビナートの復旧作業で、メーカーの遠隔保守回線を臨時に開く。そこから制御システムに侵入されると、設備の再停止や二次災害につながる。",
+      m:["情報系と制御系のネットワーク分離","遠隔保守回線はその都度承認","手動運転への切替訓練"],src:[]},
+    {id:"rescue",cat:"impact",stage:1,label:"救助・避難の遅れ",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"物理的な寸断に、偽情報や通信途絶による判断の誤りが重なる。",
+      m:["救助要請の経路を複数化","避難情報を複数媒体で発信"],src:[]},
+    {id:"admin",cat:"impact",stage:3,label:"行政機能の停止",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"罹災証明・支援金・住民情報のシステムが止まり、生活再建が遅れる。",
+      m:["住民データの遠隔地バックアップ","罹災証明の紙での発行手順"],src:[]},
+    {id:"logistics",cat:"impact",stage:3,label:"物流停止・物資不足",r:["tokyo","yamanashi","yamaguchi"],conf:"推定",
+      desc:"道路の寸断に、物流システムへの攻撃が重なると、道が通っても出荷できない状態が続く。",
+      m:["在庫の分散","手作業での出荷手順の整備"],src:["askul"]},
+    {id:"capital",cat:"impact",stage:3,label:"首都中枢機能の停止",r:["tokyo"],conf:"推定",
+      desc:"政府・金融・企業本社の機能停止が全国と市場に波及する。経済被害は約83兆円と想定される。",
+      m:["政府・企業の代替拠点","2026年度設置予定の防災庁による中枢機能維持【要確認】"],src:["tk2025"]},
+    {id:"industry",cat:"impact",stage:3,label:"素材・化学品の供給停止",r:["yamaguchi"],conf:"推定",
+      desc:"臨海部の化学・素材工場が止まると、全国の製造業のサプライチェーンに波及する。",
+      m:["調達先の複線化","供給停止を想定した在庫"],src:[]},
+    {id:"trust",cat:"impact",stage:3,label:"情報への信頼の低下",r:["tokyo","yamanashi","yamaguchi"],conf:"仮説",
+      desc:"偽情報と攻撃が続くと、公式の避難情報まで疑われるようになる。次の余震や二次災害で行動が遅れる。",
+      m:["平時から公式アカウントを周知","偽情報の訂正手順"],src:[]}
+  ],
+  /* [上流, 下流, 対象地域(省略時は両端が存在する全地域)] */
+  edges:[
+    ["quake","collapse"],["quake","power"],["quake","transport"],["quake","tsunami"],["quake","latent"],
+    ["collapse","fire"],["fire","rescue"],["fire","transport"],
+    ["tsunami","kombinat"],["tsunami","transport"],["kombinat","ot"],["kombinat","industry"],
+    ["collapse","rescue"],["transport","rescue"],["transport","isolation"],["isolation","supportgap"],
+    ["transport","kanmon"],["kanmon","logistics"],["transport","fuel"],["transport","logistics"],
+    ["power","telecom"],["power","fuel"],["power","soc"],["collapse","soc"],
+    ["latent","power"],["latent","telecom"],
+    ["telecom","exception"],["fuel","exception"],["supportgap","exception"],["telecom","fakeinfo"],["telecom","ddos"],
+    ["fakeinfo","rescue"],["fakeinfo","trust"],["ddos","trust"],
+    ["collapse","phishing"],["phishing","trust"],
+    ["exception","ransom"],["soc","ransom"],["exception","ot"],["ot","industry"],
+    ["ransom","admin"],["ransom","logistics"],["fuel","admin"],
+    ["admin","capital"],["logistics","capital"],["ransom","capital"],["supportgap","logistics"]
+  ],
+  sources:{
+    tk2025:{t:"首都直下地震被害は82兆円超 政府想定見直し、死者1万8千人(秋田魁新報, 2025-12-19)",u:"https://www.sakigake.jp/news/article/20251219CO0053/"},
+    tk2025b:{t:"政府広報オンライン 首都直下地震の新たな被害想定",u:"https://www.gov-online.go.jp/article/202602/entry-11025.html"},
+    ym_r5:{t:"山梨県地震被害想定調査結果【令和5年】",u:"https://www.pref.yamanashi.jp/bousai/jishinnhigaisoutei/jishinnhigai_sotei_r5.html"},
+    yg_h26:{t:"山口県 南海トラフ巨大地震の被害想定調査結果について(平成26年3月27日)",u:"https://www.pref.yamaguchi.lg.jp/uploaded/attachment/20331.pdf"},
+    nankai2025:{t:"南海トラフ地震の発生確率見直し(サイエンスポータル, 2025-10-22)",u:"https://scienceportal.jst.go.jp/explore/review/20251022_e01/"},
+    akinada:{t:"地震調査研究推進本部 安芸灘〜伊予灘〜豊後水道",u:"https://www.jishin.go.jp/regional_seismicity/rs_kaiko/k26_aki_iyo_bungo/"},
+    noto_soumu:{t:"総務省 令和6年版情報通信白書 災害時における偽・誤情報への対応",u:"https://www.soumu.go.jp/johotsusintokei/whitepaper/ja/r06/html/nd122c00.html"},
+    noto_news:{t:"Newsweek日本版(偽救助要請の影響をめぐる報道)",u:"https://www.newsweekjapan.jp/articles/-/12783"},
+    asahi:{t:"アサヒ障害1カ月復旧めど立たず(秋田魁新報, 2025-10-29)",u:"https://www.sakigake.jp/news/article/20251029CO0099/"},
+    askul:{t:"アスクル ランサムウェアによる出荷停止(LNEWS, 2025-10)",u:"https://www.lnews.jp/2025/10/r1023301.html"}
+  },
+  compare:{
+    rows:[
+      ["想定地震","都心南部直下地震 M7.3","南海トラフ巨大地震(東側) M9","南海トラフ巨大地震(陸側)"],
+      ["30年確率","70%程度(南関東M7級)","60〜90%程度以上(別法20〜50%)","同左。別に安芸灘〜豊後水道 40%程度"],
+      ["死者(最大)","約1.8万人(都内 約8千)","3,019人(県内最大は曽根丘陵断層帯 3,843人)","614人"],
+      ["主な死因","火災(約3分の2)","揺れ(93.1%)","津波(582人)"],
+      ["地域の弱点","中枢機能・データセンター・通信の集中。帰宅困難者 約840万人","少数の山越えルートに依存。首都圏と同じ電力系統","臨海コンビナート、関門の結節点、港湾"],
+      ["特徴的な連鎖","潜伏型攻撃の起動 → 停電・通信の長期化 → 首都中枢の停止 → 全国へ波及","道路寸断 → 孤立 → 外部支援の空白 → 例外運用の長期化 → 侵入","津波 → コンビナート被災 → 遠隔保守からOT侵入 → 素材供給停止"],
+      ["優先したい対策","代替拠点、侵害前提の点検、DDoS防御","受援計画、孤立集落の通信、例外運用の事前設計","早期避難、情報系と制御系の分離、関門の代替輸送"]
+    ],
+    note:"3地域は役割が違う。東京は「被害の中心」、山梨は「隣接して支援の空白に置かれる地域」、山口は「産業と交通の結節点」。同じ地震×サイバーの連鎖でも、断つべき箇所が地域ごとに異なる。"
+  }
+};
+
+/* ═══════════ state ═══════════ */
+const state = {
+  region:"tokyo",
+  cats:new Set(Object.keys(DATA.cats)),
+  measures:false,
+  selected:null
+};
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const byId=Object.fromEntries(DATA.nodes.map(n=>[n.id,n]));
+
+function visibleNodes(){
+  return DATA.nodes.filter(n=>n.r.includes(state.region)&&state.cats.has(n.cat));
+}
+function regionEdges(){
+  const ids=new Set(DATA.nodes.filter(n=>n.r.includes(state.region)).map(n=>n.id));
+  return DATA.edges.filter(([a,b,r])=>ids.has(a)&&ids.has(b)&&(!r||r.includes(state.region)));
+}
+/* 上流・下流をたどる(分類で隠れた項目も経由する) */
+function chain(id){
+  const es=regionEdges(), up=new Set(), down=new Set();
+  const walk=(start,set,dir)=>{
+    const st=[start];
+    while(st.length){const x=st.pop();
+      es.forEach(([a,b])=>{const [f,t]=dir?[a,b]:[b,a]; if(f===x&&!set.has(t)){set.add(t);st.push(t);}});}
+  };
+  walk(id,down,true); walk(id,up,false);
+  return {up,down};
+}
+
+/* ═══════════ 描画 ═══════════ */
+function renderControls(){
+  $("regions").innerHTML=[...Object.entries(DATA.regions).map(([k,r])=>[k,r.name]),["compare","3地域の比較"]]
+    .map(([k,n])=>`<button data-r="${k}" class="${state.region===k?"on":""}">${esc(n)}</button>`).join("");
+  $("layers").innerHTML=Object.entries(DATA.cats)
+    .map(([k,c])=>`<button class="layer ${state.cats.has(k)?"on":""}" data-c="${k}" style="--c:${c.color}"><i></i>${esc(c.name)}</button>`).join("");
+  $("tgMeasure").classList.toggle("on",state.measures);
+  const cmp=state.region==="compare";
+  $("layerRow").hidden=cmp; $("optRow").hidden=cmp;
+}
+
+function renderSummary(){
+  const r=DATA.regions[state.region];
+  $("summary").innerHTML=`<h2>${esc(r.name)}</h2><p class="scen">${esc(r.scen)}</p>
+    <ul class="facts">${r.facts.map(([k,v])=>`<li><span>${esc(k)}</span><b>${esc(v)}</b></li>`).join("")}</ul>
+    <p class="note">${esc(r.note)}</p>`;
+}
+
+function renderFlow(){
+  const vis=visibleNodes();
+  const ch=state.selected?chain(state.selected):null;
+  const lit=ch?new Set([state.selected,...ch.up,...ch.down]):null;
+  $("bands").innerHTML=DATA.stages.map((s,i)=>{
+    const ns=vis.filter(n=>n.stage===i);
+    return `<div class="band"><div class="bandhead">${esc(s)}</div><div class="nodes">${
+      ns.length?ns.map(n=>{
+        const cls=["node",n.vuln?"vuln":"",lit&&!lit.has(n.id)?"dim":"",state.selected===n.id?"sel":""].join(" ");
+        const mc=state.measures&&n.m.length?`<span class="mc">対策${n.m.length}</span>`:"";
+        return `<button class="${cls}" data-n="${n.id}" style="--c:${DATA.cats[n.cat].color}">
+          <small>${esc(DATA.cats[n.cat].name)}${n.vuln?"・脆弱状態":""}</small>${esc(n.label)}${mc}</button>`;
+      }).join(""):`<div class="empty">この段に表示する項目はありません</div>`
+    }</div></div>`;
+  }).join("");
+  if(vis.length===0) $("bands").innerHTML=`<p class="empty">分類がすべて非表示です。上の分類ボタンで表示を戻してください。</p>`;
+  requestAnimationFrame(drawEdges);
+}
+
+function drawEdges(){
+  const svg=$("edges"), box=$("flow").getBoundingClientRect();
+  const pos={};
+  document.querySelectorAll(".node").forEach(el=>{
+    const r=el.getBoundingClientRect();
+    pos[el.dataset.n]={x:r.left-box.left+r.width/2,top:r.top-box.top,bot:r.bottom-box.top,l:r.left-box.left,r:r.right-box.left};
+  });
+  const ch=state.selected?chain(state.selected):null;
+  const upS=ch?new Set([state.selected,...ch.up]):null, dnS=ch?new Set([state.selected,...ch.down]):null;
+  let paths="";
+  regionEdges().forEach(([a,b])=>{
+    const p=pos[a],q=pos[b]; if(!p||!q) return;
+    const on=ch&&((upS.has(a)&&upS.has(b))||(dnS.has(a)&&dnS.has(b)));
+    let d;
+    if(q.top>p.bot-2){ const dy=(q.top-p.bot)/2; d=`M${p.x},${p.bot} C${p.x},${p.bot+dy} ${q.x},${q.top-dy} ${q.x},${q.top}`; }
+    else if(p.top>q.bot-2){ /* 後の段から前の段へ戻る(状態を長引かせる)連鎖 */
+      const dy=(p.top-q.bot)/2; d=`M${p.x},${p.top} C${p.x},${p.top-dy} ${q.x},${q.bot+dy} ${q.x},${q.bot}`; }
+    else{ /* 同じ段:上側に弧を描く */
+      const y=Math.min(p.top,q.top), x1=p.x<q.x?p.r-8:p.l+8, x2=p.x<q.x?q.l+8:q.r-8;
+      d=`M${x1},${p.top} Q${(x1+x2)/2},${y-22} ${x2},${q.top}`; }
+    paths+=`<path d="${d}" fill="none" stroke="${on?"#C8963E":"#303C53"}" stroke-width="${on?2:1.2}"
+      stroke-opacity="${ch&&!on?.35:1}" marker-end="url(#${on?"ah":"an"})"/>`;
+  });
+  svg.innerHTML=`<defs>
+    <marker id="an" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#303C53"/></marker>
+    <marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#C8963E"/></marker>
+  </defs>${paths}`;
+}
+
+function renderPanel(){
+  const aside=$("aside");
+  const n=state.selected&&byId[state.selected];
+  if(!n){
+    aside.classList.remove("open");
+    $("panel").innerHTML=`<p class="hint">項目を選ぶと、その原因(上流)と帰結(下流)の連鎖が灯ります。破線の項目は、攻撃を招く「脆弱状態」です。</p>`;
+    return;
+  }
+  const es=regionEdges();
+  const ups=es.filter(e=>e[1]===n.id).map(e=>byId[e[0]]);
+  const dns=es.filter(e=>e[0]===n.id).map(e=>byId[e[1]]);
+  const lk=arr=>arr.length?`<div class="links">${arr.map(x=>`<button data-n="${x.id}">${esc(x.label)}</button>`).join("")}</div>`:`<p class="hint">なし</p>`;
+  const rd=n.rd&&n.rd[state.region];
+  $("panel").innerHTML=`<button class="close" id="closeP">閉じる</button>
+    <h3>${esc(n.label)}</h3>
+    <div class="meta"><span class="tag">${esc(DATA.cats[n.cat].name)}${n.vuln?"・脆弱状態":""}</span>
+      <span class="tag">${esc(DATA.stages[n.stage])}</span><span class="tag c-${n.conf}">${esc(n.conf)}</span></div>
+    <p>${esc(n.desc)}</p>
+    ${rd?`<h4>${esc(DATA.regions[state.region].name)}では</h4><p>${esc(rd)}</p>`:""}
+    <h4>原因(上流)</h4>${lk(ups)}
+    <h4>帰結(下流)</h4>${lk(dns)}
+    <h4>対策</h4><ul>${n.m.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+    <h4>出典</h4>${n.src.length?`<ul>${n.src.map(k=>`<li><a href="${DATA.sources[k].u}" target="_blank" rel="noopener">${esc(DATA.sources[k].t)}</a></li>`).join("")}</ul>`:`<p class="hint">個別の出典なし(研究上の推論)</p>`}`;
+  aside.classList.add("open");
+}
+
+function renderCompare(){
+  const regs=Object.values(DATA.regions);
+  $("cmp").innerHTML=`<table><thead><tr><th></th>${regs.map(r=>`<th>${esc(r.name)}</th>`).join("")}</tr></thead>
+    <tbody>${DATA.compare.rows.map(([k,...v])=>`<tr><td>${esc(k)}</td>${v.map(x=>`<td>${esc(x)}</td>`).join("")}</tr>`).join("")}</tbody></table>
+    <p class="note">${esc(DATA.compare.note)}</p>`;
+}
+
+function render(){
+  renderControls();
+  const cmp=state.region==="compare";
+  $("main").hidden=cmp; $("cmp").hidden=!cmp;
+  if(cmp){renderCompare();return;}
+  renderSummary(); renderFlow(); renderPanel();
+}
+
+/* ═══════════ 配線 ═══════════ */
+$("regions").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-r]"); if(!b) return;
+  state.region=b.dataset.r;
+  if(state.selected&&(state.region==="compare"||!byId[state.selected].r.includes(state.region))) state.selected=null;
+  history.replaceState(null,"","#"+state.region);
+  render();
+});
+$("layers").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-c]"); if(!b) return;
+  const c=b.dataset.c; state.cats.has(c)?state.cats.delete(c):state.cats.add(c);
+  if(state.selected&&!state.cats.has(byId[state.selected].cat)) state.selected=null;
+  render();
+});
+$("tgMeasure").addEventListener("click",()=>{state.measures=!state.measures;render();});
+document.addEventListener("click",e=>{
+  if(e.target.id==="closeP"){state.selected=null;render();return;}
+  const b=e.target.closest("button[data-n]"); if(!b) return;
+  const id=b.dataset.n;
+  if(!state.cats.has(byId[id].cat)) state.cats.add(byId[id].cat);
+  state.selected=state.selected===id&&b.classList.contains("node")?null:id;
+  render();
+});
+window.addEventListener("resize",()=>requestAnimationFrame(drawEdges));
+
+const h=location.hash.slice(1);
+if(DATA.regions[h]||h==="compare") state.region=h;
+render();
+</script>
+</body>
+</html>
