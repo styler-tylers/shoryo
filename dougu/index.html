@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="道具箱">
+<meta name="theme-color" content="#171F2B">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>道具箱 v1.0</title>
+
+<!-- changelog
+v1.0 (2026-11-25) 初版
+  - 自作の道具(HTMLツール)と研究ノートへの入口を一枚に集約
+  - 各道具の公開状態を自動判定(公開中なら「開く」、未公開なら PR へ案内)
+  - iPhone のホーム画面に置ける(アイコン・全画面表示)
+-->
+
+<style>
+:root{
+  /* 玄冬 */
+  --ji:#171F2B; --men:#202A3C; --moji:#EAEFF5; --hojo:#8A93A5;
+  --hi:#C8963E; --sen:#303C53;
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  --gothic:-apple-system,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+  --mono:"SF Mono","Menlo",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ji);color:var(--moji);
+  font-family:var(--gothic);font-size:16px;line-height:1.8;
+  -webkit-text-size-adjust:100%;min-height:100dvh;
+}
+.wrap{max-width:720px;margin:0 auto;
+  padding:40px 24px 64px;padding-top:calc(40px + env(safe-area-inset-top));
+  padding-left:calc(24px + env(safe-area-inset-left));padding-right:calc(24px + env(safe-area-inset-right));
+  padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+
+header h1{font-family:var(--mincho);font-weight:600;letter-spacing:.24em;font-size:28px;margin:0;line-height:1.4}
+header h1 .ver{font-family:var(--mono);font-size:12px;letter-spacing:0;color:var(--hojo);margin-left:12px;vertical-align:middle}
+header p{margin:8px 0 0;font-size:14px;color:var(--hojo);letter-spacing:.04em}
+
+section{margin-top:40px}
+h2{font-family:var(--mincho);font-weight:600;font-size:20px;letter-spacing:.08em;margin:0 0 8px;
+  padding-bottom:8px;border-bottom:1px solid var(--sen)}
+
+ul.list{list-style:none;margin:0;padding:0}
+ul.list li{border-bottom:1px solid var(--sen)}
+.item{display:flex;gap:16px;align-items:center;padding:16px 0;color:inherit;text-decoration:none;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;min-height:44px}
+a.item:active{background:rgba(200,150,62,.08)}
+.item .body{flex:1 1 auto;min-width:0}
+.item .name{font-family:var(--mincho);font-weight:600;font-size:20px;letter-spacing:.08em;line-height:1.5}
+.item .name .v{font-family:var(--mono);font-size:12px;font-weight:400;letter-spacing:0;color:var(--hojo);margin-left:8px}
+.item .desc{font-size:14px;color:var(--moji);margin-top:4px}
+.item .meta{font-size:12px;color:var(--hojo);margin-top:4px;letter-spacing:.04em}
+.item .go{flex:none;font-size:14px;letter-spacing:.04em;color:var(--hi);white-space:nowrap}
+.item .go.wait{color:var(--hojo)}
+.item.wait .name{color:var(--hojo)}
+
+.howto{font-size:14px;color:var(--hojo);margin:0;padding-left:16px;border-left:2px solid var(--hi)}
+.howto b{color:var(--moji);font-weight:400}
+footer{margin-top:64px;font-size:12px;color:var(--hojo);font-family:var(--mono)}
+footer a{color:var(--hojo)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>道具箱<span class="ver">v1.0</span></h1>
+  <p>自作の道具と研究ノートの入口</p>
+</header>
+
+<section>
+  <h2>道具</h2>
+  <ul class="list" id="tools"></ul>
+</section>
+
+<section>
+  <h2>研究ノート</h2>
+  <ul class="list" id="notes"></ul>
+</section>
+
+<section>
+  <h2>ホーム画面に置く</h2>
+  <p class="howto">iPhone の Safari でこのページを開き、<b>共有 → ホーム画面に追加</b>。アプリのように全画面で開けます。</p>
+</section>
+
+<footer>
+  道具箱 v1.0 ・ <a href="https://github.com/styler-tylers/shoryo">styler-tylers/shoryo</a>
+</footer>
+
+</div>
+
+<script>
+/* ==================================================================
+   DATA — 道具やノートを足すときはここだけ編集する
+   url:    このページ(dougu/)から見た相対パス、または完全な URL
+   pr:     まだ公開されていない場合に案内する PR 番号(公開後は残しても無害)
+   ================================================================== */
+const REPO = 'https://github.com/styler-tylers/shoryo';
+const DATA = {
+  tools: [
+    { name:'言霊盤', ver:'v0.1', url:'../kotodama/', pr:2, kind:'音・遊び', updated:'2026-11-08',
+      desc:'五十音を叩くと十二律で鳴り、今日の七十二候の色で灯る視聴覚楽器。' },
+    { name:'渉猟', ver:'v1.1', url:'../', kind:'研究', updated:'2026-07-25',
+      desc:'国会図書館デジタルコレクションの全文検索。紙面画像と出典書式の書き出しつき。' },
+    { name:'連鎖図', ver:'v1.0', url:'../research/bousai/rensa.html', pr:1, kind:'研究', updated:'2026-10-30',
+      desc:'大地震とサイバー攻撃の連鎖を、東京・山梨・山口の地域別に描いた図。' },
+  ],
+  notes: [
+    { name:'ヴォイニッチ手稿研究', url: REPO+'/blob/main/voynich/notes/'+encodeURIComponent('MOC ヴォイニッチ手稿研究.md'),
+      desc:'定量分析(第 1〜19 回)の目次。スクリプト集は voynich/ に。', updated:'2026-11-15' },
+    { name:'防災研究', url: REPO+'/blob/claude/disaster-prevention-research-gmquju/research/bousai/README.md', pr:1,
+      desc:'自然災害とサイバー攻撃を同じ枠組みで予測・対策する研究ノート。', updated:'2026-10-30' },
+    { name:'15世紀初頭の時代背景', url: REPO+'/pull/5', pr:5,
+      desc:'政治・学問・医学・音楽のノートと、医学書仮説の 3 つの検証。', updated:'2026-11-15' },
+  ],
+};
+
+/* ---------- 描画 ---------- */
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function row(t, external){
+  const li=document.createElement('li');
+  const meta=[t.kind, t.updated && `更新 ${t.updated}`].filter(Boolean).join(' ・ ');
+  li.innerHTML=
+    `<a class="item" href="${esc(t.url)}"${external?' target="_blank" rel="noopener"':''}>
+       <div class="body">
+         <div class="name">${esc(t.name)}${t.ver?`<span class="v">${esc(t.ver)}</span>`:''}</div>
+         <div class="desc">${esc(t.desc)}</div>
+         <div class="meta">${esc(meta)}</div>
+       </div>
+       <span class="go">${external?'読む':'開く'}</span>
+     </a>`;
+  return li;
+}
+const toolList=document.getElementById('tools'), noteList=document.getElementById('notes');
+DATA.tools.forEach(t=>{ const li=row(t,false); toolList.appendChild(li); checkPublished(t,li); });
+DATA.notes.forEach(n=>noteList.appendChild(row(n,true)));
+
+/* ---------- 公開状態の自動判定 ----------
+   GitHub Pages 上でだけ確かめる。見つからなければ PR へ案内する。 */
+async function checkPublished(t, li){
+  if(location.protocol==='file:' || /^https?:/.test(t.url)) return;
+  try{
+    const res=await fetch(t.url,{method:'HEAD',cache:'no-store'});
+    if(res.ok) return;
+    if(res.status!==404) return;
+  }catch(_){ return; }
+  const a=li.querySelector('.item'), go=li.querySelector('.go');
+  a.classList.add('wait'); go.classList.add('wait');
+  if(t.pr){
+    a.href=`${REPO}/pull/${t.pr}`; a.target='_blank'; a.rel='noopener';
+    go.textContent=`公開待ち(PR #${t.pr})`;
+  }else{
+    a.removeAttribute('href'); go.textContent='公開待ち';
+  }
+}
+</script>
+</body>
+</html>
