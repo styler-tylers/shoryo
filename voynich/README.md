@@ -11,6 +11,7 @@ René Zandbergen の **ZL 転写ファイル**（IVTFF 形式・EVA 表記, 版 
 | `line_forms.py` | 行頭形・行末形の検証 |
 | `vocab_shift.py` | ページごとの語彙の移り変わり |
 | `reorder.py` | 語彙の類似度から元の並びを推定（二つ折り単位） |
+| `hebrew_compare.py` | 本物のヘブライ語の文章（Sefaria の JSON）と比べる: 情報量・位置に偏る字形・語の家族の変わる位置 |
 | `medical_tests.py` | 医学書仮説の検証（レシピの段落の長さ、薬学のラベルと植物の本文の一致、黄道の各宮のラベル数） |
 | `compare_transcriptions.py` | 主な指標を複数の転写で比べる |
 | `spread.py` | Yale の IIIF 画像から見開き画像と綴じ目の拡大を作る（Pillow が必要） |
