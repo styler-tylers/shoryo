@@ -33,7 +33,7 @@ created: 2026-11-15
 
 ## 次の作業
 
-- 圧縮点は `・₇₉`（詳しい記録の第 241〜245 節）。**ロードマップの 5 段・時代背景の仮説は閉じた**。第 70〜78 巡で挿絵のラベルと黄道の人物。2 回の目隠し判定とも、同じ語のラベルの人物が似ている手がかりは無い。f73r の人物の胸の濃さは再現（22 人中 21 人）。答えの表は `voynich/data/blind_key_round77.json`・`blind_key_round78.json`。ノートは Obsidian に `obsidian-voynich` ブランチで届けている（Mac では `voynich`）
+- 圧縮点は `・₇₉`（詳しい記録の第 241〜245 節）。**ロードマップの 5 段・時代背景の仮説は閉じた**。第 70〜78 巡で挿絵のラベルと黄道の人物。2 回の目隠し判定とも、同じ語のラベルの人物が似ている手がかりは無い。f73r の人物の胸の濃さは再現（22 人中 21 人）。答えの表は `voynich/data/blind_key_round77.json`・`blind_key_round78.json`。ノートは Obsidian に `obsidian-voynich` ブランチで届けている（Mac では `voynich`）。**第 79 巡（第 246 節）: 判定待ちのページ 2 つ**: 黄道人物の顔と髪型（https://claude.ai/artifact/KMDhssmymMmtpoivP3VbUT 、保存先 `blind`、18 組、答えの表は判定が済むまで出さない。`build_face_page.py` 種 2028 で作り直せる）、黄道人物の胸を指す（https://claude.ai/artifact/Tjaux6xk3i4GeKsTyxmJ9S 、保存先 `breast`、30 人、人物の表 `voynich/data/breast_figures_round79.json`）
 - **注意（第 61 巡）**: 行をまたぐ量は、段落の最初の行の位置を変えずに他の行だけを並べ替えた対照の中の順位（`nevo_round61.rank`）を標準にする
 - **注意（第 60 巡）**: MI の差の量（観察の MI − 基準の MI）は、行の並びに関係なく正に寄る。0 と比べず、頁の中で行を並べ替えた対照の分布と比べる
 - **注意（第 59 巡）**: 22 の量の「またぐ」（`line_unit.l1`）は基準に別の頁を使うので、頁の語彙のまとまりを含む。行の独立の根拠には第 40 巡の `cross` を使う
