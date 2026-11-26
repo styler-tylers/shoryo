@@ -73,6 +73,16 @@ created: 2026-11-10
 
 - [[2026-11-15 ヴォイニッチ手稿 nēvo Research Method による解析]] — [[nēvo]] Research Method Ver.2.0 を当てはめる。縦に読む（列の転置は棄却）、尺度を変える（言語 A・B は語・文章の型では「別の書き手」くらい、字形の並びではそれ以上）、関係軸を変える（**行は端の軸では独立、語彙の軸では隣の行とつながる**。暗号のモデルへの反例）。発見の状態の分類・「分からない」の分類・`？` から矢印を引いた箇所の点検
 
+- [[2026-11-10 ヴォイニッチ手稿 医学書仮説の 3 つの検証]] — 黄道の各宮のラベルは 30、薬学のラベルは植物の部の本文と一致しない、レシピは短い段落（時代背景からの検証。第 6・11・13 回と同じ結論）
+
+### 時代背景（羊皮紙の年代 1404〜1438）
+
+- [[2026-11-10 15世紀初頭のイギリス・イタリア・中央ヨーロッパ]] — 炭素年代（1404〜1438）の時代背景。3 地域の年表と、写本と比べられる同時代の材料
+- [[2026-11-10 15世紀初頭の宗教・哲学・法・科学・錬金術・数学]] — 同じ時期の知的状況。医療占星術・本草・錬金術書・暗号技術の水準
+- [[2026-11-10 15世紀初頭の医学と薬学]] — 体液説・医療占星術・入浴療法・薬種商と処方集。写本の各部との対照表
+- [[2026-11-17 15世紀初頭の音楽とその規則]] — 音楽は数学。ヘクサコルドと旋法、対位法の規則、定量記譜法、アイソリズム
+- [[2026-11-25 15世紀のユダヤ人の言語・文字・文化とヘブライ語との比較]] — 移住の地域は比較材料の地域と重なる。本物のヘブライ語では字の並びの予測しやすさは再現しないが、語の家族が語頭で変わる型はラテン語よりヴォイニッチに近い
+
 ## 方法論
 
 - [[頁順の問題]] — 現在の綴じ順は元の並びと違う可能性が高い。どの分析が並びに依存するか
@@ -92,7 +102,7 @@ created: 2026-11-10
 - このリポジトリの `voynich/`: 分析スクリプト一式（使い方は `voynich/README.md`）
   - `word_freq.py` 単語頻度 / `affix.py` 語頭・語尾 / `line_position.py` 行頭・行末 / `vocab_shift.py` 語彙の移り変わり
   - `line_forms.py` 行頭形・行末形の検証 / `compare_transcriptions.py` 転写の比較 / `reorder.py` 元の並びの推定
-  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い / `word_families.py` 語の家族 / `section_vocab.py` セクションの語彙とラベル / `prefix_order.py` 語頭の入れ替え / `zodiac_labels.py` 黄道のラベル / `word_grammar.py` 語の組み立ての表 / `unit_entropy.py` 文字の単位と情報量 / `zodiac_days.py` 黄道のラベルの並び / `saints_calendar.py` 聖人暦との比較 / `null_generator.py` 意味の無い生成モデル / `function_words.py` `function_words2.py` `function_words3.py` 機能語らしい語 / `line_unit.py` 行の単位 / `line_grammar.py` 行の中の文法 / `heading_image.py` 見出し語と絵 / `section_labels2.py` セクションの単位の絵と文章 / `scripts_compare.py` ヨーロッパ以外の文字と略記・人工の表記 / `syllable_code_tests.py` 音節の暗号の予測
+  - `spread.py` `initials.py` `page_images.py` 画像の取得・組み立て / `image_text.py` 絵と文章の対応 / `labels.py` ラベルの分析 / `pharma_labels.py` 薬学ラベル対応表（[[薬学ラベル対応表]]） / `self_citation.py` 自己引用説の検証 / `style_distance.py` 本草書の様式との近さ / `sac_roots.py` 袋・縞の根の頁の偏り / `cross_section.py` 断面・切り口の根 / `pharma_roots.py` 薬学の根の断片の切り口 / `root_matching.py` 植物と薬学の根の照合 / `xsec_herbals.py` 切り口の根を本草書 3 冊と比較 / `cup_tops.py` 杯状の根の頭 / `selfcite_model.py` 自己引用の生成モデル / `scribes.py` 書き手ごとの違い / `word_families.py` 語の家族 / `section_vocab.py` セクションの語彙とラベル / `prefix_order.py` 語頭の入れ替え / `zodiac_labels.py` 黄道のラベル / `word_grammar.py` 語の組み立ての表 / `unit_entropy.py` 文字の単位と情報量 / `zodiac_days.py` 黄道のラベルの並び / `saints_calendar.py` 聖人暦との比較 / `null_generator.py` 意味の無い生成モデル / `function_words.py` `function_words2.py` `function_words3.py` 機能語らしい語 / `line_unit.py` 行の単位 / `line_grammar.py` 行の中の文法 / `heading_image.py` 見出し語と絵 / `section_labels2.py` セクションの単位の絵と文章 / `scripts_compare.py` ヨーロッパ以外の文字と略記・人工の表記 / `syllable_code_tests.py` 音節の暗号の予測 / hebrew_compare.py` 本物のヘブライ語の文章との比較 / `medical_tests.py` 医学書仮説の 3 つの検証（レシピの段落・薬学のラベル・黄道のラベル数）
 
 ## 外部資料
 
