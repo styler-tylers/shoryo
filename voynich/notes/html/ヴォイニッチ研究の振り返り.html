@@ -129,7 +129,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
 <div class="wrap">
 
 <header class="hero">
-  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜73 巡</small></h1>
+  <h1 class="hero-title">ヴォイニッチ研究の振り返り<small>nēvo 第 1〜83 巡</small></h1>
   <div class="hero-body">
     <div class="hero-fig">
       <figure style="margin:0">
@@ -147,7 +147,7 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
       </div>
     </div>
     <div class="stats" aria-label="研究の規模">
-      <div class="stat"><b class="num">73</b><span>巡（nēvo）</span></div>
+      <div class="stat"><b class="num">83</b><span>巡（nēvo）</span></div>
       <div class="stat"><b class="num">219</b><span>事前に記録した検定</span></div>
       <div class="stat"><b class="num">5 / 5</b><span>閉じたロードマップの段</span></div>
       <div class="stat"><b class="num">12</b><span>結論を変えた訂正</span></div>
@@ -175,6 +175,8 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><span class="phase">XI</span><div><span class="when">第 56〜61 巡</span><h3>二面が 1 つの作り方で両立するかを確かめる</h3><p>平文なしのモデルは、語末の欄の同じ決まりで文字の性質を出す。言語 B の文字だけの 5 頁は語の長さが右に裾を引く（平均は短い）が、ほかの性質は同じ。行をまたいで境目の規則は続かない。過去の行をまたぐ量を点検し、行の独立は偏りの無い順位の形でも保たれた。段落の最初の行は芯が長く、<code>k/t</code> が <code>p/f</code> に替わる（モデルは出さない）。</p></div></li>
     <li><span class="phase">XII</span><div><span class="when">第 62〜69 巡</span><h3>平文ありの冗長な暗号を試す</h3><p>Naibbe 暗号の元の表（著者の補足資料）で、3 つの性質と Zipf が平文ありで出ることを確かめた。語尾の幅・段落の最初の行・字形の在庫の増え続けは、性質から逆に組んだ暗号（VT）で出た。2 つを合わせた VTN は、平文なしのモデルとほぼ同じところまで近づいた。</p></div></li>
     <li><span class="phase">XIII</span><div><span class="when">第 70〜73 巡</span><h3>挿絵のラベルと、半分の頁での確かめ</h3><p>ラベルは本文から少し離れた長い芯の語で、挿絵の位置と結び付かない。半分の頁だけから作った平文ありの暗号は、残りの半分に対して 8 つの量で 6。隣の行どうしの語が似る性質だけは、平文ありの暗号に無い。</p></div></li>
+    <li><span class="phase">XIV</span><div><span class="when">第 74〜81 巡</span><h3>研究者本人の目で、挿絵とラベルを確かめる</h3><p>ラベルを伏せた目隠しの判定を 5 回（黄道の人物 3 回、薬学の物 2 回）。同じ語・近い語のラベルの物が似て見えるとは、どれも言えない。判定の中で研究者が気づいた「胸のインクの濃さ」は頁で揃い、人物の右の胸に偏り、ラベルには及ばない。後の時代のなぞり直しと読める。ヘブライ語を平文にしても、冗長な暗号は同じくらい近づく。</p></div></li>
+    <li><span class="phase">XV</span><div><span class="when">第 82〜83 巡</span><h3>書き手ごとに比べる</h3><p>言語 A はほぼ書き手 1、言語 B は書き手 2・3・5。A と B の違いは、言語 B の中の本草と生物の頁の違いと同じ程度で、別格ではない。書き手 2 と 5 は語彙が同じで字形が違う。隣の行が似る性質は書き手 2 にも 3 にもある。</p></div></li>
   </ol>
 </section>
 
@@ -401,11 +403,37 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
   </div>
 </section>
 
+<section class="sec" aria-labelledby="h-eyes">
+  <div class="sec-head">
+    <div class="eyebrow">JUDGED BY EYE, BLIND</div>
+    <h2 id="h-eyes">挿絵とラベル、書き手</h2>
+    <p class="lead">統計では分からない「絵との結び付き」を、研究者本人に判定してもらいました。どの判定も、組の選び方と判断の基準を先にノートに記録し、答えの表は判定が済むまで伏せています。</p>
+  </div>
+  <div class="table-box">
+    <table>
+      <thead><tr><th>確かめたこと</th><th>結果</th><th class="res">判定</th></tr></thead>
+      <tbody>
+        <tr><td>黄道の人物: 同じ語のラベルの人物は似ているか（目隠し 2 回）</td><td>全体では差が偶然の範囲</td><td class="res"><span class="chip">言えない</span></td></tr>
+        <tr><td>黄道の人物: 顔と髪型だけで比べる（目隠し 3）</td><td>p 0.68</td><td class="res"><span class="chip">言えない</span></td></tr>
+        <tr><td>薬学の物: 同じ語のラベルの物は似ているか（22 組）</td><td>同じ語の組がやや高い、p 0.086</td><td class="res"><span class="chip">届かない</span></td></tr>
+        <tr><td>薬学の物: 1 字違いのラベルの物は似ているか（24 組）</td><td>p 0.19</td><td class="res"><span class="chip">言えない</span></td></tr>
+        <tr><td>胸のインクの濃さ（研究者の気づき）</td><td>頁で揃う（f73r は 22 人中 21 人）。画像の左＝正面向きなら人物の右の胸に偏る（20 人中 15 人, p 0.041）</td><td class="res"><span class="chip ok">出た</span></td></tr>
+        <tr><td>なぞり直しはラベルにも及ぶか</td><td>胸の濃さとラベルの濃さは連れ立たない（30 人, p 0.65）</td><td class="res"><span class="chip">及ばない</span></td></tr>
+        <tr><td>言語 A と B と書き手</td><td>A ≒ 書き手 1。A と B の違いは、B の中の本草と生物の違いと同じ程度</td><td class="res"><span class="chip ok">出た</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="verdict">
+    <h3>ラベルの語は、絵の見た目と結び付かない。濃いインクは後の手</h3>
+    <p>5 回の目隠しの判定で、同じ語・近い語のラベルの物が似て見えるとは、どれも基準に届きませんでした。一方、研究者が判定の中で気づいた胸のインクの濃さは画素の値でも確かめられ、J. Stolfi らが「後の時代のなぞり直し（人物の右の胸と帽子）」と述べた跡と合いました。研究者は先行研究を知らずに同じものを見ていたことになります。</p>
+  </div>
+</section>
+
 <section class="sec" aria-labelledby="h-fix">
   <div class="sec-head">
     <div class="eyebrow">CORRECTIONS ON RECORD</div>
     <h2 id="h-fix">取り下げた判断</h2>
-    <p class="lead">外れた予測、計算の不具合、言い過ぎは、消さずに記録しました。結論を変えた訂正は 12 回です。</p>
+    <p class="lead">外れた予測、計算の不具合、言い過ぎは、消さずに記録しました。結論を変えた訂正は 15 回です。</p>
   </div>
   <ol class="fixes">
     <li><span class="r">第 25 巡</span><span><s>言語 A のモデルは <code>d-</code> の語を作れない</s> → 計算の不具合だった</span></li>
@@ -420,6 +448,9 @@ a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
     <li><span class="r">第 59 巡</span><span><s>言語 B の文字だけの頁は語が長い</s> → 平均はむしろ短く、分布が右に裾を引く。22 の量の「またぐ」は頁の語彙のまとまりも含み、名前どおりには読めない</span></li>
     <li><span class="r">第 58 巡</span><span><s>文字だけの頁は行の切れ目のつながりが強い</s> → かき混ぜの回数が少ないぶれ。新しい持ち越しの量も、段落の最初の行の偏りだった</span></li>
     <li><span class="r">第 54 巡</span><span><s>音節の暗号 ＋ 中ほどの略しで 3 つの性質がそろう</s> → 上限を文章ごとに合わせた結果で、別の文章に移らない</span></li>
+    <li><span class="r">第 74 巡</span><span><s>平文ありの暗号が 8 つの量で 7</s> → 確かめ直すと再現しなかった（5 前後、3〜7）</span></li>
+    <li><span class="r">第 78 巡</span><span><s>同じ語のラベルの人物が似ていたのは、樽の形のせい</s> → 研究者が見たのは顔と髪型だった</span></li>
+    <li><span class="r">第 80 巡</span><span><s>容器のラベルなのに、研究者は隣の根を指した</s> → 青い点は「判定に使った絵」の印だった（ページの説明の不足）</span></li>
   </ol>
 </section>
 
