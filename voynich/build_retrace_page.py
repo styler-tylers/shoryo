@@ -1,4 +1,4 @@
-"""N252（第 287・289 節）: 升ごとのインクの濃さの余りを測り、なぞり直しの候補の升とふつうの升を選んで、目隠しの判定のページを作る。
+"""N252（第 287・289・290 節, 2 版）: 升ごとのインクの濃さの余りを測り、なぞり直しの候補の升とふつうの升を選んで、目隠しの判定のページを作る。
 
     python3 voynich/build_retrace_page.py <IIIF の画像の場所（list.json と <id>.jpg）> voynich/notes/html/retrace_template.html <出力 html> <答えの表 json> <升の表 json>
 """
@@ -30,8 +30,14 @@ def tiles_of(path):
     T = int(0.04 * W); out = []
     for y in range(0, H - T, T):
         for x in range(0, W - T, T):
+            if x < 0.15 * W or x + T > 0.85 * W or y < 0.10 * H or y + T > 0.90 * H:   # 第 290 節: 頁の内側だけ
+                continue
             l = L[y:y + T, x:x + T]; k = ink[y:y + T, x:x + T]; f = k.mean()
-            if f < 0.03 or f > 0.40 or np.percentile(l, 80) < 0.6 * parch:
+            if f < 0.03 or f > 0.25 or np.percentile(l, 80) < 0.6 * parch:
+                continue
+            if (l < 0.25 * parch).mean() >= 0.01:                                 # 黒い背景
+                continue
+            if k.mean(0).max() > 0.70 or k.mean(1).max() > 0.70:                  # 綴じ目の影・縁の線
                 continue
             if (sat[y:y + T, x:x + T][k] > 0.4).mean() >= 0.30:
                 continue
