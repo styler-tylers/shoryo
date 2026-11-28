@@ -1,0 +1,147 @@
+<title>ヴォイニッチ研究の要旨</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* 白妙の一枚もの: 生成りの紙に墨、弁柄の差し色（振り返りのページと同じ系統）。一段組みで上から読む報告書 */
+:root {
+  --ground: #F5F1E6;   /* 生成り */
+  --panel: #FDFBF5;    /* 胡粉 */
+  --ink: #2B2B26;      /* 墨 */
+  --ink-2: #6B675C;    /* 薄墨 */
+  --bengara: #9E4A3A;  /* 弁柄 */
+  --rule: #DCD6C6;
+  --serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --sans: "Noto Sans JP", -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #1E1D1A; --panel: #272622; --ink: #ECE7DA; --ink-2: #A9A497; --bengara: #D9826E; --rule: #3C3A34; color-scheme: dark } }
+:root[data-theme="dark"] { --ground: #1E1D1A; --panel: #272622; --ink: #ECE7DA; --ink-2: #A9A497; --bengara: #D9826E; --rule: #3C3A34; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.85; margin: 0;
+  padding-block: 40px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 720px; margin: 0 auto; display: grid; gap: 40px; }
+header { display: grid; gap: 14px; border-bottom: 1px solid var(--rule); padding-bottom: 28px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.28em; color: var(--ink-2); text-transform: uppercase; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.45; margin: 0; text-wrap: balance; letter-spacing: 0.03em; }
+h1 { font-size: 32px; }
+h2 { font-size: 22px; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+.meta { font-size: 14px; color: var(--ink-2); }
+.answer { background: var(--panel); border-left: 3px solid var(--bengara); padding: 18px 20px; display: grid; gap: 8px; }
+.answer b { color: var(--bengara); font-weight: 700; }
+section { display: grid; gap: 14px; }
+ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+li::marker { color: var(--bengara); }
+code { font-family: var(--mono); font-size: 0.9em; background: var(--panel); border: 1px solid var(--rule); padding: 0 4px; }
+.table-box { overflow-x: auto; border: 1px solid var(--rule); background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.6; }
+th { font-weight: 500; color: var(--ink-2); font-size: 13px; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip { display: inline-block; font-size: 12px; padding: 0 8px; border: 1px solid var(--ink-2); color: var(--ink-2); line-height: 1.8; white-space: nowrap; }
+.chip.ok { border-color: var(--bengara); color: var(--bengara); }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.fact { border-top: 2px solid var(--bengara); padding-top: 8px; display: grid; gap: 2px; }
+.fact b { font-family: var(--serif); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fact span { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+footer { font-size: 13px; color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 20px; display: grid; gap: 6px; }
+a { color: var(--bengara); }
+a:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
+</style>
+
+<main>
+<header>
+  <div class="eyebrow">Beinecke MS 408 · nēvo Research Method</div>
+  <h1>ヴォイニッチ研究の要旨</h1>
+  <p class="meta">2026 年 11 月 · 第 1〜87 巡 · 書き起こし ZL（René Zandbergen）約 3 万 4 千語</p>
+  <div class="answer">
+    <p>ヴォイニッチ手稿の文章を、意味ではなく<b>どう作られているか</b>から数えて調べました。読めてはいません。</p>
+    <p>分かったのは、文章の作りの細かい決まりと、<b>意味の無い作り方でも、平文のある暗号でも、測った統計のほとんどが同じくらい再現できる</b>ことです。統計だけでは「中身があるか」は決まりません。</p>
+  </div>
+</header>
+
+<section aria-labelledby="h-method">
+  <h2 id="h-method">やり方</h2>
+  <div class="facts">
+    <div class="fact"><b>251</b><span>検定（N1〜N251）。全て計算の前に予測を記録</span></div>
+    <div class="fact"><b>16</b><span>結論を変えた訂正。消さずに残した</span></div>
+    <div class="fact"><b>9</b><span>研究者本人の目で判定したページ</span></div>
+  </div>
+  <ul>
+    <li>字形・語・行・頁・綴じの大きさで数え、自然言語（ラテン語・イタリア語・ヘブライ語・タガログ語ほか）、歴史上の暗号、自作のモデルと比べました</li>
+    <li>新しい測り方は、答えの分かっている作り物や、かき混ぜた対照で先に確かめました</li>
+    <li>挿絵との結び付きは統計では測れないので、ラベルを伏せた「目隠しの判定」を研究者本人が行いました</li>
+  </ul>
+</section>
+
+<section aria-labelledby="h-text">
+  <h2 id="h-text">文章の作り</h2>
+  <ul>
+    <li><b>語は 3 つの欄（語頭・芯・語末）の型から作られます。</b>語の種類の多さの 6 割は芯が生み、語末は 12 種類ほどの決まった印です</li>
+    <li><b>語と語の境目に字形の規則があります。</b>空白の位置は前後の字形から 7〜8 割当てられます（ふつうの言語は 3〜5 割）</li>
+    <li><b>行は前後の行とつながらない単位</b>なのに、隣の行には形の近い語が使われます</li>
+    <li>段落の最初の語とラベルには、<code>p</code>・<code>f</code> で始まる長い芯という「目印の書き方」があります</li>
+    <li>語の作りは言語に似て（タガログ語と同じ型）、字形の性質は規則で作った暗号に似ます。この二面は、語末の欄の決まりという一つの仕組みで両立します</li>
+  </ul>
+</section>
+
+<section aria-labelledby="h-plain">
+  <h2 id="h-plain">平文はあるのか</h2>
+  <div class="table-box">
+    <table>
+      <thead><tr><th>作り方</th><th>ヴォイニッチにどこまで近づくか</th></tr></thead>
+      <tbody>
+        <tr><td>平文の無いモデル（語の型 ＋ 前の語を写して少し変える）</td><td>22 の量のうち、言語 A で 17、言語 B で 20 が同時に出る</td></tr>
+        <tr><td>平文のある冗長な暗号（この研究で性質から組んだもの）</td><td>手を付けていない半分の頁に対し、8 つの量で 5 前後（3〜7）。平文に 100% 読み戻せる。平文がラテン語でもヘブライ語でも同じ</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>どちらもほぼ同じくらい近づくので、<b>語・行・頁の統計では、平文の有無も、平文の言語も決まりません</b>。</p>
+</section>
+
+<section aria-labelledby="h-pics">
+  <h2 id="h-pics">挿絵とラベル</h2>
+  <div class="table-box">
+    <table>
+      <thead><tr><th>確かめたこと</th><th>結果</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>同じ語のラベルの黄道の人物は似ているか（目隠し 3 回）</td><td>3 回とも基準（p &lt; 0.05）に届かない</td><td><span class="chip">言えない</span></td></tr>
+        <tr><td>同じ語・1 字違いの語のラベルの薬学の物は似ているか（目隠し 2 回）</td><td class="num">p 0.086・0.19</td><td><span class="chip">言えない</span></td></tr>
+        <tr><td>人物の胸のインクの濃さ（研究者が判定の中で気づいた）</td><td>頁で揃い（蠍座の頁は 22 人中 21 人）、人物の右の胸に偏る（20 人中 15 人, p 0.041）</td><td><span class="chip ok">出た</span></td></tr>
+        <tr><td>そのなぞり直しはラベルにも及ぶか</td><td class="num">p 0.65（30 人）</td><td><span class="chip">及ばない</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>ラベルの語は、絵の見た目と結び付きません。胸の濃いインクは、J. Stolfi らが「後の時代のなぞり直し（人物の右の胸と帽子）」と述べた跡と合います。研究者は先行研究を知らずに同じものを見ていました。</p>
+</section>
+
+<section aria-labelledby="h-hands">
+  <h2 id="h-hands">書き手</h2>
+  <ul>
+    <li>書き手の印（L. F. Davis の 5 人）で分けると、<b>言語 A はほぼ書き手 1、言語 B は書き手 2・3・5</b> です</li>
+    <li>書き手 1 と 2 の本草の頁は同じ綴じに混ざっています。その中でも A と B は強く分かれ（分かれの強さ 1.58）、綴じの違い（0.14・0.48）よりずっと大きい。<b>題材と場所を揃えても残る、書き手に付いた違い</b>です</li>
+    <li>違いは語末の欄に最も大きく、書き手 2 は <code>-dy</code> が約 4 倍、書き手 1 は <code>-l</code>・<code>-y</code>・語末無しが多くなります</li>
+    <li>言語 B の書き手は題材（本草・生物・星）で語彙が大きく分かれ、書き手 1 は分かれません</li>
+    <li>隣の行が似る性質は、書き手 2 にも 3 にもあります。一人の癖ではありません</li>
+  </ul>
+</section>
+
+<section aria-labelledby="h-open">
+  <h2 id="h-open">分からないこと</h2>
+  <ul>
+    <li>平文があるか。あるなら何語か</li>
+    <li>「目印の書き方」が見出しや名前の決まりなのか、目立つ位置で型を変えるだけなのか</li>
+    <li>次に要るのは統計の外の手がかり: 羊皮紙とインクの調査（なぞり直しの跡はその入口）、同時代の書物との具体的な照合</li>
+  </ul>
+</section>
+
+<footer>
+  <span>画像: Beinecke Rare Book and Manuscript Library, Yale University（IIIF, パブリックドメイン）。書き起こし: René Zandbergen, ZL 3b。書き手: L. F. Davis (2020)。なぞり直し: J. Stolfi の注記。冗長な暗号の比べ相手: Greshko (2025) の Naibbe 暗号（Zenodo 17219445, CC-BY 4.0）。</span>
+  <span>詳しい記録・再現のスクリプトは研究のリポジトリ（<code>voynich/</code>）にあります。経緯は「ヴォイニッチ研究の振り返り」のページにまとめています。</span>
+</footer>
+</main>

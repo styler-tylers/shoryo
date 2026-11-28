@@ -1,0 +1,179 @@
+<title>黄道人物の顔と髪型</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* 白妙: 生成りの紙に墨と弁柄（ラベルの照合のページと同じ）。上に進み具合、下に 2 人ずつの組のカード（左右の拡大図、判定とインクの記録） */
+:root {
+  --ground: #F5F1E6; --panel: #FDFBF5; --ink: #2B2B26; --ink-2: #6F6C62; --bengara: #9E4A3A; --rule: #DCD8CB; --hi: #EFE3CF;
+  --serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --sans: "Noto Sans JP", -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #1E1D1A; --panel: #272622; --ink: #ECE7DA; --ink-2: #A9A497; --bengara: #D9826E; --rule: #3C3A34; --hi: #3A3128; color-scheme: dark } }
+:root[data-theme="dark"] { --ground: #1E1D1A; --panel: #272622; --ink: #ECE7DA; --ink-2: #A9A497; --bengara: #D9826E; --rule: #3C3A34; --hi: #3A3128; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.8;
+  padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 32px; }
+h1, h2 { font-family: var(--serif); font-weight: 600; letter-spacing: 0.04em; margin: 0; line-height: 1.5; text-wrap: balance; }
+h1 { font-size: 28px; } h2 { font-size: 20px; }
+p { margin: 0; max-width: 68ch; }
+.note { font-size: 14px; color: var(--ink-2); }
+.eyebrow { font-size: 12px; letter-spacing: 0.3em; color: var(--ink-2); font-family: var(--mono); text-transform: uppercase; }
+header { display: grid; gap: 12px; }
+.tally { background: var(--panel); border: 1px solid var(--rule); padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; }
+.tally b { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 20px; color: var(--bengara); margin-right: 4px; }
+#status { font-size: 14px; color: var(--ink-2); }
+.card { background: var(--panel); border: 1px solid var(--rule); padding: 20px; display: grid; gap: 16px; min-width: 0; }
+.card.done { border-color: var(--bengara); }
+.lab { font-family: var(--mono); font-size: 22px; color: var(--bengara); letter-spacing: 0.04em; }
+.inst { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.one { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.where { font-size: 14px; }
+.where code { font-family: var(--mono); background: var(--hi); padding: 0 4px; }
+.draft { font-size: 13px; color: var(--ink-2); border-left: 2px solid var(--rule); padding-left: 8px; }
+figure { margin: 0; display: grid; gap: 4px; }
+figure img { width: 100%; max-height: 360px; object-fit: contain; background: var(--ground); border: 1px solid var(--rule); cursor: zoom-in; display: block; }
+figure.big img { max-height: none; cursor: zoom-out; }
+figcaption { font-size: 12px; color: var(--ink-2); }
+fieldset { border: 1px solid var(--rule); padding: 12px 16px; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+legend { font-size: 14px; padding: 0 4px; }
+fieldset label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+input[type=radio] { accent-color: var(--bengara); width: 18px; height: 18px; margin: 0; }
+textarea { font: inherit; font-size: 16px; width: 100%; min-height: 3.5em; padding: 8px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 6px 16px; border: 1px solid var(--bengara); background: var(--bengara); color: var(--panel); cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, img:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
+.saved { font-size: 13px; color: var(--ink-2); }
+footer { font-size: 12px; color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 4px; }
+.pair { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.fig { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.fig figure img { max-height: 420px; }
+details summary { cursor: pointer; font-size: 14px; color: var(--ink-2); }
+.ink { border: 1px solid var(--rule); padding: 8px 12px; margin: 0; display: grid; gap: 4px; }
+.ink legend { font-size: 13px; }
+.ink label { display: flex; gap: 6px; align-items: center; font-size: 14px; cursor: pointer; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Voynich MS 408 · zodiac figures · blind pairs</div>
+  <h1>黄道人物の顔と髪型</h1>
+  <p>黄道の頁の人物を 2 人ずつ、18 組並べました。組の中には、同じ語のラベルが付いた 2 人と、違う語のラベルが付いた 2 人が混ざっています。どちらの組かは伏せてあります。今回は<b>顔と髪型だけ</b>を見て、2 人がどのくらい似ているかを 4 段階で判定してください。樽・ポーズ・胸・持ち物は見ないでください。前の 2 回とは別の組です。</p>
+  <p class="note">各組の 1 人目・2 人目は、それぞれの拡大図の<b>赤い丸の中の人物</b>です（画像の中の左右ではありません）。丸は推定の位置なので、少しずれることがあります。「全体図で場所を見る」を開くと、頁のどこの人物かが分かります。72v の面は絵が薄いので使っていません。</p>
+</header>
+
+<div class="tally" aria-live="polite">
+  <span><b id="t-done">0</b>/ 18 組を保存</span>
+  <span id="status">保存先に接続しています…</span>
+</div>
+
+<div id="cards" class="wrap" style="gap:24px"></div>
+
+<footer>
+  <span>画像: Beinecke Rare Book and Manuscript Library, Yale University, MS 408（IIIF, パブリックドメイン）。人物の位置: René Zandbergen, ZL transliteration 3b の輪と時計の位置から推定。</span>
+  <span>組の選び方と判断の基準は、判定の前に研究のノート（第 246 節）に記録してあります。判定が済んだら、伏せた組の種類と照らし合わせます。</span>
+</footer>
+</div>
+
+<script>
+const DATA = __DATA__;
+const IMGS = __IMGS__;
+const SIM = [["4", "4 よく似ている"], ["3", "3 やや似ている"], ["2", "2 あまり似ていない"], ["1", "1 全く似ていない"], ["unk", "分からない（どの人物か決められない）"]];
+const INK = [["dark", "胸・髪が濃い"], ["same", "輪郭と同じ濃さ"], ["na", "見えない"]];
+const state = {};
+let db = null;
+
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v); }
+  for (const k of kids) if (k) e.append(k);
+  return e;
+}
+function radios(name, opts, cur) {
+  return opts.map(([v, t]) => {
+    const id = name + "-" + v;
+    const r = el("input", { type: "radio", name, id, value: v });
+    if (cur === v) r.checked = true;
+    return el("label", { for: id }, r, document.createTextNode(t));
+  });
+}
+function tally() {
+  document.getElementById("t-done").textContent = DATA.filter(p => state[p.id]?.sim).length;
+  for (const p of DATA) document.getElementById("card-" + p.id)?.classList.toggle("done", !!state[p.id]?.sim);
+}
+function render() {
+  const root = document.getElementById("cards");
+  root.textContent = "";
+  DATA.forEach((p, i) => {
+    const card = el("section", { class: "card", id: "card-" + p.id, "aria-labelledby": "h-" + p.id });
+    card.append(el("h2", { id: "h-" + p.id, text: `組 ${i + 1}` }));
+    const pair = el("div", { class: "pair" });
+    p.figs.forEach((f, j) => {
+      const side = j === 0 ? "1 人目" : "2 人目";
+      const box = el("div", { class: "fig" });
+      const fig = el("figure");
+      const img = el("img", { src: IMGS[f.key + "z"], alt: `${side}の拡大図（${f.page}）`, tabindex: "0", loading: "lazy" });
+      const toggle = () => fig.classList.toggle("big");
+      img.addEventListener("click", toggle);
+      img.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+      fig.append(img, el("figcaption", { text: `${side}（${f.page}）の拡大図。赤い丸の中の人物` }));
+      box.append(fig);
+      const det = el("details");
+      det.append(el("summary", { text: "全体図で場所を見る" }), el("img", { src: IMGS[f.key + "o"], alt: `${side}の全体図`, loading: "lazy" }));
+      box.append(det);
+      pair.append(box);
+    });
+    card.append(pair);
+    const fs = el("fieldset");
+    fs.append(el("legend", { text: "顔と髪型だけを見て、1 人目と 2 人目はどのくらい似ていますか" }), ...radios(`sim-${p.id}`, SIM, state[p.id]?.sim));
+    card.append(fs);
+    const ta = el("textarea", { id: "c-" + p.id, "aria-label": "見たこと（任意）", placeholder: "見たこと（任意）" });
+    ta.value = state[p.id]?.note || "";
+    card.append(ta);
+    const btn = el("button", { type: "button", id: "b-" + p.id, text: "この組を保存" });
+    const msg = el("span", { class: "saved", id: "m-" + p.id, text: state[p.id]?.savedAt ? "保存済み " + new Date(state[p.id].savedAt).toLocaleString("ja-JP") : "" });
+    btn.disabled = !db;
+    btn.addEventListener("click", () => save(p.id));
+    card.append(el("div", { class: "row" }, btn, msg));
+    root.append(card);
+  });
+  tally();
+}
+async function save(id) {
+  const sim = document.querySelector(`input[name="sim-${id}"]:checked`)?.value || "";
+  const ink = [0, 1].map(j => document.querySelector(`input[name="ink-${id}-${j}"]:checked`)?.value || "");
+  const m = document.getElementById("m-" + id);
+  if (!sim) { m.textContent = "似かたの段階（1〜4 か、分からない）を 1 つ選んでから保存してください。"; return; }
+  const btn = document.getElementById("b-" + id);
+  btn.disabled = true;
+  try {
+    const rec = { sim, ink, note: document.getElementById("c-" + id).value, savedAt: new Date().toISOString() };
+    await db.collection("blind").doc(id).set(rec);
+    state[id] = rec;
+    m.textContent = "保存しました";
+    tally();
+  } catch (e) {
+    m.textContent = "保存できませんでした（" + (e?.code || e?.message || "不明") + "）。閲覧だけの権限では保存できません。";
+  } finally { btn.disabled = false; }
+}
+function setStatus(t) { document.getElementById("status").textContent = t; }
+render();
+(async () => {
+  const timer = setTimeout(() => setStatus("保存先に接続できません。見るだけになります。"), 10000);
+  try { db = await window.claude?.use?.("db"); } catch (e) { db = null; }
+  if (!db) { clearTimeout(timer); setStatus("保存先に接続できません。見るだけになります。"); return; }
+  try {
+    const snap = await db.collection("blind").get();
+    clearTimeout(timer);
+    for (const d of snap.docs || []) state[d.id] = d.data();
+    setStatus("保存先に接続しました");
+  } catch (e) { clearTimeout(timer); setStatus("保存した判定を読めませんでした（" + (e?.code || "不明") + "）"); }
+  render();
+})();
+</script>

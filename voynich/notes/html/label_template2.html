@@ -1,0 +1,211 @@
+<title>薬学ラベルの照合</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* 白妙: 生成りの紙に墨と弁柄。第 80 巡の作り直し: ラベルごとに拡大図（赤丸がラベル）と頁の中の場所の小図。拡大図を押して物を指す */
+:root {
+  --ground: #F5F1E6; --panel: #FDFBF5; --ink: #2B2B26; --ink-2: #6F6C62; --bengara: #9E4A3A; --rule: #DCD8CB; --hi: #EFE3CF;
+  --serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --sans: "Noto Sans JP", -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #1E1D1A; --panel: #272622; --ink: #ECE7DA; --ink-2: #A9A497; --bengara: #D9826E; --rule: #3C3A34; --hi: #3A3128; color-scheme: dark } }
+:root[data-theme="dark"] { --ground: #1E1D1A; --panel: #272622; --ink: #ECE7DA; --ink-2: #A9A497; --bengara: #D9826E; --rule: #3C3A34; --hi: #3A3128; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.8;
+  padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 32px; }
+h1, h2 { font-family: var(--serif); font-weight: 600; letter-spacing: 0.04em; margin: 0; line-height: 1.5; text-wrap: balance; }
+h1 { font-size: 28px; } h2 { font-size: 20px; }
+p { margin: 0; max-width: 68ch; }
+.note { font-size: 14px; color: var(--ink-2); }
+.eyebrow { font-size: 12px; letter-spacing: 0.3em; color: var(--ink-2); font-family: var(--mono); text-transform: uppercase; }
+header { display: grid; gap: 12px; }
+.tally { background: var(--panel); border: 1px solid var(--rule); padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; }
+.tally b { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 20px; color: var(--bengara); margin-right: 4px; }
+#status { font-size: 14px; color: var(--ink-2); }
+.card { background: var(--panel); border: 1px solid var(--rule); padding: 20px; display: grid; gap: 16px; min-width: 0; }
+.card.done { border-color: var(--bengara); }
+.lab { font-family: var(--mono); font-size: 22px; color: var(--bengara); letter-spacing: 0.04em; }
+.inst { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.one { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.where { font-size: 14px; }
+.where code { font-family: var(--mono); background: var(--hi); padding: 0 4px; }
+.draft { font-size: 13px; color: var(--ink-2); border-left: 2px solid var(--rule); padding-left: 8px; }
+figure { margin: 0; display: grid; gap: 4px; }
+figure img { width: 100%; max-height: 520px; object-fit: contain; background: var(--ground); border: 1px solid var(--rule); cursor: zoom-in; display: block; }
+figure.big img { max-height: none; cursor: zoom-out; }
+figcaption { font-size: 12px; color: var(--ink-2); }
+fieldset { border: 1px solid var(--rule); padding: 12px 16px; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+legend { font-size: 14px; padding: 0 4px; }
+fieldset label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+input[type=radio] { accent-color: var(--bengara); width: 18px; height: 18px; margin: 0; }
+textarea { font: inherit; font-size: 16px; width: 100%; min-height: 3.5em; padding: 8px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+button { font: inherit; font-size: 14px; padding: 6px 16px; border: 1px solid var(--bengara); background: var(--bengara); color: var(--panel); cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, img:focus-visible { outline: 2px solid var(--bengara); outline-offset: 2px; }
+.saved { font-size: 13px; color: var(--ink-2); }
+footer { font-size: 12px; color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 4px; }
+.zoom { position: relative; cursor: crosshair; touch-action: manipulation; }
+.zoom img { cursor: crosshair; max-height: none; }
+.dot { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; border: 3px solid #fff; background: #1F5FA8; box-shadow: 0 0 0 2px #1F5FA8; pointer-events: none; }
+.mini { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: start; }
+.mini img { width: 120px; max-height: none; cursor: zoom-in; }
+.mini.big { grid-template-columns: 1fr; } .mini.big img { width: 100%; cursor: zoom-out; }
+.ask { font-size: 14px; }
+.ask b { color: var(--bengara); }
+.opts { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; }
+.opts label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+input[type=checkbox] { accent-color: var(--bengara); width: 18px; height: 18px; margin: 0; }
+.step { font-family: var(--mono); color: var(--bengara); font-weight: 700; margin-right: 6px; }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Voynich MS 408 · pharmaceutical section</div>
+  <h1>薬学ラベルの照合</h1>
+  <p>薬学の頁で、同じ語のラベルが 2 つ以上の頁に出る 7 組です。組ごとに、その語が書かれた場所を拡大して並べました。<b>赤い丸の中の語がラベル</b>です。</p>
+  <p class="note"><span class="step">1</span>拡大図の上で、赤丸のラベルが付いている物（根・葉・容器）を 1 回押してください。青い点が付きます（押し直せます）。<span class="step">2</span>組の中の物どうしが同じ種類に見えるかを選び、保存してください。拡大図の左の小さな図は、頁のどこを拡大したか（赤い枠）を示します。押すと大きくなります。</p>
+  <p class="note">赤丸の位置は分析補助（Claude）が画像を見て決めました。赤丸の中の語が上の語と違って見えるときは「赤丸の位置が違う」に印を付けてください。</p>
+</header>
+<div class="tally" aria-live="polite">
+  <span><b id="t-same">0</b>同じ物に見える</span>
+  <span><b id="t-diff">0</b>違う物に見える</span>
+  <span><b id="t-unk">0</b>分からない</span>
+  <span><b id="t-nf">0</b>ラベルが見つからない</span>
+  <span><b id="t-left">7</b>まだ</span>
+  <span id="status">保存先に接続しています…</span>
+</div>
+<div id="cards" class="wrap" style="gap:24px"></div>
+<footer>
+  <span>画像: Beinecke Rare Book and Manuscript Library, Yale University, MS 408（IIIF, パブリックドメイン）。ラベル: René Zandbergen, ZL transliteration 3b。対応表: <code>voynich/notes/薬学ラベル対応表.csv</code>、赤丸の位置: <code>voynich/data/pharma_label_positions_round80.json</code>。</span>
+  <span>判定はこのページに保存され、研究のノートに書き写します。</span>
+</footer>
+</div>
+<script>
+const DATA = __DATA__;
+const CHOICES = [["same", "同じ種類の物に見える"], ["diff", "違う物に見える"], ["unk", "分からない"], ["nf", "ラベルが見つからない"]];
+const state = {};
+const picks = {};   // 組 id → { ロカス: [x, y] }（拡大図の中の割合）
+const flags = {};   // 組 id → { ロカス: true }（赤丸の位置が違う）
+let db = null;
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v); }
+  for (const k of kids) if (k) e.append(k);
+  return e;
+}
+function tally() {
+  const c = { same: 0, diff: 0, unk: 0, nf: 0 };
+  for (const g of DATA) { const v = state[g.id]?.verdict; if (v && c[v] !== undefined) c[v]++; }
+  for (const k in c) document.getElementById("t-" + k).textContent = c[k];
+  document.getElementById("t-left").textContent = DATA.length - Object.values(c).reduce((a, b) => a + b, 0);
+  for (const g of DATA) document.getElementById("card-" + g.id)?.classList.toggle("done", !!state[g.id]?.verdict);
+}
+function placeDot(box, pt) {
+  box.querySelector(".dot")?.remove();
+  if (!pt) return;
+  const d = el("span", { class: "dot" });
+  d.style.left = (pt[0] * 100) + "%"; d.style.top = (pt[1] * 100) + "%";
+  box.append(d);
+}
+function render() {
+  const root = document.getElementById("cards");
+  root.textContent = "";
+  for (const g of DATA) {
+    picks[g.id] = Object.assign({}, state[g.id]?.picks || {});
+    flags[g.id] = Object.assign({}, state[g.id]?.misplaced || {});
+    const card = el("section", { class: "card", id: "card-" + g.id, "aria-labelledby": "h-" + g.id });
+    card.append(el("h2", { id: "h-" + g.id }, el("span", { class: "lab", text: g.labels.join(" ／ ") }), document.createTextNode(`　${g.inst.length} か所`)));
+    const inst = el("div", { class: "inst" });
+    g.inst.forEach((i, n) => {
+      const one = el("div", { class: "one" });
+      const w = el("div", { class: "where" });
+      w.append(el("b", { text: `${n + 1}. ` }), el("code", { text: i.label }), document.createTextNode(` ${i.page}・${i.dan} 段目・${i.kind === "薬壺" ? "容器のラベル" : "植物のラベル"}`));
+      one.append(w);
+      const z = el("div", { class: "zoom" });
+      const img = el("img", { src: i.zoom, alt: `${i.page} のラベル ${i.label} のまわりの拡大図。赤い丸がラベル`, draggable: "false" });
+      z.append(img);
+      z.addEventListener("click", e => {
+        const r = img.getBoundingClientRect();
+        const pt = [Math.round((e.clientX - r.left) / r.width * 1000) / 1000, Math.round((e.clientY - r.top) / r.height * 1000) / 1000];
+        picks[g.id][i.loc] = pt; placeDot(z, pt);
+        document.getElementById("m-" + g.id).textContent = "未保存の変更があります";
+      });
+      one.append(el("figure", {}, z, el("figcaption", { text: `拡大図（${i.conf === "低" ? "赤丸の位置は確かでない。かすれた語" : "赤丸がラベル"}）。押すと青い点` })));
+      placeDot(z, picks[g.id][i.loc]);
+      const mini = el("div", { class: "mini" });
+      const mimg = el("img", { src: i.over, alt: `${i.page} の頁全体。赤い枠が拡大した場所`, tabindex: "0" });
+      const tg = () => mini.classList.toggle("big");
+      mimg.addEventListener("click", tg);
+      mimg.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tg(); } });
+      mini.append(mimg, el("span", { class: "note", text: "頁の中の場所（赤い枠）" }));
+      one.append(mini);
+      const cid = `f-${g.id}-${n}`;
+      const cb = el("input", { type: "checkbox", id: cid });
+      if (flags[g.id][i.loc]) cb.checked = true;
+      cb.addEventListener("change", () => { flags[g.id][i.loc] = cb.checked; });
+      const clr = el("button", { type: "button", text: "点を消す", style: "font-size:12px;padding:2px 10px;background:transparent;color:var(--bengara)" });
+      clr.addEventListener("click", () => { delete picks[g.id][i.loc]; placeDot(z, null); });
+      one.append(el("div", { class: "opts" }, el("label", { for: cid }, cb, document.createTextNode("赤丸の位置が違う")), clr));
+      if (i.obs) one.append(el("div", { class: "draft", text: `下書き（Claude, 未確認）: ${i.obs}` }));
+      inst.append(one);
+    });
+    card.append(inst);
+    const fs = el("fieldset");
+    fs.append(el("legend", { text: "青い点で指した物どうしは、同じ種類の物に見えますか" }));
+    for (const [v, t] of CHOICES) {
+      const id = `v-${g.id}-${v}`;
+      const r = el("input", { type: "radio", name: "v-" + g.id, id, value: v });
+      if (state[g.id]?.verdict === v) r.checked = true;
+      fs.append(el("label", { for: id }, r, document.createTextNode(t)));
+    }
+    card.append(fs);
+    const ta = el("textarea", { id: "c-" + g.id, "aria-label": "見たこと", placeholder: "見たこと（どこが似ている・違うか。任意）" });
+    ta.value = state[g.id]?.note || "";
+    card.append(ta);
+    const btn = el("button", { type: "button", id: "b-" + g.id, text: "この組を保存" });
+    const msg = el("span", { class: "saved", id: "m-" + g.id, text: state[g.id]?.savedAt ? "保存済み " + new Date(state[g.id].savedAt).toLocaleString("ja-JP") : "" });
+    btn.disabled = !db;
+    btn.addEventListener("click", () => save(g.id));
+    card.append(el("div", { class: "row" }, btn, msg));
+    root.append(card);
+  }
+  tally();
+}
+async function save(id) {
+  const v = document.querySelector(`input[name="v-${id}"]:checked`)?.value || "";
+  const m = document.getElementById("m-" + id);
+  if (!v) { m.textContent = "判定を 1 つ選んでから保存してください。"; return; }
+  const btn = document.getElementById("b-" + id);
+  btn.disabled = true;
+  try {
+    const rec = { verdict: v, note: document.getElementById("c-" + id).value, labels: DATA.find(g => g.id === id).labels,
+                  picks: picks[id], misplaced: flags[id], version: 2, savedAt: new Date().toISOString() };
+    await db.collection("labels").doc(id).set(rec);
+    state[id] = rec;
+    m.textContent = "保存しました（" + Object.keys(picks[id]).length + " か所を指した）";
+    tally();
+  } catch (e) {
+    m.textContent = "保存できませんでした（" + (e?.code || e?.message || "不明") + "）。閲覧だけの権限では保存できません。";
+  } finally { btn.disabled = false; }
+}
+function setStatus(t) { document.getElementById("status").textContent = t; }
+render();
+(async () => {
+  const timer = setTimeout(() => setStatus("保存先に接続できません。判定は見るだけになります。"), 10000);
+  try { db = await window.claude?.use?.("db"); } catch (e) { db = null; }
+  if (!db) { clearTimeout(timer); setStatus("保存先に接続できません。判定は見るだけになります。"); return; }
+  try {
+    const snap = await db.collection("labels").get();
+    clearTimeout(timer);
+    for (const d of snap.docs || []) state[d.id] = d.data();
+    setStatus("保存先に接続しました");
+  } catch (e) { clearTimeout(timer); setStatus("保存した判定を読めませんでした（" + (e?.code || "不明") + "）"); }
+  render();
+})();
+</script>
